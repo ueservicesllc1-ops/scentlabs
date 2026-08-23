@@ -135,6 +135,15 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
           </Link>
 
           <Link
+            href="/admin/products"
+            className={`hover:text-white transition flex items-center gap-1 ${
+              pathname.includes("/admin/products") ? "text-amber-400 font-bold" : "text-lab-400"
+            }`}
+          >
+            <Package className="w-3 h-3 text-amber-400" /> Products
+          </Link>
+
+          <Link
             href="/admin/fragrance"
             className={`hover:text-white transition flex items-center gap-1 ${
               pathname.includes("/admin/fragrance") ? "text-amber-400 font-bold" : "text-lab-400"
@@ -264,3 +273,5 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
+export default AdminGuard;

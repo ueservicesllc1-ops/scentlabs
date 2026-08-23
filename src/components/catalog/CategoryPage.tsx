@@ -6,7 +6,6 @@ import { ProductCard } from "./ProductCard";
 import { 
   Search, 
   SlidersHorizontal, 
-  ArrowUpDown, 
   Package, 
   ChevronLeft, 
   ChevronRight,
@@ -46,13 +45,14 @@ export function CategoryPage({
 
         const matchesSub =
           selectedSubcategory === "All" ||
-          (p.subcategory && p.subcategory.toLowerCase() === selectedSubcategory.toLowerCase());
+          (p.subcategory && p.subcategory.toLowerCase() === selectedSubcategory.toLowerCase()) ||
+          (p.category && (p.category as string).toLowerCase().includes(selectedSubcategory.toLowerCase()));
 
         return matchesSearch && matchesSub;
       })
       .sort((a, b) => {
-        if (sortBy === "price-asc") return a.basePrice - b.basePrice;
-        if (sortBy === "price-desc") return b.basePrice - a.basePrice;
+        if (sortBy === "price-asc") return (a.basePrice || 0) - (b.basePrice || 0);
+        if (sortBy === "price-desc") return (b.basePrice || 0) - (a.basePrice || 0);
         if (sortBy === "name-asc") return a.name.localeCompare(b.name);
         if (sortBy === "name-desc") return b.name.localeCompare(a.name);
         return 0;
@@ -70,16 +70,17 @@ export function CategoryPage({
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 font-mono">
-      {/* Category Hero */}
-      <div className="border-b border-lab-800 pb-6 space-y-2">
-        <span className="text-[10px] text-amber-400 font-bold uppercase tracking-widest block">
-          SCENTLAB CATALOG / {categoryName.toUpperCase()}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 font-sans text-stone-900">
+      
+      {/* Category Header */}
+      <div className="border-b border-[#eae6df] pb-6 space-y-2">
+        <span className="text-[10px] text-amber-800 font-bold uppercase tracking-widest block">
+          SCENTLAB CATALOG &bull; {categoryName.toUpperCase()}
         </span>
-        <h1 className="text-3xl sm:text-4xl font-black text-white uppercase tracking-tight">
+        <h2 className="font-serif text-3xl sm:text-4xl font-normal text-stone-950 tracking-tight">
           {title}
-        </h1>
-        <p className="text-xs text-lab-400 max-w-3xl leading-relaxed">
+        </h2>
+        <p className="text-xs text-stone-600 max-w-3xl leading-relaxed font-light">
           {description}
         </p>
       </div>
@@ -98,10 +99,10 @@ export function CategoryPage({
                   setSelectedSubcategory(sub);
                   setCurrentPage(1);
                 }}
-                className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition border ${
+                className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wider transition uppercase whitespace-nowrap border ${
                   isSelected
-                    ? "bg-amber-500 text-lab-950 border-amber-400 shadow-md shadow-amber-500/20"
-                    : "bg-lab-900/60 text-lab-400 border-lab-800 hover:text-white hover:border-lab-700"
+                    ? "bg-stone-900 text-white border-stone-900 shadow-sm"
+                    : "bg-white text-stone-600 border-[#e5dfd5] hover:border-amber-700 hover:text-stone-900"
                 }`}
               >
                 {sub}
@@ -110,10 +111,11 @@ export function CategoryPage({
           })}
         </div>
 
-        {/* Search & Sort Row */}
-        <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 text-lab-500 absolute left-3 top-1/2 -translate-y-1/2" />
+        {/* Search & Sort Controls */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-white border border-[#eae6df] shadow-sm">
+          {/* Search Box */}
+          <div className="relative w-full sm:w-80">
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
             <input
               type="text"
               value={searchQuery}
@@ -121,93 +123,127 @@ export function CategoryPage({
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              placeholder={`Search in ${categoryName}...`}
-              className="w-full bg-lab-950 border border-lab-800 rounded-xl pl-9 pr-8 py-2.5 text-xs text-white placeholder-lab-600 focus:outline-none focus:border-amber-500"
+              placeholder="Search products in this category..."
+              className="w-full text-xs pl-10 pr-8 py-2 bg-[#f8f7f4] border border-[#e5e0d8] rounded-full text-stone-800 placeholder:text-stone-400 focus:bg-white focus:border-amber-600 focus:outline-none"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-lab-500 hover:text-white"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
 
-          <div className="flex items-center gap-2">
-            <ArrowUpDown className="w-4 h-4 text-lab-500" />
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-lab-950 border border-lab-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
-            >
-              <option value="featured">Sort: Featured</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-              <option value="name-asc">Name: A to Z</option>
-              <option value="name-desc">Name: Z to A</option>
-            </select>
+          {/* Results Count & Sort Dropdown */}
+          <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 text-xs">
+            <span className="text-stone-500 font-medium">
+              Showing <strong>{filteredProducts.length}</strong> items
+            </span>
+
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] text-stone-400 uppercase font-bold hidden sm:inline">Sort:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="text-xs px-3 py-1.5 bg-[#f8f7f4] border border-[#e5e0d8] rounded-full text-stone-800 focus:border-amber-600 focus:outline-none font-medium"
+              >
+                <option value="featured">Featured First</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="name-asc">Name: A to Z</option>
+                <option value="name-desc">Name: Z to A</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Grid or Loading/Empty States */}
-      {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="h-80 rounded-2xl bg-lab-900/40 border border-lab-800 animate-pulse" />
-          ))}
+      {/* Active Filter Chips */}
+      {(searchQuery || selectedSubcategory !== "All" || sortBy !== "featured") && (
+        <div className="flex items-center gap-2 flex-wrap text-xs">
+          <span className="text-stone-400 font-semibold uppercase text-[10px]">Active Filters:</span>
+          {searchQuery && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-[#e5dfd5] text-stone-700 rounded-full">
+              Query: &quot;{searchQuery}&quot;
+              <button type="button" onClick={() => setSearchQuery("")} className="hover:text-red-500">
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          )}
+          {selectedSubcategory !== "All" && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-[#e5dfd5] text-stone-700 rounded-full">
+              Category: {selectedSubcategory}
+              <button type="button" onClick={() => setSelectedSubcategory("All")} className="hover:text-red-500">
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={handleClearFilters}
+            className="text-[11px] text-amber-800 font-bold uppercase hover:underline ml-2"
+          >
+            Clear All
+          </button>
         </div>
-      ) : filteredProducts.length === 0 ? (
-        <div className="p-16 text-center border border-lab-800 rounded-2xl bg-lab-950/40 space-y-4 max-w-md mx-auto">
-          <Package className="w-10 h-10 text-lab-600 mx-auto" />
-          <h3 className="text-sm font-bold text-white uppercase">No Products Match Your Filters</h3>
-          <p className="text-xs text-lab-400">
-            Try adjusting your search terms or clearing your selected filters.
+      )}
+
+      {/* Product Grid */}
+      {loading ? (
+        <div className="py-24 text-center text-xs text-stone-400">
+          <div className="w-8 h-8 border-2 border-amber-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          Loading formulation catalog...
+        </div>
+      ) : paginatedProducts.length === 0 ? (
+        <div className="py-20 text-center space-y-4 bg-white border border-[#eae6df] rounded-3xl p-8 shadow-sm">
+          <Package className="w-10 h-10 text-stone-400 mx-auto stroke-[1.5]" />
+          <h3 className="font-serif text-2xl font-normal text-stone-900">No Products Found</h3>
+          <p className="text-xs text-stone-500 max-w-sm mx-auto font-light">
+            We couldn&apos;t find any formulation supplies matching your current filter selections.
           </p>
           <button
             type="button"
             onClick={handleClearFilters}
-            className="px-4 py-2 rounded-lg bg-lab-800 hover:bg-amber-500 hover:text-lab-950 text-white font-bold text-xs uppercase transition"
+            className="px-5 py-2.5 bg-stone-900 text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-stone-800 transition"
           >
-            Clear Filters
+            Reset All Filters
           </button>
         </div>
       ) : (
-        <div className="space-y-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {paginatedProducts.map((prod) => (
-              <ProductCard key={prod.id} product={prod} />
-            ))}
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {paginatedProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex justify-between items-center border-t border-lab-800 pt-6 text-xs text-lab-400">
-              <span>Showing {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, filteredProducts.length)} of {filteredProducts.length} items</span>
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 pt-6 border-t border-[#eae6df]">
+          <button
+            type="button"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            className="p-2 rounded-xl bg-white border border-[#e5dfd5] text-stone-600 hover:text-stone-900 disabled:opacity-30"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
 
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  className="p-2 rounded-lg border border-lab-800 bg-lab-950 disabled:opacity-30 hover:border-lab-700"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <span className="font-bold text-white px-2">Page {currentPage} of {totalPages}</span>
-                <button
-                  type="button"
-                  disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  className="p-2 rounded-lg border border-lab-800 bg-lab-950 disabled:opacity-30 hover:border-lab-700"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
+          <span className="text-xs font-bold text-stone-700 px-4 font-mono">
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <button
+            type="button"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            className="p-2 rounded-xl bg-white border border-[#e5dfd5] text-stone-600 hover:text-stone-900 disabled:opacity-30"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
         </div>
       )}
     </div>

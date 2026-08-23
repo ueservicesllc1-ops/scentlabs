@@ -1,133 +1,148 @@
 import React from "react";
 import Link from "next/link";
-import { FlaskConical, ShieldCheck, Box, RefreshCw, Sparkles, Droplet, Tag, Shield } from "lucide-react";
+import { 
+  FlaskConical, 
+  ShieldCheck, 
+  Truck, 
+  Layers, 
+  Sparkles, 
+  Droplet, 
+  Box, 
+  Tag,
+  Mail,
+  Lock
+} from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="border-t border-lab-800 bg-lab-950 text-lab-400 text-xs font-mono">
-      {/* Brand Value Pillars */}
-      <div className="border-b border-lab-800/80 bg-lab-900/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-lab-800 border border-lab-700 text-amber-400">
-              <Droplet className="w-4 h-4" />
+    <footer className="bg-[#f5f3ee] text-[#292524] border-t border-[#e5e0d8] font-sans">
+      
+      {/* 1. Value Assurances Banner */}
+      <div className="border-b border-[#e5e0d8] py-10 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-full bg-amber-50 border border-amber-200/60 flex items-center justify-center text-amber-700 shrink-0">
+                <Droplet className="w-5 h-5 stroke-[1.75]" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900">100% Pure Uncut Oils</h4>
+                <p className="text-xs text-stone-500 mt-1 leading-relaxed">
+                  Laboratory Grade-A uncut aromatic concentrates without DPG or carrier dilution.
+                </p>
+              </div>
             </div>
-            <div>
-              <h4 className="text-white font-bold text-xs uppercase">
-                Pure Fragrance Fractions
-              </h4>
-              <p className="text-[11px] text-lab-400 mt-0.5">
-                Grade-A uncut perfume bases, woody accords, and floral concentrates.
-              </p>
-            </div>
-          </div>
 
-          <div className="flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-lab-800 border border-lab-700 text-indigo-400">
-              <FlaskConical className="w-4 h-4" />
+            <div className="flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-full bg-amber-50 border border-amber-200/60 flex items-center justify-center text-amber-700 shrink-0">
+                <Layers className="w-5 h-5 stroke-[1.75]" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900">Fractioned Wholesale</h4>
+                <p className="text-xs text-stone-500 mt-1 leading-relaxed">
+                  Bulk supplier quantities repackaged into accessible 50u, 100u, and 250u laboratory packs.
+                </p>
+              </div>
             </div>
-            <div>
-              <h4 className="text-white font-bold text-xs uppercase">
-                200-Proof Alcohol & Bases
-              </h4>
-              <p className="text-[11px] text-lab-400 mt-0.5">
-                Crystal clear denatured perfumer&apos;s base sold by liter and dispensing size.
-              </p>
-            </div>
-          </div>
 
-          <div className="flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-lab-800 border border-lab-700 text-amber-400">
-              <Tag className="w-4 h-4" />
+            <div className="flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-full bg-amber-50 border border-amber-200/60 flex items-center justify-center text-amber-700 shrink-0">
+                <Tag className="w-5 h-5 stroke-[1.75]" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900">Custom Die-Cut Labels</h4>
+                <p className="text-xs text-stone-500 mt-1 leading-relaxed">
+                  Gold metallic foil and matte vinyl labels tailored to exact bottle outer dimensions.
+                </p>
+              </div>
             </div>
-            <div>
-              <h4 className="text-white font-bold text-xs uppercase">
-                Precision Label Matching
-              </h4>
-              <p className="text-[11px] text-lab-400 mt-0.5">
-                Metallic foil labels die-cut precisely to bottle outer diameters (e.g. 1.5x2.25&quot;).
-              </p>
-            </div>
-          </div>
 
-          <div className="flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-lab-800 border border-lab-700 text-emerald-400">
-              <Box className="w-4 h-4" />
-            </div>
-            <div>
-              <h4 className="text-white font-bold text-xs uppercase">
-                Cricut Fabrication & Boxes
-              </h4>
-              <p className="text-[11px] text-lab-400 mt-0.5">
-                110 lb premium presentation boxes, security seals, and shrink wrap.
-              </p>
+            <div className="flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-full bg-amber-50 border border-amber-200/60 flex items-center justify-center text-amber-700 shrink-0">
+                <Truck className="w-5 h-5 stroke-[1.75]" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900">Same-Day US Dispatch</h4>
+                <p className="text-xs text-stone-500 mt-1 leading-relaxed">
+                  Fast, fully insured USPS & UPS fulfillment directly from our laboratory dock.
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Footer Links */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-2 md:grid-cols-5 gap-8">
-        {/* Brand Summary */}
-        <div className="col-span-2 space-y-3">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-lab-800 border border-lab-700 flex items-center justify-center text-amber-400">
-              <FlaskConical className="w-4 h-4" />
+      {/* 2. Main Footer Navigation */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-10">
+          
+          {/* Brand Col */}
+          <div className="md:col-span-2 space-y-4">
+            <Link href="/" className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-white border border-[#d6d0c4] flex items-center justify-center text-amber-800 shadow-sm">
+                <FlaskConical className="w-4 h-4 stroke-[1.75]" />
+              </div>
+              <span className="font-serif text-2xl font-bold tracking-[0.15em] text-[#1c1917] uppercase">
+                SCENTLAB
+              </span>
+            </Link>
+            <p className="text-xs text-stone-600 leading-relaxed max-w-sm">
+              SCENTLAB is an enterprise direct-compounding platform providing master perfumers, boutique indie brands, and artisanal fragrance creators with formulation supplies, uncut essences, and private label packaging.
+            </p>
+            <div className="pt-2 text-[11px] text-stone-500 flex items-center gap-2">
+              <Lock className="w-3.5 h-3.5 text-stone-400" />
+              <span>Encrypted Stripe Checkout &bull; Commercial Quality Verified</span>
             </div>
-            <span className="text-base font-black text-white tracking-tight">SCENTLAB</span>
           </div>
-          <p className="text-xs text-lab-300 leading-relaxed max-w-sm">
-            Everything you need to formulate, bottle, label, and package your own fragrances.
-          </p>
-          <p className="text-[10px] text-lab-500">
-            Laboratory supplies for indie perfumers, brand founders, and compounding studios.
-          </p>
+
+          {/* Catalog Links */}
+          <div className="space-y-3">
+            <h5 className="text-xs font-bold uppercase tracking-widest text-stone-900">Formulation Supplies</h5>
+            <ul className="space-y-2 text-xs text-stone-600">
+              <li><Link href="/fragrance" className="hover:text-amber-800 transition">Fragrance Oils (Grade A)</Link></li>
+              <li><Link href="/perfume-making" className="hover:text-amber-800 transition">Perfumer&apos;s Base Alcohol</Link></li>
+              <li><Link href="/bottles" className="hover:text-amber-800 transition">Amber Glass Roll-Ons</Link></li>
+              <li><Link href="/testing" className="hover:text-amber-800 transition">Testing Blotter Strips</Link></li>
+              <li><Link href="/shop" className="hover:text-amber-800 transition">Full Catalog</Link></li>
+            </ul>
+          </div>
+
+          {/* Packaging & Branding */}
+          <div className="space-y-3">
+            <h5 className="text-xs font-bold uppercase tracking-widest text-stone-900">Branding & Packaging</h5>
+            <ul className="space-y-2 text-xs text-stone-600">
+              <li><Link href="/custom-labels" className="hover:text-amber-800 transition">Custom Metallic Labels</Link></li>
+              <li><Link href="/packaging" className="hover:text-amber-800 transition">Presentation Boxes</Link></li>
+              <li><Link href="/packaging" className="hover:text-amber-800 transition">POF Heat Shrink Wrap</Link></li>
+              <li><Link href="/custom-labels" className="hover:text-amber-800 transition">Holographic Security Seals</Link></li>
+              <li><Link href="/wholesale" className="hover:text-amber-800 transition">Volume Wholesale Pricing</Link></li>
+            </ul>
+          </div>
+
+          {/* Account & Support */}
+          <div className="space-y-3">
+            <h5 className="text-xs font-bold uppercase tracking-widest text-stone-900">Client Concierge</h5>
+            <ul className="space-y-2 text-xs text-stone-600">
+              <li><Link href="/account" className="hover:text-amber-800 transition">Customer Dashboard</Link></li>
+              <li><Link href="/account/orders" className="hover:text-amber-800 transition">Track Orders</Link></li>
+              <li><Link href="/contact" className="hover:text-amber-800 transition">Formulation Support</Link></li>
+              <li><Link href="/admin" className="hover:text-amber-800 transition">Admin Portal (PIN 1619)</Link></li>
+            </ul>
+          </div>
+
         </div>
 
-        {/* Catalog Categories */}
-        <div className="space-y-2.5">
-          <h5 className="text-xs font-bold text-white uppercase tracking-wider">
-            Catalog
-          </h5>
-          <ul className="space-y-1.5 text-xs text-lab-400">
-            <li><Link href="/shop" className="hover:text-white transition">All Supplies</Link></li>
-            <li><Link href="/fragrance" className="hover:text-amber-400 transition">Fragrance Oils</Link></li>
-            <li><Link href="/perfume-making" className="hover:text-amber-400 transition">Perfume Making</Link></li>
-            <li><Link href="/packaging" className="hover:text-white transition">Packaging & Boxes</Link></li>
-            <li><Link href="/testing" className="hover:text-indigo-400 transition">Testing Supplies</Link></li>
-            <li><Link href="/custom-labels" className="hover:text-amber-400 transition">Custom Labels</Link></li>
-          </ul>
+        {/* Bottom copyright */}
+        <div className="mt-14 pt-8 border-t border-[#e2dcd4] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500">
+          <div>
+            &copy; {new Date().getFullYear()} SCENTLAB ATELIER & FORMULATIONS. ALL RIGHTS RESERVED.
+          </div>
+          <div className="flex items-center gap-6">
+            <Link href="/about" className="hover:underline">About ScentLab</Link>
+            <Link href="/contact" className="hover:underline">Contact Concierge</Link>
+            <Link href="/admin/login" className="hover:underline">Admin Security</Link>
+          </div>
         </div>
-
-        {/* Customer Account & Orders */}
-        <div className="space-y-2.5">
-          <h5 className="text-xs font-bold text-white uppercase tracking-wider">
-            Account & Support
-          </h5>
-          <ul className="space-y-1.5 text-xs text-lab-400">
-            <li><Link href="/account" className="hover:text-white transition">Customer Account</Link></li>
-            <li><Link href="/account/orders" className="hover:text-white transition">Order History</Link></li>
-            <li><Link href="/account/custom-labels" className="hover:text-white transition">Saved Custom Labels</Link></li>
-            <li><Link href="/contact" className="hover:text-white transition">Contact Lab Support</Link></li>
-          </ul>
-        </div>
-
-        {/* Legal & Administration */}
-        <div className="space-y-2.5">
-          <h5 className="text-xs font-bold text-white uppercase tracking-wider">
-            Information
-          </h5>
-          <ul className="space-y-1.5 text-xs text-lab-400">
-            <li><Link href="/about" className="hover:text-white transition">About SCENTLAB</Link></li>
-            <li><Link href="/contact" className="hover:text-white transition">Shipping & Returns</Link></li>
-            <li><Link href="/admin/login" className="text-lab-600 hover:text-amber-400 transition flex items-center gap-1"><Shield className="w-3 h-3" /> Admin Portal</Link></li>
-          </ul>
-        </div>
-      </div>
-
-      {/* Bottom Bar */}
-      <div className="border-t border-lab-900 py-6 px-4 text-center text-[10px] text-lab-500">
-        © {new Date().getFullYear()} SCENTLAB LLC. Direct formulation, fractioning & packaging systems. All rights reserved.
       </div>
     </footer>
   );
