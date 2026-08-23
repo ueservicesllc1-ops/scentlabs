@@ -40,8 +40,14 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
       const liveProduct = INITIAL_PRODUCTS.find((p) => p.id === item.productId);
       if (liveProduct && liveProduct.status === "active") {
         const pkg =
-          liveProduct.packageOptions.find((p) => p.quantity === item.selectedOptions?.packageQuantity) ||
-          liveProduct.packageOptions[0];
+          liveProduct.packageOptions?.find((p) => p.quantity === item.selectedOptions?.packageQuantity) ||
+          liveProduct.packageOptions?.[0] || {
+            id: "pkg_default",
+            name: "Standard Pack",
+            quantity: 1,
+            price: liveProduct.basePrice,
+            unitPrice: liveProduct.basePrice,
+          };
         addItem(liveProduct, pkg, item.selectedOptions?.packageCount || 1);
         addedCount++;
       }
