@@ -47,10 +47,10 @@ async function runTests() {
       },
     ],
     volumePricing: [
-      { minQuantity: 1, unitPrice: 0.84, discountPercent: 0, active: true },
-      { minQuantity: 50, unitPrice: 0.75, discountPercent: 11, active: true },
-      { minQuantity: 250, unitPrice: 0.60, discountPercent: 28, active: true },
-      { minQuantity: 1000, unitPrice: 0.50, discountPercent: 40, active: true },
+      { minQuantity: 1, unitPrice: 0.84, discountPercentage: 0 },
+      { minQuantity: 50, unitPrice: 0.75, discountPercentage: 11 },
+      { minQuantity: 250, unitPrice: 0.60, discountPercentage: 28 },
+      { minQuantity: 1000, unitPrice: 0.50, discountPercentage: 40 },
     ],
     variants: [
       {
