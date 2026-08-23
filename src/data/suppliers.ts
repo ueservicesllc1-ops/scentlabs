@@ -1,0 +1,40 @@
+import { Supplier } from "@/types/fragrance";
+
+export const INITIAL_SUPPLIERS: Supplier[] = [
+  {
+    id: "sup_africa_imports",
+    name: "Africa Imports",
+    website: "https://africaimports.com",
+    contact: "Wholesale Department",
+    email: "wholesale@africaimports.com",
+    phone: "1-800-500-6120",
+    active: true,
+    notes: "Primary raw fragrance oil supplier for body oils, concentrates, and designer-type accords.",
+    createdAt: "2026-08-23T00:00:00.000Z",
+    updatedAt: "2026-08-23T00:00:00.000Z",
+  },
+  {
+    id: "sup_fragrance_chem",
+    name: "Aroma Chemical Supply Co.",
+    website: "https://aromachem.example.com",
+    contact: "Lab Sales",
+    email: "orders@aromachem.example.com",
+    phone: "1-888-234-5678",
+    active: true,
+    notes: "Distributor of pure aroma molecules, solvent bases, and DPG fixatives.",
+    createdAt: "2026-08-23T00:00:00.000Z",
+    updatedAt: "2026-08-23T00:00:00.000Z",
+  },
+  {
+    id: "sup_custom_artisan",
+    name: "Artisan Direct Distillers",
+    website: "https://artisandistillers.example.com",
+    contact: "Custom Sourcing",
+    email: "sourcing@artisandistillers.example.com",
+    phone: "1-800-445-9876",
+    active: true,
+    notes: "Direct extraction and organic essential oil fractions.",
+    createdAt: "2026-08-23T00:00:00.000Z",
+    updatedAt: "2026-08-23T00:00:00.000Z",
+  },
+];

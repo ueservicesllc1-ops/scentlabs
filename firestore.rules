@@ -1,0 +1,205 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Strict Admin authorization: Only ueservicesllc1@gmail.com is authorized
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.email == 'ueservicesllc1@gmail.com';
+    }
+
+    // PRODUCTS & VARIANTS
+    // Public read; write restricted strictly to authorized Admin.
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /variants/{variantId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // CATEGORIES
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // INVENTORY
+    match /inventory/{inventoryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // RECOMMENDATIONS & CROSS-SELL MATRIX
+    match /recommendations/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // CUSTOM LABEL SPECIFICATIONS & CONFIGURATIONS
+    match /customLabelSpecs/{specId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /customLabelSizes/{sizeId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /customLabelMaterials/{matId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /customLabelConfigurations/{configId} {
+      allow read: if isOwner(resource.data.customerId) || isAdmin();
+      allow create: if true; // Allows saving custom label configurations during cart configuration
+      allow update, delete: if isOwner(resource.data.customerId) || isAdmin();
+    }
+
+    // CUSTOMERS & ADDRESSES
+    match /customers/{customerId} {
+      allow read: if isOwner(customerId) || isAdmin();
+      allow write: if isOwner(customerId) || isAdmin();
+    }
+
+    match /customerAddresses/{addressId} {
+      allow read: if isOwner(resource.data.customerId) || isAdmin();
+      allow create: if isAuthenticated() && request.resource.data.customerId == request.auth.uid;
+      allow update, delete: if isOwner(resource.data.customerId) || isAdmin();
+    }
+
+    match /customerNotifications/{notificationId} {
+      allow read: if isOwner(resource.data.customerId) || isAdmin();
+      allow update: if isOwner(resource.data.customerId) || isAdmin();
+      allow create, delete: if isAdmin();
+    }
+
+    // ORDERS
+    match /orders/{orderId} {
+      allow read: if isOwner(resource.data.customerId) || isAdmin();
+      allow create: if isAuthenticated() && request.resource.data.customerId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // SUPPLIERS (Internal Admin only)
+    match /suppliers/{supplierId} {
+      allow read, write: if isAdmin();
+    }
+
+    // MEDIA METADATA
+    match /mediaMetadata/{mediaId} {
+      allow read: if resource.data.accessLevel == 'public' || isOwner(resource.data.ownerId) || isAdmin();
+      allow write: if isAuthenticated();
+    }
+
+    // STRIPE PROCESSED WEBHOOK EVENTS (Idempotency)
+    match /stripeProcessedEvents/{eventId} {
+      allow read, write: if isAdmin();
+    }
+
+    // FRAGRANCE OILS (Public read catalog; modifications restricted to Admin)
+    match /fragranceOils/{fragranceId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // PURCHASE LOTS & INVENTORY LEDGER (Confidential Internal Admin only)
+    match /purchaseLots/{lotId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /fragranceInventoryLedger/{ledgerId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /importBatches/{batchId} {
+      allow read, write: if isAdmin();
+    }
+
+    // PACKAGING MATERIALS & CRICUT PRODUCTION
+    match /packagingMaterials/{materialId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /boxSizeVariants/{variantId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /packagingCompatibilities/{compatId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /productionJobs/{jobId} {
+      allow read, write: if isAdmin();
+    }
+
+    // TESTING SUPPLIES & DISCOVERY KITS
+    match /testingProducts/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /testingKits/{kitId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // PERFUME BASES & STUDIO KITS
+    match /perfumeBases/{baseId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /perfumeKits/{kitId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // INVENTORY LEDGER, PURCHASES & COST TRACKING (Strictly Confidential / Admin Only)
+    match /inventoryTransactions/{txId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /purchases/{purchaseId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /costHistory/{costId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /inventoryLocations/{locId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /materialTransactions/{txId} {
+      allow read, write: if isAdmin();
+    }
+
+    // ADMIN AUDIT LOGS (Confidential)
+    match /adminAuditLogs/{logId} {
+      allow read, write: if isAdmin();
+    }
+
+    // TRANSACTIONAL EMAIL LOGS (Confidential / Admin Only)
+    match /emailLogs/{logId} {
+      allow read, write: if isAdmin();
+    }
+  }
+}
