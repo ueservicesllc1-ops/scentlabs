@@ -1,63 +1,389 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SCENTLAB — Design System Tokens
+   Palette: White · Forest Green · Warm Amber
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 :root {
-  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  /* Brand Colors */
+  --sl-green:        #2B5F4A;   /* Forest green — primary accent */
+  --sl-green-light:  #3D7A5F;   /* Hover state */
+  --sl-green-muted:  #E8F0EC;   /* Light green tint for badges/bg */
+  --sl-amber:        #C8963E;   /* Warm amber — price, highlight */
+  --sl-amber-light:  #FDF3E3;   /* Amber tint */
+
+  /* Neutrals */
+  --sl-ink:          #1A1A1A;   /* Near-black text */
+  --sl-gray-dark:    #4A4A4A;   /* Secondary text */
+  --sl-gray-mid:     #8A8A8A;   /* Muted text */
+  --sl-gray-light:   #E8E8E8;   /* Borders */
+  --sl-gray-bg:      #F6F6F4;   /* Card / section bg */
+  --sl-white:        #FFFFFF;
+
+  /* Typography */
+  --font-display: var(--font-cormorant), Georgia, serif;
+  --font-body:    var(--font-inter), 'Helvetica Neue', sans-serif;
 }
 
 @layer base {
   body {
-    @apply bg-[#fcfbf9] text-[#1c1917] font-sans antialiased selection:bg-amber-100 selection:text-amber-900;
+    background-color: var(--sl-white);
+    color: var(--sl-ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
   }
 
-  h1, h2, h3, .font-serif {
-    font-family: var(--font-serif);
+  h1, h2, h3 {
+    font-family: var(--font-body);
   }
 }
 
-/* Elegant luxury scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* ━━━━ Scrollbar ━━━━ */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--sl-gray-light); border-radius: 4px; }
+
+/* ━━━━ Universal Product Card ━━━━
+   Used by ALL pages: fragrances, bottles, supplies, testing, packaging
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.sl-card {
+  background: var(--sl-white);
+  border: 1px solid var(--sl-gray-light);
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  overflow: hidden;
 }
 
-::-webkit-scrollbar-track {
-  background: #f5f4ef;
+.sl-card:hover {
+  border-color: #BFBFBF;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
 }
 
-::-webkit-scrollbar-thumb {
-  background: #d6d3cc;
-  border-radius: 3px;
+/* Image zone */
+.sl-card-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: var(--sl-gray-bg);
+  overflow: hidden;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #b5b0a4;
+.sl-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
 }
+
+.sl-card:hover .sl-card-image img {
+  transform: scale(1.04);
+}
+
+/* No-image placeholder */
+.sl-card-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #F0EDE8 0%, #E8E3DC 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.sl-card-placeholder-line {
+  width: 1px;
+  height: 28px;
+  background: #B0A898;
+}
+
+.sl-card-placeholder-label {
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  color: #9A907F;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Badge */
+.sl-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  background: white;
+  color: var(--sl-ink);
+  border: 1px solid var(--sl-gray-light);
+  z-index: 10;
+}
+
+.sl-badge-green {
+  background: var(--sl-green-muted);
+  color: var(--sl-green);
+  border-color: #C5DDD3;
+}
+
+/* Body */
+.sl-card-body {
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 8px;
+}
+
+.sl-card-eyebrow {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sl-gray-mid);
+}
+
+.sl-card-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sl-ink);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sl-card-name:hover {
+  color: var(--sl-green);
+}
+
+.sl-card-meta {
+  font-size: 10px;
+  color: var(--sl-gray-mid);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-style: italic;
+}
+
+/* Size pills row */
+.sl-card-pills {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.sl-pill {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border: 1px solid var(--sl-gray-light);
+  color: var(--sl-gray-dark);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.sl-pill:hover,
+.sl-pill.active {
+  border-color: var(--sl-green);
+  color: var(--sl-green);
+  background: var(--sl-green-muted);
+}
+
+.sl-pill.active {
+  background: var(--sl-green);
+  color: white;
+}
+
+/* Footer row */
+.sl-card-footer {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--sl-gray-bg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sl-price {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--sl-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.sl-price-unit {
+  font-size: 10px;
+  color: var(--sl-gray-mid);
+  font-weight: 400;
+  margin-top: 1px;
+  display: block;
+}
+
+/* Add button */
+.sl-add-btn {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  background: var(--sl-ink);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  white-space: nowrap;
+}
+
+.sl-add-btn:hover {
+  background: var(--sl-green);
+}
+
+.sl-add-btn.added {
+  background: var(--sl-green);
+}
+
+.sl-add-btn.customize {
+  background: transparent;
+  color: var(--sl-ink);
+  border: 1px solid var(--sl-gray-light);
+}
+
+.sl-add-btn.customize:hover {
+  border-color: var(--sl-green);
+  color: var(--sl-green);
+}
+
+/* ━━━━ Catalog page layout ━━━━ */
+.sl-catalog-header {
+  padding: 40px 0 24px;
+  border-bottom: 1px solid var(--sl-gray-light);
+  margin-bottom: 0;
+}
+
+.sl-catalog-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--sl-green);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.sl-catalog-title {
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: 300;
+  color: var(--sl-ink);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.sl-catalog-subtitle {
+  font-size: 13px;
+  color: var(--sl-gray-dark);
+  font-weight: 300;
+  line-height: 1.6;
+  margin-top: 8px;
+  max-width: 560px;
+}
+
+/* ━━━━ Filter bar ━━━━ */
+.sl-filter-bar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: white;
+  border-bottom: 1px solid var(--sl-gray-light);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.sl-filter-bar::-webkit-scrollbar { display: none; }
+
+.sl-filter-pill {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 14px 16px;
+  color: var(--sl-gray-mid);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.sl-filter-pill:hover {
+  color: var(--sl-ink);
+}
+
+.sl-filter-pill.active {
+  color: var(--sl-green);
+  border-bottom-color: var(--sl-green);
+}
+
+/* ━━━━ Legacy compatibility ━━━━ */
+.flat-btn {
+  background: var(--sl-ink);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+  padding: 10px 24px;
+}
+.flat-btn:hover { background: var(--sl-green); }
+
+.outline-btn {
+  background: transparent;
+  border: 1px solid var(--sl-ink);
+  color: var(--sl-ink);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  padding: 10px 24px;
+}
+.outline-btn:hover { background: var(--sl-ink); color: white; }
+
+.ghost-link {
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s ease;
+}
+.ghost-link:hover { border-bottom-color: var(--sl-ink); }
 
 .luxury-card {
-  background: #ffffff;
-  border: 1px solid #eae6df;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  background: white;
+  border: 1px solid var(--sl-gray-light);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
-
 .luxury-card:hover {
-  border-color: #d1c7b7;
-  box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.07), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
-  transform: translateY(-2px);
-}
-
-.gold-gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-amber-700 via-amber-600 to-yellow-600;
-}
-
-.gold-badge {
-  background: #fdf8ed;
-  border: 1px solid #f2e3be;
-  color: #996515;
+  border-color: #BFBFBF;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
 }

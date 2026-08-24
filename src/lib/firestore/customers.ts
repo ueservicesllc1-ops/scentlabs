@@ -17,8 +17,12 @@ export const customerService = {
       const snapshot = await getDoc(docRef);
       if (!snapshot.exists()) return null;
       return { id: snapshot.id, ...snapshot.data() } as Customer;
-    } catch (error) {
-      logger.error(`Failed to get customer profile for ${uid}`, error);
+    } catch (error: any) {
+      if (error?.code === "permission-denied") {
+        logger.warn(`Firestore customer profile access restricted for ${uid}. Using local session.`);
+      } else {
+        logger.error(`Failed to get customer profile for ${uid}`, error);
+      }
       return null;
     }
   },

@@ -26,4 +26,7 @@ export const b2Paths = {
 
   adminDocument: (filename: string) =>
     `admin/${filename}`,
+
+  referenceImage: (brand: string, product: string, filename: string) =>
+    `reference/fragrancenet/${brand}/${product}/${filename}`,
 };

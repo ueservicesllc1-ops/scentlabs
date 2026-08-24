@@ -1,0 +1,506 @@
+{
+  "COMPREHENSIVE_DUPES": {
+    "Maison Alhambra_Delilah": {
+      "shortDescription": "Aroma floral frutal encantador con ruibarbo silvestre, lichi dulce, rosa turca aterciopelada y vainilla.",
+      "description": "Delilah de Maison Alhambra es un homenaje deslumbrante a la feminidad moderna, abriendo con notas vivas de lichi, ruibarbo y bergamota, desplegando un corazón de rosa turca y peonía, sobre una base suave de vainilla, almizcle y cachemira.",
+      "inspiredBy": "Delina",
+      "originalBrand": "Parfums de Marly",
+      "estimatedSimilarity": "~93%",
+      "isOneToOne": "No",
+      "notes": "Salida: Ruibarbo, Lichi, Bergamota. Corazón: Rosa turca, Peonía, Lirio de los valles. Fondo: Vainilla, Almizcle blanco, Cachemira, Cedro.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Women",
+      "measure": "100 ml / 3.4 fl oz"
+    },
+    "Maison Alhambra_Delilah Pour Femme": {
+      "shortDescription": "Aroma floral frutal encantador con ruibarbo silvestre, lichi dulce, rosa turca aterciopelada y vainilla.",
+      "description": "Delilah de Maison Alhambra es un homenaje deslumbrante a la feminidad moderna, abriendo con notas vivas de lichi, ruibarbo y bergamota, desplegando un corazón de rosa turca y peonía, sobre una base suave de vainilla, almizcle y cachemira.",
+      "inspiredBy": "Delina",
+      "originalBrand": "Parfums de Marly",
+      "estimatedSimilarity": "~93%",
+      "isOneToOne": "No",
+      "notes": "Salida: Ruibarbo, Lichi, Bergamota. Corazón: Rosa turca, Peonía, Lirio de los valles. Fondo: Vainilla, Almizcle blanco, Cachemira, Cedro.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Women",
+      "measure": "100 ml / 3.4 fl oz"
+    },
+    "Maison Alhambra_Porto Neroli": {
+      "shortDescription": "Frescura mediterránea radiante con flores de neroli, mandarina dulce, azahar y ámbar cristalino.",
+      "description": "Porto Neroli evoca la costa italiana con notas cítricas efervescentes de neroli y bergamota sobre un fondo fresco de flor de azahar y ámbar suave.",
+      "inspiredBy": "Neroli Portofino",
+      "originalBrand": "Tom Ford",
+      "estimatedSimilarity": "~92%",
+      "isOneToOne": "No",
+      "notes": "Salida: Neroli, Mandarina, Limón, Naranja amarga. Corazón: Flor de azahar, Jazmín. Fondo: Ámbar, Almizcle ambreta, Angélica.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Unisex",
+      "measure": "80 ml / 2.7 fl oz"
+    },
+    "Maison Alhambra_Salvo": {
+      "shortDescription": "Fragancia masculina fresca y aromática con bergamota de Calabria, pimienta de Sichuan y ambroxan.",
+      "description": "Salvo de Maison Alhambra destaca por su apertura fresca y especiada de bergamota picante y su secado amaderado de ambroxan de gran fijación.",
+      "inspiredBy": "Sauvage",
+      "originalBrand": "Dior",
+      "estimatedSimilarity": "~91%",
+      "isOneToOne": "No",
+      "notes": "Salida: Bergamota de Calabria, Pimienta de Sichuan. Corazón: Lavanda, Pimienta rosa, Anís. Fondo: Ambroxan, Madera de cedro, Ládano.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Men",
+      "measure": "100 ml / 3.4 fl oz"
+    },
+    "Maison Alhambra_Salvo Intense": {
+      "shortDescription": "Versión intensa y profunda con vainilla ahumada, anís estrellado, nuez moscada y ambroxan cálido.",
+      "description": "Salvo Intense aporta un carácter más nocturno y sensual con notas ambaradas y especias orientales envolventes.",
+      "inspiredBy": "Sauvage Eau de Parfum",
+      "originalBrand": "Dior",
+      "estimatedSimilarity": "~92%",
+      "isOneToOne": "No",
+      "notes": "Salida: Bergamota, Pimienta. Corazón: Lavanda, Nuez moscada, Anís estrellado. Fondo: Vainilla de Papúa, Ambroxan.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Men",
+      "measure": "100 ml / 3.4 fl oz"
+    },
+    "Maison Alhambra_Salvo Elixir": {
+      "shortDescription": "Concentración potente con canela, nuez moscada, lavanda silvestre, regaliz y maderas oscuras.",
+      "description": "Salvo Elixir recrea la intensidad licorosa y especiada de los elixires modernos con una proyección monumental.",
+      "inspiredBy": "Sauvage Elixir",
+      "originalBrand": "Dior",
+      "estimatedSimilarity": "~90%",
+      "isOneToOne": "No",
+      "notes": "Salida: Canela, Nuez moscada, Cardamomo, Pomelo. Corazón: Lavanda, Regaliz. Fondo: Sándalo, Ámbar, Pachulí, Vetiver.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Men",
+      "measure": "60 ml / 2.0 fl oz"
+    },
+    "Maison Alhambra_Bright Peach": {
+      "shortDescription": "Gourmand frutal embriagador con melocotón maduro, naranja sanguina, aceite de davana, coñac y pachulí.",
+      "description": "Bright Peach captura la dulzura aterciopelada y sensual del melocotón licoroso combinado con maderas cálidas y vainilla.",
+      "inspiredBy": "Bitter Peach",
+      "originalBrand": "Tom Ford",
+      "estimatedSimilarity": "~90%",
+      "isOneToOne": "No",
+      "notes": "Salida: Melocotón, Naranja sanguina, Cardamomo. Corazón: Davana, Ron, Coñac, Jazmín. Fondo: Vainilla, Pachulí, Haba tonka, Sándalo, Benjuí.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Unisex",
+      "measure": "80 ml / 2.7 fl oz"
+    },
+    "Maison Alhambra_Lovely Chèrie": {
+      "shortDescription": "Aroma voluptuoso de cereza negra ácida, licor de cereza, almendra amarga, rosa turca y haba tonka.",
+      "description": "Lovely Chèrie despliega un contraste tentador entre cerezas dulces en almíbar, frutos secos tostados y resinas orientales.",
+      "inspiredBy": "Lost Cherry",
+      "originalBrand": "Tom Ford",
+      "estimatedSimilarity": "~92%",
+      "isOneToOne": "No",
+      "notes": "Salida: Cereza negra, Licor de cereza, Almendra amarga. Corazón: Ciruela, Rosa turca, Jazmín sambac. Fondo: Haba tonka, Vainilla, Bálsamo de Perú, Canela, Cedro.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Unisex",
+      "measure": "80 ml / 2.7 fl oz"
+    },
+    "Maison Alhambra_Fabulo Intense": {
+      "shortDescription": "Composición de cuero aromático con salvia esclarea, lavanda fresca, almendra amarga, cuero suave y haba tonka.",
+      "description": "Fabulo Intense ofrece una firma olfativa distintiva con notas decadentes de cuero oriental, vainilla y notas empolvadas de iris.",
+      "inspiredBy": "Fucking Fabulous",
+      "originalBrand": "Tom Ford",
+      "estimatedSimilarity": "~91%",
+      "isOneToOne": "No",
+      "notes": "Salida: Salvia esclarea, Lavanda. Corazón: Almendra amarga, Cuero, Raíz de lirio, Vainilla. Fondo: Haba tonka, Cuero, Cachemira, Ámbar, Maderas blancas.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Unisex",
+      "measure": "80 ml / 2.7 fl oz"
+    },
+    "Maison Alhambra_Toscano Leather": {
+      "shortDescription": "Elegancia pura de cuero curtido con frambuesa dulce, azafrán, tomillo aromático y jazmín nocturno.",
+      "description": "Toscano Leather combina la crudeza sofisticada del cuero toscano con el dulzor afrutado de las frambuesas silvestres.",
+      "inspiredBy": "Tuscan Leather",
+      "originalBrand": "Tom Ford",
+      "estimatedSimilarity": "~93%",
+      "isOneToOne": "No",
+      "notes": "Salida: Azafrán, Frambuesa, Tomillo. Corazón: Cuero, Olibano, Jazmín nocturno. Fondo: Cuero negro, Gamuza, Ámbar, Notas amaderadas.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Unisex",
+      "measure": "80 ml / 2.7 fl oz"
+    },
+    "Maison Alhambra_Amber & Leather": {
+      "shortDescription": "Cuero moderno aterciopelado con cardamomo especiado, jazmín sambac, musgo blanco y pachulí.",
+      "description": "Amber & Leather captura la inmensidad del desierto americano con una estela limpia y envolvente de cuero cálido y especias.",
+      "inspiredBy": "Ombré Leather",
+      "originalBrand": "Tom Ford",
+      "estimatedSimilarity": "~92%",
+      "isOneToOne": "No",
+      "notes": "Salida: Cardamomo. Corazón: Cuero, Jazmín sambac. Fondo: Ámbar, Musgo, Pachulí.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Unisex",
+      "measure": "80 ml / 2.7 fl oz"
+    },
+    "Maison Alhambra_Kismet Magic": {
+      "shortDescription": "Gourmand licoroso y cálido con coñac añejo, canela en rama, praliné de chocolate, roble y vainilla.",
+      "description": "Kismet Magic (anteriormente Kismet Angel) es una joya olfativa invernal con acordes licorosos y postres dulces de alta repostería.",
+      "inspiredBy": "Angels' Share",
+      "originalBrand": "Kilian Paris",
+      "estimatedSimilarity": "~94%",
+      "isOneToOne": "No",
+      "notes": "Salida: Coñac, Canela. Corazón: Haba tonka, Madera de roble, Praliné. Fondo: Vainilla, Sándalo, Ámbar.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Unisex",
+      "measure": "100 ml / 3.4 fl oz"
+    },
+    "Maison Alhambra_The Tux": {
+      "shortDescription": "Elegancia nocturna con pachulí refinado, pimienta negra, hojas de violeta, rosa oscura y ámbar gris.",
+      "description": "The Tux es una de las fragancias más codiciadas por su recreación fiel de la sofisticación andrógina y amaderada de Tuxedo.",
+      "inspiredBy": "Tuxedo",
+      "originalBrand": "Yves Saint Laurent",
+      "estimatedSimilarity": "~93%",
+      "isOneToOne": "No",
+      "notes": "Salida: Hojas de violeta, Bergamota, Cilantro. Corazón: Rosa, Pimienta negra, Lirio de los valles. Fondo: Pachulí, Ámbar gris, Vainilla bourbon.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Unisex",
+      "measure": "90 ml / 3.0 fl oz"
+    },
+    "Maison Alhambra_Yeah!": {
+      "shortDescription": "Aroma fresco y vibrante con manzana crujiente, jengibre, salvia aromática, geranio y madera de cedro.",
+      "description": "Yeah! de Maison Alhambra ofrece una versatilidad moderna con salida chispeante y un fondo sensual de maderas e incienso.",
+      "inspiredBy": "Y Eau de Parfum",
+      "originalBrand": "Yves Saint Laurent",
+      "estimatedSimilarity": "~91%",
+      "isOneToOne": "No",
+      "notes": "Salida: Manzana, Jengibre, Bergamota. Corazón: Salvia, Bayas de enebro, Geranio. Fondo: Madera de ámbar, Haba tonka, Cedro, Vetiver, Olibano.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Men",
+      "measure": "100 ml / 3.4 fl oz"
+    },
+    "Maison Alhambra_Philos Pura": {
+      "shortDescription": "Explosión de frutas mediterráneas cítricas y dulces sobre un lecho aterciopelado de vainilla y almizcle blanco.",
+      "description": "Philos Pura despliega una estela alegre y expansiva de naranjas sicilianas, limones de Calabria y frutas exóticas confitadas.",
+      "inspiredBy": "Erba Pura",
+      "originalBrand": "Xerjoff",
+      "estimatedSimilarity": "~91%",
+      "isOneToOne": "No",
+      "notes": "Salida: Naranja siciliana, Bergamota de Calabria, Limón siciliano. Corazón: Cesta de frutas mediterráneas. Fondo: Almizcle blanco, Vainilla de Madagascar, Ámbar.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Unisex",
+      "measure": "100 ml / 3.4 fl oz"
+    },
+    "Maison Alhambra_Infini Rose": {
+      "shortDescription": "Rosa oscura explosiva con pimienta rosa, jazmín hedione, rosa de mayo y ámbar amaderado.",
+      "description": "Infini Rose es una fragancia floral embriagadora y potente que proyecta una rosa moderna y sensual.",
+      "inspiredBy": "Atomic Rose",
+      "originalBrand": "Initio Parfums Privés",
+      "estimatedSimilarity": "~93%",
+      "isOneToOne": "No",
+      "notes": "Salida: Pimienta rosa, Bergamota. Corazón: Rosa de Bulgaria, Rosa turca, Jazmín egipcio. Fondo: Vainilla de Madagascar, Ámbar amaderado.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Unisex",
+      "measure": "90 ml / 3.0 fl oz"
+    },
+    "Maison Alhambra_Infini Oud": {
+      "shortDescription": "Maderas sagradas y azafrán con nuez moscada, lavanda aromática, oud ahumado y pachulí.",
+      "description": "Infini Oud ofrece una estela señorial de oud oriental equilibrado con especias finas.",
+      "inspiredBy": "Oud for Greatness",
+      "originalBrand": "Initio Parfums Privés",
+      "estimatedSimilarity": "~92%",
+      "isOneToOne": "No",
+      "notes": "Salida: Azafrán, Nuez moscada, Lavanda. Corazón: Madera de agar (Oud), Pachulí. Fondo: Oud, Almizcle, Pachulí.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Unisex",
+      "measure": "90 ml / 3.0 fl oz"
+    },
+    "Lattafa_Qaed Al Fursan": {
+      "shortDescription": "Aroma amaderado aromático y frutal dominado por piña jugosa, azafrán dulce, notas amaderadas y ámbar cálido.",
+      "description": "Qaed Al Fursan es una fragancia vibrante y seductora que abre con una explosión de piña dulce y azafrán, evolucionando hacia un corazón floral de jazmín y bálsamo de abeto, sobre una base rica de oud, ámbar y cedro.",
+      "inspiredBy": "Black XS / Hacivat / Aventus Accord",
+      "originalBrand": "Paco Rabanne / Nishane",
+      "estimatedSimilarity": "~88%",
+      "isOneToOne": "No",
+      "notes": "Salida: Piña jugosa, Azafrán. Corazón: Jazmín, Bálsamo de abeto. Fondo: Madera de cedro, Ámbar, Madera de agar (Oud).",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Unisex",
+      "measure": "100 ml / 3.4 fl oz",
+      "upc": "6291107455365",
+      "barcode": "6291107455365"
+    },
+    "Lattafa_Eclaire": {
+      "shortDescription": "Gourmand ultra cremoso con notas de leche condensada tibia, caramelo fundido, miel, vainilla y almizcle suave.",
+      "description": "Eclaire de Lattafa es una delicia olfativa dulce que evoca los postres lácteos más finos con un manto reconfortante de vainilla pura.",
+      "inspiredBy": "Bianco Latte",
+      "originalBrand": "Giardini di Toscana",
+      "estimatedSimilarity": "~94%",
+      "isOneToOne": "No",
+      "notes": "Salida: Leche tibia, Miel, Caramelo. Corazón: Mantequilla, Vainilla, Azúcar blanco. Fondo: Almizcle blanco, Haba tonka, Vainilla bourbon.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Women",
+      "measure": "100 ml / 3.4 fl oz"
+    },
+    "Lattafa_Ana Abiyedh Rouge": {
+      "shortDescription": "Aroma cristalino dulce con azafrán radiante, jazmín, cedro y resina de ámbar gris.",
+      "description": "Ana Abiyedh Rouge proyecta una estela algodonada y elegante inspirada en el lujo contemporáneo.",
+      "inspiredBy": "Baccarat Rouge 540",
+      "originalBrand": "Maison Francis Kurkdjian",
+      "estimatedSimilarity": "~90%",
+      "isOneToOne": "No",
+      "notes": "Salida: Azafrán, Almendra amarga. Corazón: Jazmín, Cedro. Fondo: Ámbar gris, Almizcle, Maderas.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Unisex",
+      "measure": "60 ml / 2.0 fl oz"
+    },
+    "Lattafa_Fakhar Black": {
+      "shortDescription": "Frescura aromática moderna con manzana verde, jengibre, salvia, lavanda y cedro ambarado.",
+      "description": "Fakhar Black destaca por su botella en forma de escudo plateado y su aroma sumamente versátil y masculino.",
+      "inspiredBy": "Y Eau de Parfum",
+      "originalBrand": "Yves Saint Laurent",
+      "estimatedSimilarity": "~91%",
+      "isOneToOne": "No",
+      "notes": "Salida: Manzana, Bergamota, Jengibre. Corazón: Salvia, Bayas de enebro, Lavanda. Fondo: Haba tonka, Cedro, Vetiver, Amberwood.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Men",
+      "measure": "100 ml / 3.4 fl oz"
+    },
+    "Lattafa_Fakhar Rose": {
+      "shortDescription": "Floral blanco luminoso y femenino con flor de azahar, nardo cremoso, jazmín, frutas rojas y vainilla.",
+      "description": "Fakhar Rose (Fakhar Women) despliega una elegancia radiante y seductora de flores blancas y notas dulces.",
+      "inspiredBy": "L'Interdit",
+      "originalBrand": "Givenchy",
+      "estimatedSimilarity": "~92%",
+      "isOneToOne": "No",
+      "notes": "Salida: Frutas rojas, Lirio, Aldehídos, Granada. Corazón: Nardo, Jazmín, Flor de azahar, Rosa, Madreselva. Fondo: Vainilla, Almizcle blanco, Sándalo.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Women",
+      "measure": "100 ml / 3.4 fl oz"
+    },
+    "Lattafa_Liam Grey": {
+      "shortDescription": "Composición amaderada refinada con cardamomo, té negro, higo dulce, iris y sándalo cremoso.",
+      "description": "Liam Grey de Lattafa es una obra maestra de sutileza y calidez amaderada inspirada en el nicho parisino.",
+      "inspiredBy": "Gris Charnel",
+      "originalBrand": "BDK Parfums",
+      "estimatedSimilarity": "~93%",
+      "isOneToOne": "No",
+      "notes": "Salida: Cardamomo, Té negro, Higo. Corazón: Iris, Vetiver, Ládano. Fondo: Sándalo, Vainilla, Haba tonka, Pachulí.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Unisex",
+      "measure": "100 ml / 3.4 fl oz"
+    },
+    "Lattafa_Vintage Radio": {
+      "shortDescription": "Aroma amaderado aromático con ciruela oscura, lavanda, pimienta negra, palo santo y sándalo.",
+      "description": "Vintage Radio cautiva con su apertura de ciruela jugosa y su base mística de palo santo y maderas preciosas.",
+      "inspiredBy": "Paragon",
+      "originalBrand": "Initio Parfums Privés",
+      "estimatedSimilarity": "~94%",
+      "isOneToOne": "No",
+      "notes": "Salida: Ciruela, Lavanda, Salvia. Corazón: Palo Santo, Pimienta negra. Fondo: Sándalo, Madera de agar (Oud).",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Unisex",
+      "measure": "100 ml / 3.4 fl oz"
+    },
+    "Lattafa_Ameer Al Oudh Intense Oud": {
+      "shortDescription": "Cálido y acogedor con notas de azúcar quemado, madera de oud, madera de guayaco, vainilla y benjuí.",
+      "description": "Ameer Al Oudh Intense Oud recrea la atmósfera reconfortante de una chimenea de leña con notas dulces de malvavisco tostado.",
+      "inspiredBy": "By the Fireplace",
+      "originalBrand": "Maison Margiela",
+      "estimatedSimilarity": "~90%",
+      "isOneToOne": "No",
+      "notes": "Salida: Maderas nobles, Oud. Corazón: Vainilla, Azúcar moreno. Fondo: Madera de agar, Sándalo, Benjuí.",
+      "concentration": "Eau de Parfum (EDP)",
+      "gender": "Unisex",
+      "measure": "100 ml / 3.4 fl oz"
+    }
+  },
+  "CLONE_PATTERNS": [
+    {
+      "pattern": {},
+      "inspiredBy": "Delina",
+      "originalBrand": "Parfums de Marly",
+      "sim": "~93%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Sauvage Elixir",
+      "originalBrand": "Dior",
+      "sim": "~90%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Sauvage",
+      "originalBrand": "Dior",
+      "sim": "~91%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Neroli Portofino",
+      "originalBrand": "Tom Ford",
+      "sim": "~92%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Bitter Peach",
+      "originalBrand": "Tom Ford",
+      "sim": "~90%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Lost Cherry",
+      "originalBrand": "Tom Ford",
+      "sim": "~92%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Fucking Fabulous",
+      "originalBrand": "Tom Ford",
+      "sim": "~91%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Tuscan Leather",
+      "originalBrand": "Tom Ford",
+      "sim": "~93%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Ombré Leather",
+      "originalBrand": "Tom Ford",
+      "sim": "~92%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Oud Wood",
+      "originalBrand": "Tom Ford",
+      "sim": "~90%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Tobacco Vanille",
+      "originalBrand": "Tom Ford",
+      "sim": "~92%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Angels' Share",
+      "originalBrand": "Kilian Paris",
+      "sim": "~94%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Tuxedo",
+      "originalBrand": "Yves Saint Laurent",
+      "sim": "~93%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Y Eau de Parfum",
+      "originalBrand": "Yves Saint Laurent",
+      "sim": "~91%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Baccarat Rouge 540",
+      "originalBrand": "Maison Francis Kurkdjian",
+      "sim": "~93%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Erba Pura",
+      "originalBrand": "Xerjoff",
+      "sim": "~93%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Baccarat Rouge 540",
+      "originalBrand": "Maison Francis Kurkdjian",
+      "sim": "~92%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Tobacco Vanille",
+      "originalBrand": "Tom Ford",
+      "sim": "~91%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Green Irish Tweed",
+      "originalBrand": "Creed",
+      "sim": "~90%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Layton",
+      "originalBrand": "Parfums de Marly",
+      "sim": "~93%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Aventus",
+      "originalBrand": "Creed",
+      "sim": "~91%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Aventus",
+      "originalBrand": "Creed",
+      "sim": "~92%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Baccarat Rouge 540",
+      "originalBrand": "Maison Francis Kurkdjian",
+      "sim": "~93%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Bleu de Chanel",
+      "originalBrand": "Chanel",
+      "sim": "~90%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Silver Mountain Water",
+      "originalBrand": "Creed",
+      "sim": "~91%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Millésime Impérial",
+      "originalBrand": "Creed",
+      "sim": "~91%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Santal 33",
+      "originalBrand": "Le Labo",
+      "sim": "~90%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Ultra Male",
+      "originalBrand": "Jean Paul Gaultier",
+      "sim": "~91%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Tygar",
+      "originalBrand": "Bvlgari",
+      "sim": "~93%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Invictus Aqua",
+      "originalBrand": "Paco Rabanne",
+      "sim": "~90%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Dior Homme Intense",
+      "originalBrand": "Dior",
+      "sim": "~93%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Oud Bouquet",
+      "originalBrand": "Lancôme",
+      "sim": "~92%"
+    },
+    {
+      "pattern": {},
+      "inspiredBy": "Delina / Chance Eau Tendre",
+      "originalBrand": "Parfums de Marly",
+      "sim": "~89%"
+    }
+  ]
+}

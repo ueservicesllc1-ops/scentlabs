@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { CartItem, Product, SellingPackage } from "@/types";
+import { CartItem, Product, ProductCategory, SellingPackage } from "@/types";
 import { INITIAL_PRODUCTS, SHRINK_WRAP_VARIANTS } from "@/data/products";
 import { calculateCartSummary, PricingCalculationResult } from "@/services/pricing.service";
 
@@ -20,10 +20,22 @@ interface CartContextType {
         sku: string;
       };
       customLabelSpecs?: {
-        bottleName: string;
+        bottleName?: string;
+        dimensions?: string;
+        material?: string;
+        customText?: string;
+        product?: string;
+        size?: string;
+        finish?: string;
+        quantity?: number;
+        unitPrice?: number;
+        total?: number;
+        designFile?: string;
+      };
+      customBoxSpecs?: {
         dimensions: string;
         material: string;
-        customText?: string;
+        quantity: number;
       };
     }
   ) => string; // returns cart item id
@@ -43,12 +55,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
 
-  // Load cart from localStorage on mount
+  // Load cart from localStorage on mount and sanitize prohibited sizes
   useEffect(() => {
     try {
       const saved = localStorage.getItem("scentlab_cart");
       if (saved) {
-        setItems(JSON.parse(saved));
+        const parsed: CartItem[] = JSON.parse(saved);
+        const ALLOWED_FRAGRANCE_SIZES = [1, 2, 4, 8, 16];
+        const sanitized = parsed.filter((item) => {
+          if (item.category === "fragrance" || item.productId?.startsWith("frag_")) {
+            const size = item.selectedPackage?.quantity;
+            if (size !== undefined && !ALLOWED_FRAGRANCE_SIZES.includes(size)) {
+              console.warn(`Purging prohibited fragrance size: ${size} oz from cart.`);
+              return false;
+            }
+          }
+          return true;
+        });
+        setItems(sanitized);
       }
     } catch (e) {
       console.error("Failed to load cart", e);
@@ -70,6 +94,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     packageCount = 1,
     customOptions
   ) => {
+    // Validate fragrance size
+    if (product.category === "fragrance" || product.id?.startsWith("frag_")) {
+      const ALLOWED_FRAGRANCE_SIZES = [1, 2, 4, 8, 16];
+      if (pkg.quantity !== undefined && !ALLOWED_FRAGRANCE_SIZES.includes(pkg.quantity)) {
+        console.error(`Rejected prohibited fragrance size ${pkg.quantity} oz. Only 1, 2, 4, 8, 16 oz allowed.`);
+        return "";
+      }
+    }
+
     const newItemId = `cart_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     
     // Check if duplicate line exists with same package and linked status
@@ -98,9 +131,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       productId: product.id,
       productName: product.name,
       productSlug: product.slug,
-      category: product.category,
-      sku: product.sku,
-      image: product.media[0]?.url || "",
+      category: (product.category as ProductCategory) || "fragrance",
+      sku: product.sku || product.id,
+      image: (product.media && product.media[0]?.url) || (product as any).primaryImageUrl || (product as any).primaryImage || "",
       selectedPackage: pkg,
       packageCount,
       totalUnits: pkg.quantity * packageCount,
@@ -111,6 +144,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       parentCartItemId: customOptions?.linkedParentItemId,
       selectedVariant: customOptions?.selectedVariant,
       customLabelSpecs: customOptions?.customLabelSpecs,
+      customBoxSpecs: customOptions?.customBoxSpecs,
     };
 
     setItems((prev) => [...prev, newItem]);
@@ -153,9 +187,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   // Build product cost lookup for the pricing service
   const productCostLookup = INITIAL_PRODUCTS.reduce((acc, p) => {
     acc[p.id] = {
-      totalUnitCost: p.costData.totalUnitCost,
-      discountEligible: p.discountEligible,
-      minimumDiscountMargin: p.minimumDiscountMargin,
+      totalUnitCost: p.costData?.totalUnitCost || 0,
+      discountEligible: p.discountEligible ?? true,
+      minimumDiscountMargin: p.minimumDiscountMargin || 0.4,
     };
     return acc;
   }, {} as Record<string, { totalUnitCost: number; discountEligible: boolean; minimumDiscountMargin: number }>);

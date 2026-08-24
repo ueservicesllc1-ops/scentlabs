@@ -15,7 +15,8 @@ import {
   Layers, 
   ShoppingBag, 
   Check, 
-  ArrowRight 
+  ArrowRight,
+  X 
 } from "lucide-react";
 
 const SUBCATEGORIES = [
@@ -64,11 +65,12 @@ export function TestingCatalog() {
     const pkg = { id: `pkg_${kit.id}`, quantity: 1, price: kit.bundlePrice || 8.50, unitPrice: kit.bundlePrice || 8.50 };
     addItem(kitProxy, pkg, 1);
     setAddedKitId(kit.id);
-    setTimeout(() => setAddedKitId(null), 2500);
+    setTimeout(() => setAddedKitId(null), 2000);
   };
 
   const filteredProducts = products.filter((p) => {
     const matchesSearch =
+      !searchQuery.trim() ||
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.subcategory.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (p.sampleSize && p.sampleSize.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -77,130 +79,154 @@ export function TestingCatalog() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 font-mono">
-      {/* Header */}
-      <div className="border-b border-lab-800 pb-6 space-y-2">
-        <div className="flex items-center gap-2 text-xs text-indigo-400 font-bold uppercase tracking-widest">
-          <FlaskConical className="w-4 h-4" /> LABORATORY & OLFACTIVE EVALUATION
+    <div style={{ background: "white", minHeight: "100vh" }}>
+      
+      {/* ── Page Header ── */}
+      <div className="max-w-screen-xl mx-auto px-6 lg:px-10">
+        <div className="sl-catalog-header">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+            <div>
+              <span className="sl-catalog-eyebrow">Olfactory Evaluation · Lab Supplies</span>
+              <h1 className="sl-catalog-title">Testing & Sample Supplies</h1>
+              <p className="sl-catalog-subtitle">
+                Lint-free blotter strips, amber sample vials, atomizers, and discovery starter kits.
+              </p>
+            </div>
+
+            {/* Search */}
+            <div style={{ position: "relative", width: "100%", maxWidth: 280 }}>
+              <Search style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", width: 14, height: 14, color: "#8A8A8A" }} />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search testing supplies…"
+                style={{
+                  width: "100%",
+                  fontSize: 12,
+                  paddingLeft: 36,
+                  paddingRight: searchQuery ? 32 : 12,
+                  paddingTop: 8,
+                  paddingBottom: 8,
+                  border: "1px solid var(--sl-gray-light)",
+                  background: "white",
+                  color: "var(--sl-ink)",
+                  outline: "none",
+                }}
+                onFocus={(e) => (e.target.style.borderColor = "var(--sl-green)")}
+                onBlur={(e) => (e.target.style.borderColor = "var(--sl-gray-light)")}
+              />
+              {searchQuery && (
+                <button type="button" onClick={() => setSearchQuery("")}
+                  style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", color: "#8A8A8A", background: "none", border: "none", cursor: "pointer" }}>
+                  <X style={{ width: 13, height: 13 }} />
+                </button>
+              )}
+            </div>
+          </div>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-black text-white uppercase tracking-tight">
-          Fragrance Testing & Sample Supplies
-        </h1>
-        <p className="text-xs text-lab-400 max-w-3xl leading-relaxed">
-          Calibrated lint-free blotter strips, 5 ml amber glass sample vials, fine mist atomizers, and discovery kits. Essential tools for evaluating evaporation curves before committing to bulk production.
-        </p>
       </div>
 
-      {/* Testing Kit Starter Feature Banner */}
-      {kits.length > 0 && (selectedSubcategory === "All" || selectedSubcategory === "Testing Kits") && (
-        <div className="p-6 rounded-2xl border border-indigo-500/40 bg-gradient-to-r from-indigo-950/60 via-lab-900 to-lab-950 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-2xl">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-400 text-[10px] font-bold uppercase">
-                Featured Testing Bundle
-              </span>
-              <span className="text-[11px] text-emerald-400 font-bold">Save 20% Bundle Discount</span>
-            </div>
-            <h2 className="text-xl font-bold text-white uppercase">{kits[0].name}</h2>
-            <p className="text-xs text-lab-300 max-w-2xl leading-relaxed">
-              Includes 10x 5ml Amber Sample Bottles, 50x Lint-Free Blotters, 2x 5ml Spray Atomizers, and 1x 10ml Atomizer for comprehensive formulation testing.
-            </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 whitespace-nowrap">
-            <div>
-              <span className="text-[10px] text-lab-500 uppercase block">Bundle Price</span>
-              <span className="text-2xl font-black text-amber-400">{formatCurrency(kits[0].bundlePrice || 8.50)}</span>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => handleAddKit(kits[0])}
-              className={`px-5 py-3 rounded-xl text-xs font-bold uppercase transition flex items-center gap-2 shadow-lg ${
-                addedKitId === kits[0].id
-                  ? "bg-emerald-500 text-lab-950"
-                  : "bg-indigo-500 hover:bg-indigo-400 text-white shadow-indigo-500/20"
-              }`}
-            >
-              {addedKitId === kits[0].id ? <Check className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
-              {addedKitId === kits[0].id ? "Added Kit!" : "Add Starter Kit"}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Subcategory Filter Pills */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-        {SUBCATEGORIES.map((sub) => {
-          const isSelected = selectedSubcategory === sub;
-          return (
+      {/* ── Sticky Filter Bar ── */}
+      <div className="sl-filter-bar" style={{ top: 48 }}>
+        <div style={{ display: "flex", alignItems: "center", paddingLeft: 40, paddingRight: 40, gap: 0 }}>
+          {SUBCATEGORIES.map((sub) => (
             <button
               key={sub}
               type="button"
+              className={`sl-filter-pill ${selectedSubcategory === sub ? "active" : ""}`}
               onClick={() => setSelectedSubcategory(sub)}
-              className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition border ${
-                isSelected
-                  ? "bg-indigo-500 text-white border-indigo-400 shadow-md shadow-indigo-500/20"
-                  : "bg-lab-900/60 text-lab-400 border-lab-800 hover:text-white hover:border-lab-700"
-              }`}
             >
               {sub}
             </button>
-          );
-        })}
-      </div>
-
-      {/* Search Bar */}
-      <div className="relative max-w-md">
-        <Search className="w-4 h-4 text-lab-500 absolute left-3 top-1/2 -translate-y-1/2" />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search blotters, 5ml vials, atomizers..."
-          className="w-full bg-lab-950 border border-lab-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white placeholder-lab-600 focus:outline-none focus:border-indigo-500"
-        />
-      </div>
-
-      {/* Products Grid */}
-      {loading ? (
-        <div className="min-h-[40vh] flex items-center justify-center text-xs text-lab-400">
-          <div className="w-8 h-8 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin mr-3" />
-          Loading testing supplies...
-        </div>
-      ) : filteredProducts.length === 0 ? (
-        <div className="p-16 text-center border border-lab-800 rounded-2xl bg-lab-950/40 space-y-3 max-w-md mx-auto">
-          <FlaskConical className="w-10 h-10 text-lab-600 mx-auto" />
-          <h3 className="text-sm font-bold text-white uppercase">No Testing Supplies Found</h3>
-          <p className="text-xs text-lab-400">
-            Try adjusting your search or selecting &quot;All&quot; subcategories.
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => (
-            <TestingProductCard key={product.id} product={product} />
           ))}
         </div>
-      )}
+      </div>
 
-      {/* Two-Way Navigation Banner: Testing -> Fragrance */}
-      <div className="p-6 rounded-2xl border border-lab-800 bg-lab-900/40 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <span className="text-xs font-bold text-white uppercase block">
-            Looking for Pure Fragrance Oils to Evaluate?
-          </span>
-          <p className="text-xs text-lab-400 mt-0.5">
-            Browse our Grade-A uncut perfume bases, woody accords, and floral essences.
-          </p>
-        </div>
+      <div className="max-w-screen-xl mx-auto px-6 lg:px-10 py-8 space-y-8">
+        
+        {/* Testing Kit Starter Feature Banner */}
+        {kits.length > 0 && (selectedSubcategory === "All" || selectedSubcategory === "Testing Kits") && (
+          <div className="p-6 border border-gray-200 bg-gray-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-sm">
+            <div className="space-y-1.5">
+              <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 bg-[#E8F0EC] text-[#2B5F4A] border border-[#C5DDD3]">
+                Featured Starter Bundle
+              </span>
+              <h3 className="text-lg font-semibold text-gray-950">
+                {kits[0].name}
+              </h3>
+              <p className="text-xs text-gray-600 max-w-xl font-light">
+                {kits[0].description}
+              </p>
+            </div>
 
-        <Link
-          href="/fragrance"
-          className="px-5 py-2.5 rounded-xl bg-lab-800 hover:bg-amber-500 hover:text-lab-950 text-white font-bold text-xs uppercase tracking-wider transition flex items-center gap-1.5 whitespace-nowrap"
-        >
-          Shop Fragrance Oils <ArrowRight className="w-3.5 h-3.5" />
-        </Link>
+            <div className="flex items-center gap-6 shrink-0">
+              <div>
+                <span className="text-[9px] uppercase font-bold text-gray-400 block tracking-wider">Bundle Price</span>
+                <span className="text-2xl font-semibold text-gray-950">
+                  ${(kits[0].bundlePrice || 8.50).toFixed(2)}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleAddKit(kits[0])}
+                style={{
+                  background: addedKitId === kits[0].id ? "#2B5F4A" : "#1A1A1A",
+                  color: "white",
+                  padding: "10px 24px",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  letterSpacing: "0.15em",
+                  textTransform: "uppercase",
+                  border: "none",
+                  cursor: "pointer",
+                  transition: "background 0.2s ease",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px"
+                }}
+                onMouseEnter={(e) => { if (addedKitId !== kits[0].id) (e.target as HTMLElement).style.background = "#2B5F4A"; }}
+                onMouseLeave={(e) => { if (addedKitId !== kits[0].id) (e.target as HTMLElement).style.background = "#1A1A1A"; }}
+              >
+                {addedKitId === kits[0].id ? (
+                  <>
+                    <Check className="w-3.5 h-3.5" /> Added
+                  </>
+                ) : (
+                  <>
+                    <ShoppingBag className="w-3.5 h-3.5" /> Add Kit
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Products Grid */}
+        {loading ? (
+          <div style={{ paddingTop: 80, paddingBottom: 80, display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+            <div style={{ width: 18, height: 18, border: "2px solid var(--sl-green)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+            <p style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--sl-gray-mid)" }}>Loading supplies…</p>
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+          </div>
+        ) : filteredProducts.length === 0 ? (
+          <div className="py-20 text-center space-y-3">
+            <FlaskConical className="w-8 h-8 text-gray-400 mx-auto" />
+            <h3 className="text-base font-semibold text-gray-950">No Testing Supplies Found</h3>
+            <p className="text-xs text-gray-500 max-w-sm mx-auto font-light">
+              No supplies matched your search criteria.
+            </p>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1, background: "var(--sl-gray-light)" }}>
+            {filteredProducts.map((p) => (
+              <div key={p.id} style={{ background: "white" }}>
+                <TestingProductCard product={p} />
+              </div>
+            ))}
+          </div>
+        )}
+
       </div>
     </div>
   );

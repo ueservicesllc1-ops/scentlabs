@@ -12,7 +12,8 @@ export type ProductType =
   | 'component'
   | 'raw_material'
   | 'bulk'
-  | 'packaging';
+  | 'packaging'
+  | 'finished_perfume';
 
 export interface ProductMediaItem {
   id: string;
@@ -165,6 +166,9 @@ export interface Product {
   supplierSku?: string;
   supplierUrl?: string;
   supplierPackSize?: number;
+  source?: string;
+  sourceReferenceId?: string;
+  sourcePrice?: number;
   supplier?: ProductSupplierData;
   asin?: string;
   externalUrl?: string;
@@ -248,6 +252,18 @@ export interface Product {
   internalNotes?: string;
   externalProductId?: string;
   
+  // Finished Perfume & Inspiration (Dupe) Master Fields
+  brandType?: "arabic" | "designer_niche";
+  upc?: string;
+  barcode?: string;
+  inspiredBy?: string;
+  originalBrand?: string;
+  relationshipType?: string;
+  estimatedSimilarity?: string;
+  isOneToOne?: string | boolean;
+  referencePrice?: number;
+  notes?: string;
+
   createdAt: string;
   updatedAt: string;
 }

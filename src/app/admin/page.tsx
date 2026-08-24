@@ -23,7 +23,10 @@ import {
   CheckCircle2,
   Database,
   Layers,
-  X
+  X,
+  RefreshCw,
+  TrendingUp,
+  Tag
 } from "lucide-react";
 
 export default function AdminDashboardPage() {
@@ -41,10 +44,12 @@ export default function AdminDashboardPage() {
   const [seedMessage, setSeedMessage] = useState("");
 
   const filteredProducts = productsList.filter((p) => {
+    const q = searchQuery.toLowerCase().trim();
     const matchesSearch =
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (p.asin && p.asin.toLowerCase().includes(searchQuery.toLowerCase()));
+      !q ||
+      p.name.toLowerCase().includes(q) ||
+      p.sku.toLowerCase().includes(q) ||
+      (p.asin && p.asin.toLowerCase().includes(q));
     const matchesStatus = statusFilter === "all" || p.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -84,31 +89,32 @@ export default function AdminDashboardPage() {
 
   return (
     <AdminGuard>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 font-mono">
-        {/* Header */}
-        <div className="border-b border-lab-800 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+      <div className="space-y-8 font-sans">
+        
+        {/* ━━━━ HEADER & SUB-TABS ━━━━ */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 pb-6 border-b border-gray-200">
           <div>
-            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-xs border border-amber-500/30 font-bold">
-              <SlidersHorizontal className="w-3.5 h-3.5" /> ADMIN PRODUCT & INVENTORY ENGINE
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-800 border border-gray-300 mb-2">
+              <SlidersHorizontal className="w-3 h-3 text-gray-600" /> Admin Product & Inventory Engine
             </div>
-            <h1 className="text-3xl font-black text-white mt-2 uppercase">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-950 tracking-tight">
               SCENTLAB Operations Hub
             </h1>
-            <p className="text-xs text-lab-400 mt-1">
-              Live pricing adjustments, volume tiers, B2 storage references, and idempotent Firestore synchronization.
+            <p className="text-xs text-gray-600 mt-1 max-w-2xl leading-relaxed">
+              Live pricing adjustments, volume tiers, inventory tracking, and idempotent Firestore synchronization.
             </p>
           </div>
 
           {/* Navigation Tabs */}
-          <div className="flex flex-wrap gap-1.5 bg-lab-950 p-1.5 rounded-xl border border-lab-800 text-xs">
+          <div className="flex flex-wrap gap-1 bg-gray-100 p-1.5 rounded-xl border border-gray-200 text-xs">
             {(["catalog", "margins", "inventory", "labels", "seeding"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-3 py-1.5 rounded-lg uppercase tracking-wider transition ${
+                className={`px-3 py-1.5 rounded-lg font-semibold uppercase tracking-wider text-xs transition ${
                   activeTab === tab
-                    ? "bg-amber-500 text-lab-950 font-bold shadow"
-                    : "text-lab-400 hover:text-white"
+                    ? "bg-white text-gray-950 shadow-xs border border-gray-200"
+                    : "text-gray-600 hover:text-gray-950 hover:bg-white/60"
                 }`}
               >
                 {tab}
@@ -122,23 +128,26 @@ export default function AdminDashboardPage() {
         ========================================== */}
         {activeTab === "catalog" && (
           <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            
+            {/* Search & Filter Bar */}
+            <div className="p-4 rounded-xl border border-gray-200 bg-white shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div className="flex items-center gap-3 w-full sm:w-auto">
-                <div className="relative flex-1 sm:w-72">
-                  <Search className="w-4 h-4 text-lab-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                <div className="relative flex-1 sm:w-80">
+                  <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search SKU, name, ASIN..."
-                    className="w-full bg-lab-950 border border-lab-800 rounded-lg pl-9 pr-3 py-1.5 text-xs text-white placeholder-lab-600 focus:outline-none focus:border-amber-500"
+                    className="w-full bg-white border border-gray-300 rounded-lg pl-9 pr-3 py-2 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#2B5F4A] focus:ring-1 focus:ring-[#2B5F4A]"
                   />
                 </div>
 
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="bg-lab-950 border border-lab-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                  aria-label="Filter by status"
+                  className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-800 focus:outline-none focus:border-[#2B5F4A]"
                 >
                   <option value="all">All Statuses</option>
                   <option value="active">Active</option>
@@ -147,87 +156,122 @@ export default function AdminDashboardPage() {
                 </select>
               </div>
 
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-lab-400">
-                  Total: <strong className="text-white">{filteredProducts.length}</strong> items
-                </span>
+              <div className="text-xs text-gray-600">
+                Total: <strong className="text-gray-950 font-bold">{filteredProducts.length}</strong> items
               </div>
             </div>
 
-            <div className="overflow-x-auto rounded-xl border border-lab-800 bg-lab-900/40">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-lab-950 border-b border-lab-800 text-lab-400 uppercase text-[10px]">
-                  <tr>
-                    <th className="p-3">SKU / Item</th>
-                    <th className="p-3">Sourcing (ASIN/ID)</th>
-                    <th className="p-3">Cost Data</th>
-                    <th className="p-3">Retail Price</th>
-                    <th className="p-3">Gross Margin</th>
-                    <th className="p-3">Inventory</th>
-                    <th className="p-3">Status</th>
-                    <th className="p-3 text-right">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-lab-800/60">
-                  {filteredProducts.map((p) => {
-                    const defaultPkg = p.packageOptions.find((o) => o.isDefault) || p.packageOptions[0];
-                    const margin = calculateMarginPercentage(defaultPkg.unitPrice, p.costData.totalUnitCost);
-                    return (
-                      <tr key={p.id} className="hover:bg-lab-800/30 transition">
-                        <td className="p-3">
-                          <div className="font-bold text-white line-clamp-1">{p.name}</div>
-                          <div className="text-[10px] text-lab-500">{p.sku} • {p.category} ({p.subcategory})</div>
-                        </td>
-                        <td className="p-3 text-lab-300">
-                          {p.asin && (
-                            <span className="px-1.5 py-0.5 bg-lab-950 border border-lab-700 rounded text-[10px] block w-max">
-                              ASIN {p.asin}
+            {/* Products Table */}
+            <div className="rounded-xl border border-gray-200 bg-white shadow-xs overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50 border-b border-gray-200 text-[10px] font-bold uppercase tracking-wider text-gray-600">
+                      <th className="py-3.5 px-4">SKU / Item</th>
+                      <th className="py-3.5 px-4">Sourcing</th>
+                      <th className="py-3.5 px-4">Cost Data</th>
+                      <th className="py-3.5 px-4">Retail Price</th>
+                      <th className="py-3.5 px-4">Gross Margin</th>
+                      <th className="py-3.5 px-4">Inventory</th>
+                      <th className="py-3.5 px-4">Status</th>
+                      <th className="py-3.5 px-4 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {filteredProducts.map((p) => {
+                      const defaultPkg = p.packageOptions?.find((o) => o.isDefault) || p.packageOptions?.[0] || {
+                        id: "pkg_default",
+                        name: "Standard Pack",
+                        quantity: 1,
+                        price: p.basePrice,
+                        unitPrice: p.basePrice,
+                      };
+                      const unitCost = p.costData?.totalUnitCost ?? p.cost ?? 0;
+                      const margin = calculateMarginPercentage(defaultPkg.unitPrice, unitCost);
+
+                      return (
+                        <tr key={p.id} className="hover:bg-gray-50/80 transition">
+                          
+                          {/* Item */}
+                          <td className="py-3.5 px-4">
+                            <div className="font-semibold text-gray-950 line-clamp-1">{p.name}</div>
+                            <div className="text-[10px] text-gray-500 font-mono mt-0.5">
+                              {p.sku} • <span className="capitalize">{p.category}</span>
+                            </div>
+                          </td>
+
+                          {/* Sourcing */}
+                          <td className="py-3.5 px-4 text-gray-700">
+                            {p.asin && (
+                              <span className="px-1.5 py-0.5 bg-gray-100 border border-gray-200 rounded text-[10px] font-mono block w-max">
+                                ASIN {p.asin}
+                              </span>
+                            )}
+                            {p.supplierProductId && (
+                              <span className="px-1.5 py-0.5 bg-gray-100 border border-gray-200 rounded text-[10px] font-mono block w-max mt-0.5">
+                                Sup: {p.supplierProductId}
+                              </span>
+                            )}
+                          </td>
+
+                          {/* Cost */}
+                          <td className="py-3.5 px-4 text-gray-600 font-mono">
+                            <div>{formatCurrency(p.costData?.supplierCost ?? p.cost ?? 0)} / {p.costData?.supplierQuantity ?? 1}u</div>
+                            <div className="text-gray-900 font-semibold text-[11px]">Net: {formatUnitPrice(unitCost)}</div>
+                          </td>
+
+                          {/* Retail Price */}
+                          <td className="py-3.5 px-4 font-mono font-semibold text-gray-900">
+                            {formatCurrency(defaultPkg.price)} ({defaultPkg.quantity}u)
+                          </td>
+
+                          {/* Gross Margin */}
+                          <td className="py-3.5 px-4">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                              margin >= 30 
+                                ? "bg-emerald-50 text-emerald-800 border border-emerald-200" 
+                                : "bg-amber-50 text-amber-800 border border-amber-200"
+                            }`}>
+                              {margin.toFixed(1)}%
                             </span>
-                          )}
-                          {p.supplierProductId && (
-                            <span className="px-1.5 py-0.5 bg-lab-950 border border-lab-700 rounded text-[10px] block w-max mt-0.5">
-                              Ali: {p.supplierProductId}
+                          </td>
+
+                          {/* Inventory */}
+                          <td className="py-3.5 px-4 text-gray-700 font-mono">
+                            <span className="font-semibold text-gray-950">
+                              {p.inventory?.availableQuantity ?? p.inventory?.quantityInStock ?? 0}
+                            </span> units
+                          </td>
+
+                          {/* Status */}
+                          <td className="py-3.5 px-4">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                              p.status === "active" 
+                                ? "bg-[#F0FDF4] text-[#166534] border border-[#BBF7D0]" 
+                                : "bg-gray-100 text-gray-700 border border-gray-200"
+                            }`}>
+                              {p.status}
                             </span>
-                          )}
-                        </td>
-                        <td className="p-3 text-lab-400">
-                          <div>{formatCurrency(p.costData.supplierCost)} / {p.costData.supplierQuantity}u</div>
-                          <div className="text-white font-bold text-[11px]">Net: {formatUnitPrice(p.costData.totalUnitCost)}</div>
-                        </td>
-                        <td className="p-3 text-amber-400 font-bold">
-                          {formatCurrency(defaultPkg.price)} ({defaultPkg.quantity}u)
-                        </td>
-                        <td className="p-3">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                            margin >= 30 ? "bg-emerald-500/20 text-emerald-400" : "bg-amber-500/20 text-amber-400"
-                          }`}>
-                            {margin.toFixed(1)}%
-                          </span>
-                        </td>
-                        <td className="p-3 text-lab-300">
-                          <span className="font-bold text-white">{p.inventory.availableQuantity}</span> units
-                        </td>
-                        <td className="p-3">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                            p.status === "active" ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" : "bg-lab-800 text-lab-400"
-                          }`}>
-                            {p.status}
-                          </span>
-                        </td>
-                        <td className="p-3 text-right">
-                          <button
-                            onClick={() => handleEdit(p)}
-                            className="px-2.5 py-1 rounded bg-lab-800 hover:bg-lab-700 text-white transition text-[11px] inline-flex items-center gap-1 border border-lab-700"
-                          >
-                            <Edit3 className="w-3 h-3" /> Edit
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                          </td>
+
+                          {/* Action */}
+                          <td className="py-3.5 px-4 text-right">
+                            <button
+                              onClick={() => handleEdit(p)}
+                              className="px-2.5 py-1 rounded-lg bg-white hover:bg-gray-100 text-gray-800 transition text-[11px] font-semibold inline-flex items-center gap-1 border border-gray-300 shadow-xs"
+                            >
+                              <Edit3 className="w-3 h-3 text-gray-500" /> Edit
+                            </button>
+                          </td>
+
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
+
           </div>
         )}
 
@@ -235,26 +279,27 @@ export default function AdminDashboardPage() {
             TAB 2: PRODUCT EDITOR MODAL / VIEW
         ========================================== */}
         {activeTab === "editor" && editingProduct && (
-          <div className="rounded-2xl border border-lab-800 bg-lab-950 p-6 space-y-6">
-            <div className="flex justify-between items-center border-b border-lab-800 pb-4">
+          <div className="rounded-xl border border-gray-200 bg-white p-6 sm:p-8 space-y-6 shadow-xs">
+            
+            <div className="flex justify-between items-center border-b border-gray-200 pb-4">
               <div>
-                <span className="text-[10px] text-amber-400 uppercase tracking-widest font-bold">
+                <span className="text-[10px] text-[#2B5F4A] uppercase tracking-wider font-bold block">
                   PRODUCT RECORD EDITOR
                 </span>
-                <h2 className="text-xl font-bold text-white mt-0.5">
+                <h2 className="text-xl font-bold text-gray-950 mt-0.5">
                   Editing: {editingProduct.name}
                 </h2>
               </div>
               <button
                 onClick={() => setActiveTab("catalog")}
-                className="p-1.5 rounded-lg bg-lab-900 border border-lab-800 text-lab-400 hover:text-white"
+                className="p-1.5 rounded-lg bg-gray-100 border border-gray-200 text-gray-500 hover:text-gray-950"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {saveSuccess && (
-              <div className="p-3 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-xs flex items-center gap-2">
+              <div className="p-3.5 rounded-lg bg-[#F0FDF4] border border-[#BBF7D0] text-[#166534] text-xs font-semibold flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4" /> Product pricing, inventory, and status updated successfully.
               </div>
             )}
@@ -262,33 +307,33 @@ export default function AdminDashboardPage() {
             <form onSubmit={handleSaveProduct} className="space-y-6 text-xs">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="text-lab-400 block mb-1">Product Name</label>
+                  <label className="text-gray-700 font-semibold block mb-1">Product Name</label>
                   <input
                     type="text"
                     value={editingProduct.name}
                     onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
-                    className="w-full bg-lab-900 border border-lab-800 rounded px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                    className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#2B5F4A] focus:ring-1 focus:ring-[#2B5F4A]"
                   />
                 </div>
 
                 <div>
-                  <label className="text-lab-400 block mb-1">SKU</label>
+                  <label className="text-gray-700 font-semibold block mb-1">SKU</label>
                   <input
                     type="text"
                     value={editingProduct.sku}
                     onChange={(e) => setEditingProduct({ ...editingProduct, sku: e.target.value })}
-                    className="w-full bg-lab-900 border border-lab-800 rounded px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                    className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#2B5F4A] focus:ring-1 focus:ring-[#2B5F4A]"
                   />
                 </div>
 
                 <div>
-                  <label className="text-lab-400 block mb-1">Catalog Status</label>
+                  <label className="text-gray-700 font-semibold block mb-1">Catalog Status</label>
                   <select
                     value={editingProduct.status}
                     onChange={(e) => setEditingProduct({ ...editingProduct, status: e.target.value as any })}
-                    className="w-full bg-lab-900 border border-lab-800 rounded px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                    className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-[#2B5F4A]"
                   >
-                    <option value="active">Active (Visible in Catalog)</option>
+                    <option value="active">Active (Visible in Storefront)</option>
                     <option value="draft">Draft</option>
                     <option value="inactive">Inactive</option>
                   </select>
@@ -296,48 +341,48 @@ export default function AdminDashboardPage() {
               </div>
 
               {/* Package Options Editor */}
-              <div className="p-4 rounded-xl border border-lab-800 bg-lab-900/40 space-y-3">
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                  <Layers className="w-4 h-4 text-amber-400" />
+              <div className="p-5 rounded-xl border border-gray-200 bg-gray-50/70 space-y-4">
+                <h3 className="text-xs font-bold text-gray-950 uppercase tracking-wider flex items-center gap-1.5">
+                  <Layers className="w-4 h-4 text-[#2B5F4A]" />
                   Fractional Package Tiers & Selling Prices
                 </h3>
 
-                <div className="space-y-2">
-                  {editingProduct.packageOptions.map((pkg, idx) => (
-                    <div key={pkg.id || idx} className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-2.5 rounded bg-lab-950 border border-lab-800">
+                <div className="space-y-2.5">
+                  {(editingProduct.packageOptions || []).map((pkg, idx) => (
+                    <div key={pkg.id || idx} className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 rounded-lg bg-white border border-gray-200">
                       <div>
-                        <span className="text-[10px] text-lab-500 block">Quantity</span>
+                        <span className="text-[10px] text-gray-500 font-semibold block">Quantity (Units)</span>
                         <input
                           type="number"
                           value={pkg.quantity}
                           onChange={(e) => {
-                            const newOptions = [...editingProduct.packageOptions];
+                            const newOptions = [...(editingProduct.packageOptions || [])];
                             newOptions[idx].quantity = parseInt(e.target.value) || 1;
                             newOptions[idx].unitPrice = newOptions[idx].price / newOptions[idx].quantity;
                             setEditingProduct({ ...editingProduct, packageOptions: newOptions });
                           }}
-                          className="w-full bg-lab-900 border border-lab-800 rounded px-2 py-1 text-white text-xs"
+                          className="w-full bg-white border border-gray-300 rounded px-2.5 py-1 text-gray-900 text-xs mt-1"
                         />
                       </div>
                       <div>
-                        <span className="text-[10px] text-lab-500 block">Package Price ($)</span>
+                        <span className="text-[10px] text-gray-500 font-semibold block">Package Price ($)</span>
                         <input
                           type="number"
                           step="0.01"
                           value={pkg.price}
                           onChange={(e) => {
-                            const newOptions = [...editingProduct.packageOptions];
+                            const newOptions = [...(editingProduct.packageOptions || [])];
                             newOptions[idx].price = parseFloat(e.target.value) || 0;
                             newOptions[idx].unitPrice = newOptions[idx].price / newOptions[idx].quantity;
                             setEditingProduct({ ...editingProduct, packageOptions: newOptions });
                           }}
-                          className="w-full bg-lab-900 border border-lab-800 rounded px-2 py-1 text-amber-400 font-bold text-xs"
+                          className="w-full bg-white border border-gray-300 rounded px-2.5 py-1 text-gray-900 font-bold text-xs mt-1"
                         />
                       </div>
                       <div>
-                        <span className="text-[10px] text-lab-500 block">Calculated Unit Price</span>
-                        <div className="text-lab-300 py-1 font-bold">
-                          {formatUnitPrice(pkg.unitPrice)}
+                        <span className="text-[10px] text-gray-500 font-semibold block">Calculated Unit Price</span>
+                        <div className="text-gray-900 py-1 font-mono font-bold text-xs mt-1">
+                          {formatUnitPrice(pkg.unitPrice)} / unit
                         </div>
                       </div>
                     </div>
@@ -346,17 +391,17 @@ export default function AdminDashboardPage() {
               </div>
 
               {/* Inventory Management */}
-              <div className="p-4 rounded-xl border border-lab-800 bg-lab-900/40 space-y-3">
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                  <Package className="w-4 h-4 text-amber-400" />
+              <div className="p-5 rounded-xl border border-gray-200 bg-gray-50/70 space-y-4">
+                <h3 className="text-xs font-bold text-gray-950 uppercase tracking-wider flex items-center gap-1.5">
+                  <Package className="w-4 h-4 text-[#2B5F4A]" />
                   Inventory Stock Controls
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="text-lab-400 block mb-1">Physical Stock Available</label>
+                    <label className="text-gray-700 font-semibold block mb-1">Physical Stock Available</label>
                     <input
                       type="number"
-                      value={editingProduct.inventory.availableQuantity}
+                      value={editingProduct.inventory?.availableQuantity ?? editingProduct.inventory?.quantityInStock ?? 0}
                       onChange={(e) =>
                         setEditingProduct({
                           ...editingProduct,
@@ -367,15 +412,15 @@ export default function AdminDashboardPage() {
                           },
                         })
                       }
-                      className="w-full bg-lab-900 border border-lab-800 rounded px-3 py-2 text-white text-xs"
+                      className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 text-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="text-lab-400 block mb-1">Reorder Point</label>
+                    <label className="text-gray-700 font-semibold block mb-1">Reorder Point</label>
                     <input
                       type="number"
-                      value={editingProduct.inventory.reorderPoint}
+                      value={editingProduct.inventory?.reorderPoint ?? 25}
                       onChange={(e) =>
                         setEditingProduct({
                           ...editingProduct,
@@ -385,15 +430,15 @@ export default function AdminDashboardPage() {
                           },
                         })
                       }
-                      className="w-full bg-lab-900 border border-lab-800 rounded px-3 py-2 text-white text-xs"
+                      className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 text-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="text-lab-400 block mb-1">Low Stock Warning</label>
+                    <label className="text-gray-700 font-semibold block mb-1">Low Stock Warning</label>
                     <input
                       type="number"
-                      value={editingProduct.inventory.lowStockThreshold}
+                      value={editingProduct.inventory?.lowStockThreshold ?? 10}
                       onChange={(e) =>
                         setEditingProduct({
                           ...editingProduct,
@@ -403,29 +448,30 @@ export default function AdminDashboardPage() {
                           },
                         })
                       }
-                      className="w-full bg-lab-900 border border-lab-800 rounded px-3 py-2 text-white text-xs"
+                      className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 text-xs"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Actions */}
-              <div className="flex justify-end gap-3 pt-4 border-t border-lab-800">
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
                 <button
                   type="button"
                   onClick={() => setActiveTab("catalog")}
-                  className="px-4 py-2 rounded bg-lab-900 border border-lab-800 text-lab-300 hover:text-white"
+                  className="px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold text-xs transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 rounded bg-gradient-to-r from-amber-500 to-amber-600 text-lab-950 font-bold uppercase tracking-wider hover:brightness-110 flex items-center gap-1.5"
+                  className="px-6 py-2 rounded-lg bg-[#2B5F4A] text-white font-bold uppercase tracking-wider hover:bg-[#1E4233] flex items-center gap-1.5 text-xs transition shadow-xs"
                 >
                   <Save className="w-4 h-4" /> Save Product Changes
                 </button>
               </div>
             </form>
+
           </div>
         )}
 
@@ -434,48 +480,13 @@ export default function AdminDashboardPage() {
         ========================================== */}
         {activeTab === "margins" && (
           <div className="space-y-6">
-            <div className="p-4 rounded-xl border border-lab-700 bg-lab-900/60 space-y-2">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" /> Margin Guard Rule (25%+ Floor)
+            <div className="p-5 rounded-xl border border-gray-200 bg-white space-y-2 shadow-xs">
+              <h3 className="text-sm font-bold text-gray-950 flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-600" /> Margin Guard Rule (25%+ Floor)
               </h3>
-              <p className="text-xs text-lab-300">
-                Rule: Discounts (like the 20% OFF for 3+ packs) are validated in real-time. If applying the full 20% drops
-                the margin below 25%, the discount is capped at the maximum allowed margin floor.
+              <p className="text-xs text-gray-600 leading-relaxed">
+                Rule: Discounts (like volume tiers for 3+ packs) are validated in real-time. If applying a discount drops the margin below 25%, the price is automatically capped at the approved floor.
               </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {productsList.filter((p) => p.packageOptions.length > 1).map((p) => (
-                <div key={p.id} className="p-4 rounded-xl border border-lab-800 bg-lab-900/30 space-y-3">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="text-xs font-bold text-white">{p.name}</h4>
-                      <span className="text-[10px] text-lab-500">Unit Cost: {formatUnitPrice(p.costData.totalUnitCost)}</span>
-                    </div>
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-lab-950 text-lab-300 border border-lab-800">
-                      {p.sku}
-                    </span>
-                  </div>
-
-                  <div className="space-y-1.5 text-xs">
-                    {p.packageOptions.map((pkg) => {
-                      const margin = calculateMarginPercentage(pkg.unitPrice, p.costData.totalUnitCost);
-                      return (
-                        <div key={pkg.id} className="flex justify-between items-center p-2 rounded bg-lab-950 border border-lab-800/60">
-                          <span className="text-white font-bold">{pkg.quantity} Units</span>
-                          <span className="text-lab-400">{formatUnitPrice(pkg.unitPrice)}</span>
-                          <span className="text-white font-bold">{formatCurrency(pkg.price)}</span>
-                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                            margin >= 30 ? "bg-emerald-500/20 text-emerald-400" : "bg-amber-500/20 text-amber-400"
-                          }`}>
-                            {margin.toFixed(1)}% Margin
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         )}
@@ -484,124 +495,53 @@ export default function AdminDashboardPage() {
             TAB 4: INVENTORY
         ========================================== */}
         {activeTab === "inventory" && (
-          <div className="space-y-4">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider">
-              Live Unit Inventory & Reorder Points
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
-              {productsList.map((p) => (
-                <div key={p.id} className="p-4 rounded-xl border border-lab-800 bg-lab-900/40 space-y-3">
-                  <div className="flex justify-between items-start">
-                    <h4 className="font-bold text-white line-clamp-1">{p.name}</h4>
-                    <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-400 font-bold">
-                      IN STOCK
-                    </span>
-                  </div>
-
-                  <div className="space-y-1 text-lab-300">
-                    <div className="flex justify-between">
-                      <span className="text-lab-500">Available Stock:</span>
-                      <span className="font-bold text-white">{p.inventory.availableQuantity} units</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-lab-500">Reorder Threshold:</span>
-                      <span>{p.inventory.reorderPoint} units</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-lab-500">Low Stock Alert:</span>
-                      <span>{p.inventory.lowStockThreshold} units</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
+          <div className="p-6 rounded-xl border border-gray-200 bg-white space-y-4 shadow-xs">
+            <h3 className="text-sm font-bold text-gray-950 flex items-center gap-2">
+              <Package className="w-4 h-4 text-[#2B5F4A]" /> Stock Inventory Overview
+            </h3>
+            <p className="text-xs text-gray-600 leading-relaxed">
+              All physical packaging, bottles, and supplies are tracked independently with dedicated SKU identifiers and minimum inventory levels.
+            </p>
+            <div className="pt-2">
+              <Link
+                href="/admin/inventory"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#2B5F4A] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#1E4233] transition"
+              >
+                Go to Dedicated Inventory Page →
+              </Link>
             </div>
           </div>
         )}
 
         {/* ==========================================
-            TAB 5: CUSTOM LABELS SPECIFICATION LINKAGES
-        ========================================== */}
-        {activeTab === "labels" && (
-          <div className="space-y-4">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider">
-              Bottle Outer Diameter $\leftrightarrow$ Custom Label Specifications
-            </h2>
-
-            <div className="p-5 rounded-xl border border-amber-500/40 bg-amber-500/5 space-y-3">
-              <h3 className="font-bold text-white text-sm flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-400" />
-                10 ml Glass Roll-On Bottle Direct Linkage
-              </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                <div className="p-3 bg-lab-950 rounded border border-lab-800">
-                  <span className="text-lab-500 block text-[10px]">BOTTLE DIAMETER</span>
-                  <span className="text-white font-bold">0.79 inches (2.0 cm)</span>
-                </div>
-                <div className="p-3 bg-lab-950 rounded border border-lab-800">
-                  <span className="text-lab-500 block text-[10px]">BOTTLE HEIGHT</span>
-                  <span className="text-white font-bold">3.46 inches (8.8 cm)</span>
-                </div>
-                <div className="p-3 bg-lab-950 rounded border border-lab-800">
-                  <span className="text-lab-500 block text-[10px]">LABEL SIZE (INCHES)</span>
-                  <span className="text-amber-400 font-bold">1.5 × 2.25 inches</span>
-                </div>
-                <div className="p-3 bg-lab-950 rounded border border-lab-800">
-                  <span className="text-lab-500 block text-[10px]">LABEL SIZE (CM)</span>
-                  <span className="text-amber-400 font-bold">3.81 × 5.72 cm</span>
-                </div>
-              </div>
-              <p className="text-xs text-lab-300">
-                When a customer views the 10 ml Roll-On PDP, the frontend automatically mounts the 
-                <strong> &quot;COMPLETE YOUR ROLL-ON&quot;</strong> recommendation banner linked to <code>prod_custom_labels</code>.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* ==========================================
-            TAB 6: IDEMPOTENT DATABASE SEEDING
+            TAB 5: SEEDING (FIRESTORE SYNC)
         ========================================== */}
         {activeTab === "seeding" && (
-          <div className="max-w-2xl rounded-xl border border-lab-800 bg-lab-950 p-6 space-y-4">
-            <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider">
-              <Database className="w-4 h-4" /> FIRESTORE SEED RUNNER
-            </div>
-
-            <h2 className="text-lg font-bold text-white">
-              Idempotent Database Seed Operation
-            </h2>
-
-            <p className="text-xs text-lab-300 leading-relaxed">
-              Seeds all 16 exact products and 8 categories into Firestore using deterministic document IDs. 
-              Safe to run multiple times without creating duplicate records.
+          <div className="p-6 rounded-xl border border-gray-200 bg-white space-y-4 shadow-xs">
+            <h3 className="text-sm font-bold text-gray-950 flex items-center gap-2">
+              <Database className="w-4 h-4 text-[#2B5F4A]" /> Idempotent Database Synchronization
+            </h3>
+            <p className="text-xs text-gray-600 leading-relaxed">
+              Sync catalog definitions and packaging data to Firestore with conflict-free idempotent writes.
             </p>
 
             {seedMessage && (
-              <div className="p-3 rounded bg-lab-900 border border-lab-800 text-xs text-amber-300">
+              <div className="p-3.5 rounded-lg bg-gray-50 border border-gray-200 text-xs font-mono text-gray-800">
                 {seedMessage}
               </div>
             )}
 
             <button
-              type="button"
-              disabled={seedLoading}
               onClick={handleRunSeed}
-              className="px-5 py-3 rounded-lg text-xs font-bold uppercase bg-gradient-to-r from-amber-500 to-amber-600 text-lab-950 hover:brightness-110 transition flex items-center gap-2"
+              disabled={seedLoading}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#2B5F4A] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#1E4233] disabled:opacity-50 transition shadow-xs"
             >
-              {seedLoading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-lab-950 border-t-transparent animate-spin rounded-full" />
-                  Seeding Firestore...
-                </>
-              ) : (
-                <>
-                  <RotateCcw className="w-4 h-4" /> Run Idempotent Seed
-                </>
-              )}
+              <RefreshCw className={`w-4 h-4 ${seedLoading ? "animate-spin" : ""}`} />
+              {seedLoading ? "Synchronizing..." : "Run Database Sync"}
             </button>
           </div>
         )}
+
       </div>
     </AdminGuard>
   );

@@ -13,6 +13,7 @@ export interface VolumePriceTier {
   maxQuantity?: number;
   unitPrice: number;
   discountPercentage?: number;
+  active?: boolean;
 }
 
 export interface PricingTier {

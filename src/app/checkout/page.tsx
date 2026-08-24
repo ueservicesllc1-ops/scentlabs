@@ -9,17 +9,12 @@ import { customerRepository } from "@/lib/firestore/customer";
 import { CustomerAddress } from "@/types/customer";
 import { ShippoRate } from "@/types/shipping";
 import { GoogleAddressAutocomplete } from "@/components/common/GoogleAddressAutocomplete";
-import { formatCurrency, formatUnitPrice } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 import { 
   ShieldCheck, 
-  Truck, 
   ArrowLeft, 
   Lock, 
-  ShoppingBag, 
   AlertCircle, 
-  CheckCircle2, 
-  Sparkles, 
-  MapPin, 
   Loader2,
   RefreshCw 
 } from "lucide-react";
@@ -98,67 +93,79 @@ export default function CheckoutPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           items,
-          shippingAddress: {
-            line1: streetAddress,
-            line2: suite,
+          toAddress: {
+            name: fullName || "Guest Buyer",
+            street1: streetAddress,
+            street2: suite,
             city,
             state,
-            postalCode,
+            zip: postalCode,
             country,
+            phone,
           },
         }),
       });
 
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "Failed to calculate courier shipping rates.");
+      }
+
       const data = await res.json();
-      if (res.ok && data.rates && data.rates.length > 0) {
+      if (data.rates && data.rates.length > 0) {
         setRates(data.rates);
-        setSelectedRate(data.rates[0]);
+        // Default select cheapest
+        const sorted = [...data.rates].sort((a, b) => Number(a.amount) - Number(b.amount));
+        setSelectedRate(sorted[0]);
       } else {
-        setRatesError("We couldn't find automatic courier rates for this address.");
+        setRates([]);
+        setSelectedRate(null);
+        setRatesError("No shipping services available for this destination address.");
       }
     } catch (err: any) {
-      setRatesError("Failed to fetch shipping rates. Default flat rate available.");
+      setRatesError(err.message || "Unable to fetch Shippo rates.");
+      setRates([]);
+      setSelectedRate(null);
     } finally {
       setFetchingRates(false);
     }
   };
 
+  // Auto query rates when zip/city changes
   useEffect(() => {
-    if (city && postalCode && streetAddress) {
-      fetchLiveRates();
-    }
-  }, [city, postalCode, streetAddress]);
+    const delayDebounce = setTimeout(() => {
+      if (streetAddress && city && state && postalCode) {
+        fetchLiveRates();
+      }
+    }, 1200);
 
-  const shippingCost = selectedRate ? selectedRate.amount : 8.50;
+    return () => clearTimeout(delayDebounce);
+  }, [streetAddress, city, state, postalCode]);
+
+  const shippingCost = selectedRate ? Number(selectedRate.amount) : 0;
   const grandTotal = summary.totalBeforeShipping + shippingCost;
 
   const handleCreateStripeSession = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage("");
+    if (items.length === 0) return;
 
-    if (!email.trim() || !fullName.trim() || !streetAddress.trim() || !city.trim() || !postalCode.trim()) {
-      setErrorMessage("Please complete all shipping address and contact fields.");
-      return;
-    }
-
-    if (items.length === 0) {
-      setErrorMessage("Your cart is empty.");
+    if (!selectedRate) {
+      setErrorMessage("Please select a Shippo shipping courier rate option.");
       return;
     }
 
     setLoading(true);
+    setErrorMessage("");
 
     try {
-      const response = await fetch("/api/checkout/create-session", {
+      // 1. Validate alignment with Margin Guard first
+      const validationRes = await fetch("/api/orders/validate-margins", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           items,
-          customerEmail: email,
-          customerId: user?.uid || null,
           shippingAddress: {
-            fullName,
-            streetAddress: `${streetAddress} ${suite}`.trim(),
+            name: fullName,
             line1: streetAddress,
             line2: suite,
             city,
@@ -167,41 +174,66 @@ export default function CheckoutPage() {
             country,
             phone,
           },
-          shippoRateId: selectedRate?.id || "rate_standard",
-          carrier: selectedRate?.carrier || "USPS",
-          service: selectedRate?.service || "USPS Ground Advantage",
+          shippingMethod: selectedRate.service,
           shippingCost,
-          taxRate: 0,
         }),
       });
 
-      const data = await response.json();
-
-      if (!response.ok || !data.url) {
-        throw new Error(data.error || "Failed to initialize checkout session.");
+      const validationData = await validationRes.json();
+      if (!validationRes.ok) {
+        throw new Error(
+          validationData.message || "Margin Guard validation failed. Discount levels exceed allowed margin caps."
+        );
       }
 
-      window.location.href = data.url;
+      // 2. Create Stripe checkout session
+      const stripeRes = await fetch("/api/checkout/stripe-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items,
+          customerId: user?.uid || "guest",
+          customerEmail: email,
+          shippingAddress: {
+            name: fullName,
+            line1: streetAddress,
+            line2: suite,
+            city,
+            state,
+            postalCode,
+            country,
+            phone,
+          },
+          shippingRate: selectedRate,
+          grandTotal,
+        }),
+      });
+
+      if (!stripeRes.ok) {
+        const stripeErr = await stripeRes.json();
+        throw new Error(stripeErr.message || "Stripe checkout session initialization failed.");
+      }
+
+      const stripeSession = await stripeRes.json();
+      if (stripeSession.checkoutUrl) {
+        router.push(stripeSession.checkoutUrl);
+      } else {
+        throw new Error("Stripe checkout redirection URL is missing.");
+      }
     } catch (err: any) {
-      setErrorMessage(err.message || "An unexpected error occurred during checkout initialization.");
+      setErrorMessage(err.message || "Checkout transaction error.");
       setLoading(false);
     }
   };
 
   if (items.length === 0) {
     return (
-      <div className="max-w-md mx-auto my-20 p-8 text-center border border-lab-800 rounded-2xl bg-lab-950 space-y-4 font-mono">
-        <div className="w-14 h-14 rounded-full bg-lab-900 border border-lab-800 flex items-center justify-center mx-auto text-lab-500">
-          <ShoppingBag className="w-6 h-6" />
-        </div>
-        <h1 className="text-lg font-bold text-white uppercase">Cart is Empty</h1>
-        <p className="text-xs text-lab-400">
-          Please add items to your formulation cart before proceeding to checkout.
+      <div className="max-w-md mx-auto text-center py-24 space-y-6 px-4 font-body-md text-on-surface">
+        <h2 className="font-display-hero text-headline-lg text-primary uppercase">No Selection Active</h2>
+        <p className="font-caption text-caption text-secondary">
+          Add raw materials, compounding vessels, or labels to your bag before checking out.
         </p>
-        <Link
-          href="/shop"
-          className="inline-block px-5 py-2.5 rounded-lg text-xs font-bold uppercase bg-amber-500 text-lab-950 hover:brightness-110"
-        >
+        <Link href="/shop" className="flat-btn px-8 py-3.5 w-full uppercase">
           Explore Catalog
         </Link>
       </div>
@@ -209,94 +241,97 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-mono space-y-8">
+    <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-section-gap font-body-md text-on-surface space-y-stack-lg">
+      
       {/* Header */}
-      <div className="border-b border-lab-800 pb-4 flex justify-between items-end">
+      <div className="border-b border-outline-variant pb-4 flex justify-between items-end">
         <div>
-          <span className="text-xs text-amber-400 font-bold uppercase tracking-widest block mb-1">
-            SECURE FORMULATION DISPATCH
+          <span className="font-label-caps text-label-caps text-secondary uppercase tracking-[0.2em] block mb-1">
+            Secure Fulfillment
           </span>
-          <h1 className="text-2xl sm:text-3xl font-black text-white uppercase">
-            Checkout & Fulfillment
+          <h1 className="font-display-hero text-headline-lg-mobile md:text-headline-md text-primary uppercase">
+            Secure Checkout
           </h1>
         </div>
         <Link
           href="/cart"
-          className="text-xs text-lab-400 hover:text-white transition flex items-center gap-1.5"
+          className="font-label-caps text-label-caps text-secondary hover:text-primary transition flex items-center gap-1.5 uppercase"
         >
           <ArrowLeft className="w-3.5 h-3.5" /> Back to Cart
         </Link>
       </div>
 
       {errorMessage && (
-        <div className="p-4 rounded-xl bg-rose-950/60 border border-rose-500/40 text-xs text-rose-300 flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+        <div className="p-4 rounded-sm bg-red-50 border border-red-200 text-xs text-red-800 flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
           <span>{errorMessage}</span>
         </div>
       )}
 
-      <form onSubmit={handleCreateStripeSession} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column: Contact, Address, Shippo Selection */}
+      <form onSubmit={handleCreateStripeSession} className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+        
+        {/* Left Column: Contact, Address, Shippo Selection (Stitch 7 Columns) */}
         <div className="lg:col-span-7 space-y-6">
+          
           {/* 1. Contact Information */}
-          <div className="p-6 rounded-2xl border border-lab-800 bg-lab-950 space-y-4">
-            <h2 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-amber-500 text-lab-950 flex items-center justify-center text-[10px] font-black">
+          <div className="p-6 border border-outline-variant bg-surface-bright rounded-sm space-y-4">
+            <h2 className="font-label-caps text-label-caps text-primary uppercase flex items-center gap-2">
+              <span className="w-5 h-5 rounded bg-primary text-on-primary flex items-center justify-center text-[10px] font-semibold">
                 1
               </span>
-              Contact & Formulation Recipient
+              Contact & Recipient
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-body-md">
               <div className="sm:col-span-2">
-                <label className="text-lab-400 block mb-1 uppercase text-[10px]">Email Address</label>
+                <label className="text-secondary block mb-1 uppercase text-[10px] font-semibold">Email Address</label>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="formulator@scentlab.com"
-                  className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3.5 py-2.5 text-white placeholder-lab-600 focus:outline-none focus:border-amber-500"
+                  placeholder="name@company.com"
+                  className="w-full bg-surface border border-outline-variant rounded-sm px-3.5 py-2.5 text-primary placeholder:text-secondary focus:outline-none focus:border-primary"
                 />
               </div>
 
               <div>
-                <label className="text-lab-400 block mb-1 uppercase text-[10px]">Full Name</label>
+                <label className="text-secondary block mb-1 uppercase text-[10px] font-semibold">Full Name</label>
                 <input
                   type="text"
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Jane Doe"
-                  className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3.5 py-2.5 text-white placeholder-lab-600 focus:outline-none focus:border-amber-500"
+                  className="w-full bg-surface border border-outline-variant rounded-sm px-3.5 py-2.5 text-primary placeholder:text-secondary focus:outline-none focus:border-primary"
                 />
               </div>
 
               <div>
-                <label className="text-lab-400 block mb-1 uppercase text-[10px]">Phone Number</label>
+                <label className="text-secondary block mb-1 uppercase text-[10px] font-semibold">Phone Number</label>
                 <input
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+1 (555) 019-2834"
-                  className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3.5 py-2.5 text-white placeholder-lab-600 focus:outline-none focus:border-amber-500"
+                  className="w-full bg-surface border border-outline-variant rounded-sm px-3.5 py-2.5 text-primary placeholder:text-secondary focus:outline-none focus:border-primary"
                 />
               </div>
             </div>
           </div>
 
-          {/* 2. Delivery Address with Google Places Autocomplete */}
-          <div className="p-6 rounded-2xl border border-lab-800 bg-lab-950 space-y-4">
+          {/* 2. Delivery Address */}
+          <div className="p-6 border border-outline-variant bg-surface-bright rounded-sm space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-amber-500 text-lab-950 flex items-center justify-center text-[10px] font-black">
+              <h2 className="font-label-caps text-label-caps text-primary uppercase flex items-center gap-2">
+                <span className="w-5 h-5 rounded bg-primary text-on-primary flex items-center justify-center text-[10px] font-semibold">
                   2
                 </span>
                 Shipping Destination
               </h2>
 
               {savedAddresses.length > 0 && (
-                <div className="text-[10px] text-lab-400">
+                <div className="text-[10px] text-primary">
                   <select
                     value={selectedSavedAddrId}
                     onChange={(e) => {
@@ -308,12 +343,12 @@ export default function CheckoutPage() {
                         if (found) applyAddress(found);
                       }
                     }}
-                    className="bg-lab-900 border border-lab-800 text-amber-400 px-2.5 py-1 rounded-lg text-xs"
+                    className="bg-surface border border-outline-variant text-primary px-2.5 py-1 rounded-sm text-xs focus:outline-none focus:border-primary"
                   >
                     <option value="new">+ Enter New Address</option>
                     {savedAddresses.map((a) => (
                       <option key={a.id} value={a.id}>
-                        {a.firstName} {a.lastName} ({a.city}, {a.state}) {a.isDefault ? "★" : ""}
+                        {a.firstName} {a.lastName} ({a.city}, {a.state})
                       </option>
                     ))}
                   </select>
@@ -323,7 +358,7 @@ export default function CheckoutPage() {
 
             {/* Google Places Autocomplete Search */}
             <div className="space-y-1.5">
-              <label className="text-[10px] text-lab-400 uppercase block">Google Address Autocomplete</label>
+              <label className="text-[10px] text-secondary uppercase block font-semibold">Google Address Autocomplete</label>
               <GoogleAddressAutocomplete
                 initialAddress={{ line1: streetAddress }}
                 onAddressSelect={applyAddress}
@@ -331,63 +366,63 @@ export default function CheckoutPage() {
             </div>
 
             {/* Address Form Inputs */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-body-md pt-1">
               <div className="sm:col-span-2">
-                <label className="text-lab-400 block mb-1 uppercase text-[10px]">Street Address</label>
+                <label className="text-secondary block mb-1 uppercase text-[10px] font-semibold">Street Address</label>
                 <input
                   type="text"
                   required
                   value={streetAddress}
                   onChange={(e) => setStreetAddress(e.target.value)}
-                  placeholder="123 Formulator Way"
-                  className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3.5 py-2.5 text-white placeholder-lab-600 focus:outline-none focus:border-amber-500"
+                  placeholder="123 Compounding Way"
+                  className="w-full bg-surface border border-outline-variant rounded-sm px-3.5 py-2.5 text-primary placeholder:text-secondary focus:outline-none focus:border-primary"
                 />
               </div>
 
               <div className="sm:col-span-2">
-                <label className="text-lab-400 block mb-1 uppercase text-[10px]">Suite / Apt / Unit</label>
+                <label className="text-secondary block mb-1 uppercase text-[10px] font-semibold">Suite / Apt / Unit</label>
                 <input
                   type="text"
                   value={suite}
                   onChange={(e) => setSuite(e.target.value)}
                   placeholder="Suite 400"
-                  className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3.5 py-2.5 text-white placeholder-lab-600 focus:outline-none focus:border-amber-500"
+                  className="w-full bg-surface border border-outline-variant rounded-sm px-3.5 py-2.5 text-primary placeholder:text-secondary focus:outline-none focus:border-primary"
                 />
               </div>
 
               <div>
-                <label className="text-lab-400 block mb-1 uppercase text-[10px]">City</label>
+                <label className="text-secondary block mb-1 uppercase text-[10px] font-semibold">City</label>
                 <input
                   type="text"
                   required
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="Miami"
-                  className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3.5 py-2.5 text-white placeholder-lab-600 focus:outline-none focus:border-amber-500"
+                  className="w-full bg-surface border border-outline-variant rounded-sm px-3.5 py-2.5 text-primary placeholder:text-secondary focus:outline-none focus:border-primary"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-lab-400 block mb-1 uppercase text-[10px]">State</label>
+                  <label className="text-secondary block mb-1 uppercase text-[10px] font-semibold">State</label>
                   <input
                     type="text"
                     required
                     value={state}
                     onChange={(e) => setState(e.target.value)}
                     placeholder="FL"
-                    className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3.5 py-2.5 text-white placeholder-lab-600 focus:outline-none focus:border-amber-500"
+                    className="w-full bg-surface border border-outline-variant rounded-sm px-3.5 py-2.5 text-primary placeholder:text-secondary focus:outline-none focus:border-primary"
                   />
                 </div>
                 <div>
-                  <label className="text-lab-400 block mb-1 uppercase text-[10px]">ZIP Code</label>
+                  <label className="text-secondary block mb-1 uppercase text-[10px] font-semibold">ZIP Code</label>
                   <input
                     type="text"
                     required
                     value={postalCode}
                     onChange={(e) => setPostalCode(e.target.value)}
                     placeholder="33122"
-                    className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3.5 py-2.5 text-white placeholder-lab-600 focus:outline-none focus:border-amber-500"
+                    className="w-full bg-surface border border-outline-variant rounded-sm px-3.5 py-2.5 text-primary placeholder:text-secondary focus:outline-none focus:border-primary"
                   />
                 </div>
               </div>
@@ -395,37 +430,37 @@ export default function CheckoutPage() {
           </div>
 
           {/* 3. Shippo Real-Time Shipping Rates */}
-          <div className="p-6 rounded-2xl border border-lab-800 bg-lab-950 space-y-4">
+          <div className="p-6 border border-outline-variant bg-surface-bright rounded-sm space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-amber-500 text-lab-950 flex items-center justify-center text-[10px] font-black">
+              <h2 className="font-label-caps text-label-caps text-primary uppercase flex items-center gap-2">
+                <span className="w-5 h-5 rounded bg-primary text-on-primary flex items-center justify-center text-[10px] font-semibold">
                   3
                 </span>
-                Shippo Courier Dispatch
+                Shippo Shipping Dispatch
               </h2>
 
               <button
                 type="button"
                 onClick={fetchLiveRates}
                 disabled={fetchingRates}
-                className="text-[10px] text-amber-400 hover:text-amber-300 font-bold uppercase flex items-center gap-1"
+                className="font-label-caps text-label-caps text-secondary hover:text-primary transition uppercase flex items-center gap-1"
               >
-                <RefreshCw className={`w-3 h-3 ${fetchingRates ? "animate-spin" : ""}`} /> Recalculate Rates
+                <RefreshCw className={`w-3 h-3 ${fetchingRates ? "animate-spin" : ""}`} /> Recalculate
               </button>
             </div>
 
             {fetchingRates ? (
-              <div className="p-6 text-center text-xs text-lab-400 flex items-center justify-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
-                Querying live USPS & UPS carrier rates via Shippo...
+              <div className="p-6 text-center text-xs text-secondary flex items-center justify-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                Querying carrier rates via Shippo API...
               </div>
             ) : ratesError ? (
-              <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/30 text-xs text-amber-300">
+              <div className="p-3.5 rounded-sm bg-red-50 border border-red-200 text-xs text-red-800">
                 {ratesError}
               </div>
             ) : rates.length === 0 ? (
-              <div className="text-xs text-lab-500 text-center py-4">
-                Enter your street address and ZIP code above to calculate live Shippo courier rates.
+              <div className="text-xs text-secondary text-center py-4">
+                Enter shipping destination address above to calculate live Shippo freight rates.
               </div>
             ) : (
               <div className="space-y-2.5">
@@ -435,34 +470,34 @@ export default function CheckoutPage() {
                     <div
                       key={rate.id}
                       onClick={() => setSelectedRate(rate)}
-                      className={`p-3.5 rounded-xl border cursor-pointer transition flex justify-between items-center text-xs ${
+                      className={`p-4 border cursor-pointer transition flex justify-between items-center rounded-sm text-xs ${
                         isSelected
-                          ? "border-amber-500 bg-amber-500/10 text-white shadow-md shadow-amber-500/5"
-                          : "border-lab-800 bg-lab-900/60 text-lab-300 hover:border-lab-700"
+                          ? "border-primary bg-surface-container text-primary font-medium"
+                          : "border-outline-variant bg-surface text-secondary hover:border-primary"
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                          isSelected ? "border-amber-400 bg-amber-400 text-lab-950" : "border-lab-700"
+                          isSelected ? "border-primary bg-primary text-on-primary" : "border-outline-variant"
                         }`}>
-                          {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-lab-950" />}
+                          {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-on-primary" />}
                         </div>
 
                         <div>
-                          <div className="font-bold uppercase flex items-center gap-2">
+                          <div className="font-semibold uppercase flex items-center gap-2">
                             <span>{rate.service}</span>
-                            <span className="text-[10px] px-1.5 py-0.2 rounded bg-lab-850 text-lab-400 border border-lab-750">
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-sm bg-surface-bright border border-outline-variant">
                               {rate.carrier}
                             </span>
                           </div>
-                          <div className="text-[10px] text-lab-400">
+                          <div className="text-[10px] text-secondary">
                             {rate.durationTerms || `${rate.estimatedDays || 3} business days`}
                           </div>
                         </div>
                       </div>
 
-                      <div className="font-mono font-bold text-amber-400 text-sm">
-                        {formatCurrency(rate.amount)}
+                      <div className="font-semibold text-primary text-sm">
+                        {formatCurrency(Number(rate.amount))}
                       </div>
                     </div>
                   );
@@ -472,60 +507,61 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        {/* Right Column: Order Summary & Stripe Payment */}
+        {/* Right Column: Order Summary & Stripe Payment (Stitch 5 Columns) */}
         <div className="lg:col-span-5 space-y-6">
-          <div className="p-6 rounded-2xl border border-lab-800 bg-lab-950 space-y-5 sticky top-6 shadow-2xl">
-            <h2 className="text-xs font-bold text-white uppercase tracking-wider border-b border-lab-900 pb-3 flex items-center justify-between">
-              <span>Order Summary</span>
-              <span className="text-amber-400 font-mono">{totalUnits} units</span>
+          <div className="p-6 border border-outline-variant bg-surface-bright rounded-sm space-y-5 lg:sticky lg:top-24">
+            
+            <h2 className="font-label-caps text-label-caps text-primary uppercase border-b border-outline-variant pb-3 flex justify-between">
+              <span>Bag Summary</span>
+              <span>{totalUnits} Units</span>
             </h2>
 
-            {/* Line items mini scroll */}
-            <div className="space-y-3 max-h-56 overflow-y-auto text-xs divide-y divide-lab-900/60">
+            {/* Line items list */}
+            <div className="space-y-3 max-h-56 overflow-y-auto text-xs divide-y divide-outline-variant/60">
               {items.map((item, idx) => (
                 <div key={idx} className="pt-2.5 first:pt-0 flex justify-between items-start gap-2">
                   <div>
-                    <div className="font-bold text-white uppercase text-[11px] leading-tight">
+                    <div className="font-semibold text-primary uppercase text-[11px] leading-tight">
                       {item.productName}
                     </div>
-                    <div className="text-[10px] text-lab-400">
-                      {item.selectedPackage?.name || item.selectedPackage?.label || `${item.selectedPackage?.quantity || 1} Unit Pack`} • {item.packageCount} pack(s) ({item.totalUnits}u total)
+                    <div className="text-[10px] text-secondary">
+                      {item.selectedPackage?.name || `${item.selectedPackage?.quantity || 1} u`} &bull; Qty: {item.packageCount} ({item.totalUnits}u total)
                     </div>
                   </div>
-                  <div className="font-mono text-lab-300 font-bold text-[11px]">
-                    {formatCurrency(item.totalLinePrice ?? item.totalPrice ?? (item.packagePrice * item.packageCount))}
-                  </div>
+                  <span className="font-mono text-primary font-medium">
+                    {formatCurrency(item.totalLinePrice ?? item.totalPrice ?? 0)}
+                  </span>
                 </div>
               ))}
             </div>
 
             {/* Price Calculations */}
-            <div className="border-t border-lab-900 pt-3 space-y-2 text-xs">
-              <div className="flex justify-between text-lab-400">
-                <span>Items Subtotal</span>
-                <span className="font-mono text-white">{formatCurrency(summary.subtotal)}</span>
+            <div className="border-t border-outline-variant pt-3 space-y-2 text-xs">
+              <div className="flex justify-between text-secondary">
+                <span>Subtotal</span>
+                <span className="text-primary font-medium">{formatCurrency(summary.subtotal)}</span>
               </div>
 
-              {(summary.discountTotal > 0 || (summary.discount || 0) > 0) && (
-                <div className="flex justify-between text-emerald-400">
+              {summary.discountTotal > 0 && (
+                <div className="flex justify-between text-emerald-700">
                   <span>Volume Tier Savings</span>
-                  <span className="font-mono">-{formatCurrency(summary.discountTotal || summary.discount || 0)}</span>
+                  <span>-${formatCurrency(summary.discountTotal)}</span>
                 </div>
               )}
 
-              <div className="flex justify-between text-lab-400">
-                <span>Shippo Dispatch ({selectedRate?.carrier || "Standard"})</span>
-                <span className="font-mono text-white">{formatCurrency(shippingCost)}</span>
+              <div className="flex justify-between text-secondary">
+                <span>Shippo Freight ({selectedRate?.carrier || "Standard"})</span>
+                <span className="text-primary font-medium">{formatCurrency(shippingCost)}</span>
               </div>
 
-              <div className="flex justify-between text-lab-400">
-                <span>Estimated Tax</span>
-                <span className="font-mono text-lab-500">$0.00</span>
+              <div className="flex justify-between text-secondary">
+                <span>Taxes &amp; Customs</span>
+                <span className="text-primary">$0.00</span>
               </div>
 
-              <div className="border-t border-lab-900 pt-3 flex justify-between items-baseline">
-                <span className="font-black text-white uppercase text-sm">Grand Total</span>
-                <span className="font-black text-amber-400 text-xl font-mono">
+              <div className="border-t border-outline-variant pt-3 flex justify-between items-baseline">
+                <span className="font-label-caps text-label-caps text-primary uppercase">Grand Total</span>
+                <span className="font-headline-md text-headline-md text-primary font-semibold">
                   {formatCurrency(grandTotal)}
                 </span>
               </div>
@@ -535,11 +571,11 @@ export default function CheckoutPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-lab-950 font-black text-sm uppercase tracking-wider hover:brightness-110 transition shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2"
+              className="flat-btn w-full py-4 uppercase flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Initializing Stripe Payment...
+                  <Loader2 className="w-4 h-4 animate-spin" /> Initializing Payment...
                 </>
               ) : (
                 <>
@@ -549,12 +585,12 @@ export default function CheckoutPage() {
             </button>
 
             {/* Security Guarantee */}
-            <div className="p-3 rounded-xl bg-lab-900/60 border border-lab-800 text-[10px] text-lab-400 space-y-1">
-              <div className="flex items-center gap-1.5 text-white font-bold uppercase">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> 256-Bit Encrypted Checkout
+            <div className="p-3.5 border border-outline-variant bg-surface-container-low text-[10px] text-secondary rounded-sm space-y-1">
+              <div className="flex items-center gap-1.5 text-primary font-semibold uppercase text-[9px] tracking-wider">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" /> Secure Payment &amp; Logistics
               </div>
-              <p className="leading-relaxed">
-                Payments are securely processed via Stripe. Shippo provides tracked multi-carrier dispatch with carrier liability protection.
+              <p className="leading-relaxed font-light">
+                Direct integration with Stripe API ensures PCI compliance. Tracked Shippo courier integration provides transit protections.
               </p>
             </div>
           </div>

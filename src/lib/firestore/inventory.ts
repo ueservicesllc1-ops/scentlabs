@@ -517,24 +517,47 @@ export const inventoryRepository = {
     }
   },
 
-  async getTransactions(limitCount: number = 50): Promise<InventoryTransaction[]> {
-    const local = Array.from(LOCAL_TRANSACTIONS.values()).sort(
+  async getTransactions(productIdOrLimit?: string | number, limitCount: number = 50): Promise<InventoryTransaction[]> {
+    let filterProductId: string | undefined = undefined;
+    let maxLimit = limitCount;
+
+    if (typeof productIdOrLimit === "string") {
+      filterProductId = productIdOrLimit;
+    } else if (typeof productIdOrLimit === "number") {
+      maxLimit = productIdOrLimit;
+    }
+
+    let local = Array.from(LOCAL_TRANSACTIONS.values()).sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
-    if (!isFirebaseConfigured || !db) return local.slice(0, limitCount);
+    if (filterProductId) {
+      local = local.filter((t) => t.inventoryItemId === filterProductId || (t as any).productId === filterProductId);
+    }
+
+    if (!isFirebaseConfigured || !db) return local.slice(0, maxLimit);
 
     try {
-      const q = query(
+      let q = query(
         collection(db, TRANSACTIONS_COLLECTION),
         orderBy("createdAt", "desc"),
-        limit(limitCount)
+        limit(maxLimit)
       );
+
+      if (filterProductId) {
+        q = query(
+          collection(db, TRANSACTIONS_COLLECTION),
+          where("inventoryItemId", "==", filterProductId),
+          orderBy("createdAt", "desc"),
+          limit(maxLimit)
+        );
+      }
+
       const snapshot = await getDocs(q);
       const docs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as InventoryTransaction));
-      return docs.length > 0 ? docs : local.slice(0, limitCount);
+      return docs.length > 0 ? docs : local.slice(0, maxLimit);
     } catch {
-      return local.slice(0, limitCount);
+      return local.slice(0, maxLimit);
     }
   },
 

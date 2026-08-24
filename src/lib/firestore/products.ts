@@ -12,14 +12,93 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase/client";
 import { Product, ProductCompleteness, ProductStatus, ProductType } from "@/types/product";
+import { ProductPackage } from "@/types/pricing";
 import { INITIAL_PRODUCTS } from "@/data/products";
 import { isFirebaseConfigured } from "../firebase/config";
 import { logger } from "../logger";
 import { inventoryRepository } from "./inventory";
 import { orderRepository } from "./orders";
+import { fragranceRepository } from "./fragrance";
+import { FragranceOil } from "@/types/fragrance";
+import { ALL_PERFUME_HOUSES, PerfumePreset } from "@/data/perfume-catalog-database";
 
 const COLLECTION_NAME = "products";
 let LOCAL_STORE: Product[] = [...INITIAL_PRODUCTS];
+
+export function convertPerfumePresetToProduct(preset: PerfumePreset): Product {
+  const pSlug = generateSlug(`${preset.brand} ${preset.name}`);
+  const basePrice = preset.suggestedPrice || (preset.brandType === "arabic" ? 39.99 : 145.00);
+  const cost = preset.suggestedCost || (preset.brandType === "arabic" ? 18.00 : 75.00);
+  const primaryImg = preset.imageUrl || "";
+
+  return {
+    id: preset.id || `perf_${pSlug}`,
+    name: preset.name,
+    slug: pSlug,
+    sku: preset.sku || preset.skuCode || `PERF-${preset.brand.slice(0, 3).toUpperCase()}-${preset.name.slice(0, 4).toUpperCase()}`,
+    upc: preset.upc || preset.barcode,
+    barcode: preset.barcode || preset.upc,
+    category: "perfumes",
+    categoryName: "Perfumes",
+    subcategory: preset.category || (preset.brandType === "arabic" ? "Árabe" : "Diseñador / Nicho"),
+    brand: preset.brand,
+    brandType: preset.brandType,
+    productType: "finished_perfume",
+    shortDescription: preset.shortDescription || "",
+    description: preset.description || preset.shortDescription || `Perfume original ${preset.name} de la prestigiosa casa ${preset.brand}. Fragancia de alta proyección y fijación duradera.`,
+    tags: ["perfume", "finished_perfume", preset.brand.toLowerCase(), preset.gender.toLowerCase(), preset.category?.toLowerCase() || "arabe"],
+    attributes: {
+      brand: preset.brand,
+      concentration: preset.concentration,
+      gender: preset.gender,
+      measure: preset.measure,
+      ...(preset.inspiredBy ? { inspiredBy: preset.inspiredBy, originalBrand: preset.originalBrand || "" } : {})
+    },
+    inspiredBy: preset.inspiredBy,
+    originalBrand: preset.originalBrand,
+    relationshipType: preset.relationshipType,
+    estimatedSimilarity: preset.estimatedSimilarity,
+    isOneToOne: preset.isOneToOne,
+    referencePrice: preset.referencePrice,
+    notes: preset.notes,
+    currency: "USD",
+    hasVariants: false,
+    basePrice,
+    price: basePrice,
+    cost,
+    inventory: {
+      quantityInStock: 25,
+      reservedQuantity: 0,
+      availableQuantity: 25,
+      lowStockThreshold: 5,
+      reorderPoint: 5,
+      status: "in_stock",
+    },
+    supplierId: "sup_georgina_wholesale",
+    supplierName: "Georgina Wholesale",
+    status: "active",
+    featured: preset.name === "Oud Mood" || preset.name === "Stallion 53" || preset.name === "Khamrah" || preset.name === "Asad" || preset.name === "Aventus",
+    primaryImageUrl: primaryImg,
+    images: primaryImg ? [{ id: `img_${pSlug}`, url: primaryImg, sortOrder: 0, isPrimary: true }] : [],
+    media: primaryImg ? [{ id: `med_${pSlug}`, b2Key: `perfumes/${pSlug}.webp`, url: primaryImg, isPrimary: true, sortOrder: 0, mimeType: "image/webp", size: 0, fileName: `${pSlug}.webp`, createdAt: "" }] : [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+let MASTER_PERFUME_PRODUCTS_CACHE: Product[] | null = null;
+
+export function getAllMasterPerfumeProducts(): Product[] {
+  if (MASTER_PERFUME_PRODUCTS_CACHE) return MASTER_PERFUME_PRODUCTS_CACHE;
+  const products: Product[] = [];
+  ALL_PERFUME_HOUSES.forEach((house) => {
+    house.famousPerfumes.forEach((preset) => {
+      products.push(convertPerfumePresetToProduct(preset));
+    });
+  });
+  MASTER_PERFUME_PRODUCTS_CACHE = products;
+  return products;
+}
 
 export function calculateProductCompleteness(product: Partial<Product>): ProductCompleteness {
   const missingFields: string[] = [];
@@ -58,30 +137,21 @@ export function calculateProductCompleteness(product: Partial<Product>): Product
   if (product.cost !== undefined && product.cost > 0) score += 5;
   else missingFields.push("Cost");
 
-  // 5. Shipping Dimensions (10%)
-  const hasWeight = Boolean(product.shipping?.weight && product.shipping.weight > 0);
-  const hasDims = Boolean(
-    product.shipping?.length && product.shipping?.width && product.shipping?.height
-  );
-  if (hasWeight && hasDims) score += 10;
-  else if (hasWeight) {
-    score += 5;
-    missingFields.push("Shipping Dimensions");
-  } else {
-    missingFields.push("Shipping Weight & Dimensions");
-  }
+  // 5. Categorization (10%)
+  if (product.tags && product.tags.length > 0) score += 5;
+  else missingFields.push("Tags");
 
-  // 6. Inventory Configuration (10%)
-  if (product.inventory?.reorderPoint !== undefined && product.inventory?.lowStockThreshold !== undefined) {
-    score += 10;
-  } else {
-    missingFields.push("Inventory Reorder Point");
-  }
+  if (product.attributes && Object.keys(product.attributes).length > 0) score += 5;
+  else missingFields.push("Attributes");
+
+  // 6. Inventory Data (10%)
+  if (product.inventory && product.inventory.quantityInStock !== undefined) score += 10;
+  else missingFields.push("Inventory Stock");
 
   return {
     score: Math.min(100, score),
+    isComplete: score >= 80,
     missingFields,
-    isComplete: score >= 85,
   };
 }
 
@@ -97,24 +167,96 @@ export function generateSlug(name: string): string {
 export const productService = {
   /**
    * Fetches all active products for the public storefront.
-   * Internal sensitive data (cost, supplier, internal notes) are filtered.
+   * Unifies active physical laboratory products with active Firestore fragrance oils.
    */
   async getAllProducts(): Promise<Product[]> {
+    let physicalProducts: Product[] = [];
     if (!isFirebaseConfigured || !db) {
-      return LOCAL_STORE.filter((p) => p.status === "active");
+      physicalProducts = LOCAL_STORE.filter((p) => p.status === "active");
+    } else {
+      try {
+        const q = query(collection(db, COLLECTION_NAME), where("status", "==", "active"));
+        const snapshot = await getDocs(q);
+        physicalProducts = snapshot.empty
+          ? LOCAL_STORE.filter((p) => p.status === "active")
+          : snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Product));
+      } catch (error) {
+        logger.warn("Firestore getAllProducts failed; falling back to local dataset.", error);
+        physicalProducts = LOCAL_STORE.filter((p) => p.status === "active");
+      }
     }
 
+    // Fetch active Fragrance Oils from Firestore / repository
+    let activeFragrances: FragranceOil[] = [];
     try {
-      const q = query(collection(db, COLLECTION_NAME), where("status", "==", "active"));
-      const snapshot = await getDocs(q);
-      if (snapshot.empty) {
-        return LOCAL_STORE.filter((p) => p.status === "active");
-      }
-      return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Product));
-    } catch (error) {
-      logger.warn("Firestore getAllProducts failed; falling back to local dataset.", error);
-      return LOCAL_STORE.filter((p) => p.status === "active");
+      const allFragrances = await fragranceRepository.getAllFragrances();
+      activeFragrances = allFragrances.filter((f) => f.status === "active" || !f.status);
+    } catch (err) {
+      logger.warn("Failed to fetch fragrance oils for storefront catalog", err);
     }
+
+    const fragranceProducts: Product[] = activeFragrances.map((f) => {
+      // Approved customer-facing fragrance sizes: 1, 2, 4, 8, 16 oz
+      const approvedVariants = (f.repackagingVariants || []).filter((v) =>
+        [1, 2, 4, 8, 16].includes(Number(v.sellingSize))
+      );
+      const starting1oz = approvedVariants.find((v) => Number(v.sellingSize) === 1) || approvedVariants[0];
+      const basePrice = starting1oz ? starting1oz.retailPrice : (f.costPerOz ? f.costPerOz * 2 : 8.50);
+
+      const packageOptions: ProductPackage[] = approvedVariants.map((v) => ({
+        id: `pkg_${v.id}`,
+        name: `${v.sellingSize} OZ Bottle`,
+        quantity: Number(v.sellingSize),
+        price: v.retailPrice,
+        unitPrice: v.unitCost || 0,
+        isDefault: Number(v.sellingSize) === 1,
+      }));
+
+      const primaryImg = f.primaryImage || (f.images && f.images[0]) || "";
+
+      return {
+        id: f.id,
+        name: f.name,
+        slug: f.slug,
+        sku: f.supplierProductId ? `SC-FR-${f.supplierProductId}` : `SC-FR-${f.id.toUpperCase()}`,
+        category: "fragrance_oils",
+        categoryName: "Fragrance Oils",
+        subcategory: f.scentFamily || "Woody",
+        description: f.description || `Pure concentrated grade-A uncut fragrance oil.`,
+        shortDescription: `Pure concentrated ${f.name} fragrance oil.`,
+        tags: ["fragrance", "fragrance_oils", f.scentFamily?.toLowerCase() || "woody", f.gender || "unisex"],
+        attributes: {
+          scentFamily: f.scentFamily || "Woody",
+          gender: f.gender || "unisex",
+          strength: f.strength || "Concentrated Pure Grade-A",
+        },
+        currency: "USD",
+        hasVariants: true,
+        basePrice,
+        packageOptions,
+        inventory: {
+          quantityInStock: Math.round(f.inventoryVolumeOz || 32),
+          reservedQuantity: 0,
+          availableQuantity: Math.round(f.inventoryVolumeOz || 32),
+          lowStockThreshold: 10,
+          reorderPoint: 15,
+          status: "in_stock",
+        },
+        supplierId: f.supplierId || "sup_africa_imports",
+        supplierName: f.supplierName || "Africa Imports",
+        status: "active",
+        featured: false,
+        primaryImageUrl: primaryImg,
+        images: primaryImg ? [{ id: `img_${f.id}`, url: primaryImg, sortOrder: 0, isPrimary: true }] : [],
+        media: primaryImg ? [{ id: `med_${f.id}`, b2Key: `fragrances/${f.id}.webp`, url: primaryImg, isPrimary: true, sortOrder: 0, mimeType: "image/webp", size: 0, fileName: `${f.id}.webp`, createdAt: f.createdAt || "" }] : [],
+        discountEligible: true,
+        minimumDiscountMargin: 0.25,
+        createdAt: f.createdAt || new Date().toISOString(),
+        updatedAt: f.updatedAt || new Date().toISOString(),
+      };
+    });
+
+    return [...physicalProducts, ...fragranceProducts];
   },
 
   /**
@@ -222,21 +364,35 @@ export const productService = {
    * Fetches a product by its URL slug
    */
   async getProductBySlug(slug: string): Promise<Product | null> {
+    const cleanSlug = slug.toLowerCase().trim();
+
     if (!isFirebaseConfigured || !db) {
-      return LOCAL_STORE.find((p) => p.slug === slug) || null;
+      const localFound = LOCAL_STORE.find((p) => p.slug.toLowerCase() === cleanSlug);
+      if (localFound) return localFound;
+    } else {
+      try {
+        const q = query(collection(db, COLLECTION_NAME), where("slug", "==", slug));
+        const snapshot = await getDocs(q);
+        if (!snapshot.empty) {
+          return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() } as Product;
+        }
+      } catch (error) {
+        logger.warn(`Firestore getProductBySlug(${slug}) failed; falling back to local seed.`, error);
+      }
+      const localFound = LOCAL_STORE.find((p) => p.slug.toLowerCase() === cleanSlug);
+      if (localFound) return localFound;
     }
 
-    try {
-      const q = query(collection(db, COLLECTION_NAME), where("slug", "==", slug));
-      const snapshot = await getDocs(q);
-      if (snapshot.empty) {
-        return LOCAL_STORE.find((p) => p.slug === slug) || null;
-      }
-      return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() } as Product;
-    } catch (error) {
-      logger.warn(`Firestore getProductBySlug(${slug}) failed; falling back to local seed.`, error);
-      return LOCAL_STORE.find((p) => p.slug === slug) || null;
-    }
+    return null;
+  },
+
+  /**
+   * Fetches products by Brand
+   */
+  async getProductsByBrand(brand: string): Promise<Product[]> {
+    const all = await this.getAllProducts();
+    const bLower = brand.toLowerCase().trim();
+    return all.filter((p) => p.brand && p.brand.toLowerCase().trim() === bLower);
   },
 
   /**

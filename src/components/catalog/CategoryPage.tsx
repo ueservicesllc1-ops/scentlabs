@@ -3,14 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { Product } from "@/types/product";
 import { ProductCard } from "./ProductCard";
-import { 
-  Search, 
-  SlidersHorizontal, 
-  Package, 
-  ChevronLeft, 
-  ChevronRight,
-  X 
-} from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, X, SlidersHorizontal } from "lucide-react";
 
 interface CategoryPageProps {
   title: string;
@@ -30,222 +23,209 @@ export function CategoryPage({
   loading = false,
 }: CategoryPageProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSubcategory, setSelectedSubcategory] = useState("All");
-  const [sortBy, setSortBy] = useState<"featured" | "price-asc" | "price-desc" | "name-asc" | "name-desc">("featured");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState<"featured" | "price-asc" | "price-desc" | "name-asc">("featured");
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 12;
+  const pageSize = 16;
+
+  const allAvailableCategories = useMemo(() => {
+    const set = new Set<string>();
+    products.forEach((p) => {
+      if (p.category) set.add(p.category as string);
+      if (p.categoryName) set.add(p.categoryName);
+      if (p.subcategory) set.add(p.subcategory);
+    });
+    return Array.from(set).filter(Boolean);
+  }, [products]);
+
+  const handleCategoryToggle = (cat: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
+    );
+    setCurrentPage(1);
+  };
+
+  const normalizeCategory = (str?: string) =>
+    (str || "")
+      .toLowerCase()
+      .replace(/[_\s-]+/g, "")
+      .replace(/oils?|supplies|making|products?/g, "");
+
+  const isCategoryMatch = (p: Product, targetCat: string) => {
+    const targetNorm = normalizeCategory(targetCat);
+    if (!targetNorm) return false;
+    const catNorm = normalizeCategory(p.category as string);
+    const catNameNorm = normalizeCategory(p.categoryName);
+    const subcatNorm = normalizeCategory(p.subcategory);
+    
+    return (
+      (!!catNorm && (catNorm.includes(targetNorm) || targetNorm.includes(catNorm))) ||
+      (!!catNameNorm && (catNameNorm.includes(targetNorm) || targetNorm.includes(catNameNorm))) ||
+      (!!subcatNorm && (subcatNorm.includes(targetNorm) || targetNorm.includes(subcatNorm)))
+    ) || false;
+  };
 
   const filteredProducts = useMemo(() => {
     return products
       .filter((p) => {
         const matchesSearch =
+          !searchQuery.trim() ||
           p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
           p.sku.toLowerCase().includes(searchQuery.toLowerCase());
 
-        const matchesSub =
-          selectedSubcategory === "All" ||
-          (p.subcategory && p.subcategory.toLowerCase() === selectedSubcategory.toLowerCase()) ||
-          (p.category && (p.category as string).toLowerCase().includes(selectedSubcategory.toLowerCase()));
+        const matchesCategory =
+          selectedCategories.length === 0 ||
+          selectedCategories.some((c) => isCategoryMatch(p, c));
 
-        return matchesSearch && matchesSub;
+        return matchesSearch && matchesCategory;
       })
       .sort((a, b) => {
         if (sortBy === "price-asc") return (a.basePrice || 0) - (b.basePrice || 0);
         if (sortBy === "price-desc") return (b.basePrice || 0) - (a.basePrice || 0);
         if (sortBy === "name-asc") return a.name.localeCompare(b.name);
-        if (sortBy === "name-desc") return b.name.localeCompare(a.name);
         return 0;
       });
-  }, [products, searchQuery, selectedSubcategory, sortBy]);
+  }, [products, searchQuery, selectedCategories, sortBy]);
 
   const totalPages = Math.ceil(filteredProducts.length / pageSize) || 1;
   const paginatedProducts = filteredProducts.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
-  const handleClearFilters = () => {
-    setSearchQuery("");
-    setSelectedSubcategory("All");
-    setSortBy("featured");
-    setCurrentPage(1);
-  };
-
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 font-sans text-stone-900">
+    <div className="max-w-screen-xl mx-auto px-6 lg:px-10 py-10">
       
-      {/* Category Header */}
-      <div className="border-b border-[#eae6df] pb-6 space-y-2">
-        <span className="text-[10px] text-amber-800 font-bold uppercase tracking-widest block">
-          SCENTLAB CATALOG &bull; {categoryName.toUpperCase()}
-        </span>
-        <h2 className="font-serif text-3xl sm:text-4xl font-normal text-stone-950 tracking-tight">
-          {title}
-        </h2>
-        <p className="text-xs text-stone-600 max-w-3xl leading-relaxed font-light">
-          {description}
-        </p>
-      </div>
-
-      {/* Control Bar: Subcategories, Search, Sort */}
-      <div className="space-y-4">
-        {/* Subcategory Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-          {["All", ...subcategories].map((sub) => {
-            const isSelected = selectedSubcategory === sub;
-            return (
-              <button
-                key={sub}
-                type="button"
-                onClick={() => {
-                  setSelectedSubcategory(sub);
-                  setCurrentPage(1);
-                }}
-                className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wider transition uppercase whitespace-nowrap border ${
-                  isSelected
-                    ? "bg-stone-900 text-white border-stone-900 shadow-sm"
-                    : "bg-white text-stone-600 border-[#e5dfd5] hover:border-amber-700 hover:text-stone-900"
-                }`}
-              >
-                {sub}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Search & Sort Controls */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-white border border-[#eae6df] shadow-sm">
-          {/* Search Box */}
-          <div className="relative w-full sm:w-80">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setCurrentPage(1);
-              }}
-              placeholder="Search products in this category..."
-              className="w-full text-xs pl-10 pr-8 py-2 bg-[#f8f7f4] border border-[#e5e0d8] rounded-full text-stone-800 placeholder:text-stone-400 focus:bg-white focus:border-amber-600 focus:outline-none"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
+      {/* Shop Layout: 12-Column Grid */}
+      <section className="grid grid-cols-1 md:grid-cols-12 gap-8">
+        
+        {/* Left Sidebar Filters */}
+        <aside className="md:col-span-3 hidden md:flex flex-col gap-6 border-r border-gray-200 pr-6">
+          <div className="flex items-center justify-between border-b border-gray-200 pb-3">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-900">Categories</span>
+            <SlidersHorizontal className="w-3.5 h-3.5 text-gray-400" />
           </div>
 
-          {/* Results Count & Sort Dropdown */}
-          <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 text-xs">
-            <span className="text-stone-500 font-medium">
-              Showing <strong>{filteredProducts.length}</strong> items
+          {/* Categories List */}
+          <div className="flex flex-col gap-2">
+            {(subcategories.length > 0 ? subcategories : allAvailableCategories).map((cat) => {
+              const count = products.filter((p) => isCategoryMatch(p, cat)).length;
+              const isChecked = selectedCategories.includes(cat);
+
+              return (
+                <label key={cat} className="flex items-center gap-2.5 cursor-pointer py-1 text-xs text-gray-700 hover:text-gray-950 transition">
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => handleCategoryToggle(cat)}
+                    className="h-3.5 w-3.5 text-[#2B5F4A] rounded-none border-gray-300 focus:ring-[#2B5F4A] cursor-pointer"
+                  />
+                  <span className="capitalize flex-1 font-light">
+                    {cat}
+                  </span>
+                  <span className="text-[10px] text-gray-400 font-mono">({count})</span>
+                </label>
+              );
+            })}
+          </div>
+
+          {/* Reset Filters */}
+          {selectedCategories.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setSelectedCategories([])}
+              className="text-[10px] font-semibold uppercase tracking-wider text-[#2B5F4A] underline text-left pt-2"
+            >
+              Reset Filters
+            </button>
+          )}
+        </aside>
+
+        {/* Right Product Grid Area */}
+        <div className="md:col-span-9 flex flex-col gap-6">
+          
+          {/* Top Sort & Controls Bar */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-200 pb-4">
+            <span className="text-xs text-gray-500 font-medium">
+              Showing <strong>{paginatedProducts.length}</strong> of {filteredProducts.length} items
             </span>
 
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] text-stone-400 uppercase font-bold hidden sm:inline">Sort:</span>
+            <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+              {/* Search Box */}
+              <div className="relative w-48 sm:w-64">
+                <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Filter catalog..."
+                  className="w-full text-xs pl-8 pr-2 py-1.5 bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:bg-white focus:outline-none focus:border-[#2B5F4A]"
+                />
+              </div>
+
+              {/* Sort Select */}
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="text-xs px-3 py-1.5 bg-[#f8f7f4] border border-[#e5e0d8] rounded-full text-stone-800 focus:border-amber-600 focus:outline-none font-medium"
+                className="py-1.5 px-3 text-xs border border-gray-200 bg-white text-gray-800 focus:outline-none focus:border-[#2B5F4A] cursor-pointer"
               >
                 <option value="featured">Featured First</option>
+                <option value="name-asc">Name: A-Z</option>
                 <option value="price-asc">Price: Low to High</option>
                 <option value="price-desc">Price: High to Low</option>
-                <option value="name-asc">Name: A to Z</option>
-                <option value="name-desc">Name: Z to A</option>
               </select>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Active Filter Chips */}
-      {(searchQuery || selectedSubcategory !== "All" || sortBy !== "featured") && (
-        <div className="flex items-center gap-2 flex-wrap text-xs">
-          <span className="text-stone-400 font-semibold uppercase text-[10px]">Active Filters:</span>
-          {searchQuery && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-[#e5dfd5] text-stone-700 rounded-full">
-              Query: &quot;{searchQuery}&quot;
-              <button type="button" onClick={() => setSearchQuery("")} className="hover:text-red-500">
-                <X className="w-3 h-3" />
-              </button>
-            </span>
+          {/* 4-Column Product Grid */}
+          {loading ? (
+            <div className="py-24 text-center text-xs text-gray-400">
+              <div className="w-6 h-6 border-2 border-[#2B5F4A] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+              Loading supplies...
+            </div>
+          ) : paginatedProducts.length === 0 ? (
+            <div className="py-20 text-center space-y-3 bg-gray-50 border border-gray-200 p-8">
+              <h3 className="text-base font-semibold text-gray-950">No Products Found</h3>
+              <p className="text-xs text-gray-500 font-light">
+                No items match your filter criteria. Try resetting your search.
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 1, background: "var(--sl-gray-light)" }}>
+              {paginatedProducts.map((p) => (
+                <div key={p.id} style={{ background: "white" }}>
+                  <ProductCard product={p} />
+                </div>
+              ))}
+            </div>
           )}
-          {selectedSubcategory !== "All" && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-[#e5dfd5] text-stone-700 rounded-full">
-              Category: {selectedSubcategory}
-              <button type="button" onClick={() => setSelectedSubcategory("All")} className="hover:text-red-500">
-                <X className="w-3 h-3" />
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 pt-6 border-t border-gray-200">
+              <button
+                type="button"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 text-[10px] font-semibold uppercase tracking-wider border border-gray-300 hover:border-gray-900 disabled:opacity-30 transition"
+              >
+                Previous
               </button>
-            </span>
+              <span className="text-[10px] font-mono px-3 text-gray-500">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                type="button"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 text-[10px] font-semibold uppercase tracking-wider border border-gray-300 hover:border-gray-900 disabled:opacity-30 transition"
+              >
+                Next
+              </button>
+            </div>
           )}
-          <button
-            type="button"
-            onClick={handleClearFilters}
-            className="text-[11px] text-amber-800 font-bold uppercase hover:underline ml-2"
-          >
-            Clear All
-          </button>
-        </div>
-      )}
 
-      {/* Product Grid */}
-      {loading ? (
-        <div className="py-24 text-center text-xs text-stone-400">
-          <div className="w-8 h-8 border-2 border-amber-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          Loading formulation catalog...
         </div>
-      ) : paginatedProducts.length === 0 ? (
-        <div className="py-20 text-center space-y-4 bg-white border border-[#eae6df] rounded-3xl p-8 shadow-sm">
-          <Package className="w-10 h-10 text-stone-400 mx-auto stroke-[1.5]" />
-          <h3 className="font-serif text-2xl font-normal text-stone-900">No Products Found</h3>
-          <p className="text-xs text-stone-500 max-w-sm mx-auto font-light">
-            We couldn&apos;t find any formulation supplies matching your current filter selections.
-          </p>
-          <button
-            type="button"
-            onClick={handleClearFilters}
-            className="px-5 py-2.5 bg-stone-900 text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-stone-800 transition"
-          >
-            Reset All Filters
-          </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {paginatedProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      )}
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 pt-6 border-t border-[#eae6df]">
-          <button
-            type="button"
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            className="p-2 rounded-xl bg-white border border-[#e5dfd5] text-stone-600 hover:text-stone-900 disabled:opacity-30"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-
-          <span className="text-xs font-bold text-stone-700 px-4 font-mono">
-            Page {currentPage} of {totalPages}
-          </span>
-
-          <button
-            type="button"
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            className="p-2 rounded-xl bg-white border border-[#e5dfd5] text-stone-600 hover:text-stone-900 disabled:opacity-30"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      )}
+      </section>
     </div>
   );
 }

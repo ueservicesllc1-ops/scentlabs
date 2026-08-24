@@ -57,8 +57,9 @@ export default function CustomLabelsPage() {
   const [added, setAdded] = useState(false);
 
   const matchingPackage =
-    labelProduct.packageOptions.find((p) => p.quantity === selectedQuantity) ||
-    labelProduct.packageOptions[2]; // 100 default
+    (labelProduct.packageOptions || []).find((p) => p.quantity === selectedQuantity) ||
+    (labelProduct.packageOptions || [])[2] ||
+    { id: "pkg_default", name: "Default Pack", quantity: selectedQuantity, price: labelProduct.basePrice, unitPrice: labelProduct.basePrice };
 
   const handleAddToCart = () => {
     addItem(
@@ -217,7 +218,7 @@ export default function CustomLabelsPage() {
             </div>
 
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-              {labelProduct.packageOptions.map((pkg) => (
+              {(labelProduct.packageOptions || []).map((pkg) => (
                 <button
                   key={pkg.id}
                   type="button"

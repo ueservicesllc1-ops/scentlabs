@@ -1,345 +1,322 @@
-import React from "react";
-import Link from "next/link";
-import { 
-  FlaskConical, 
-  Sparkles, 
-  Layers, 
-  Box, 
-  Droplet, 
-  ShieldCheck, 
-  Tag, 
-  ArrowRight, 
-  CheckCircle2, 
-  Package, 
-  Search,
-  SlidersHorizontal,
-  Truck,
-  Star,
-  ChevronRight
-} from "lucide-react";
-import { productService } from "@/lib/firestore/products";
-import { ProductCard } from "@/components/catalog/ProductCard";
+"use client";
 
-const CATEGORY_SHOWCASE = [
-  {
-    name: "Fragrance Oils",
-    slug: "fragrance",
-    tagline: "Grade-A Uncut Essences",
-    desc: "100% pure uncut aromatic concentrates, sandalwood, floral bouquets & amber accords.",
-    href: "/fragrance",
-    icon: Droplet,
-    badge: "100% Pure & Uncut",
-    bgGradient: "from-amber-500/10 via-amber-500/5 to-transparent",
-  },
-  {
-    name: "Perfume Making & Bases",
-    slug: "perfume-making",
-    tagline: "200-Proof SDA-40B Base",
-    desc: "Commercial perfumer's alcohol, graduated transfer pipettes, and formulation kits.",
-    href: "/perfume-making",
-    icon: Sparkles,
-    badge: "Laboratory Grade",
-    bgGradient: "from-amber-500/10 via-amber-500/5 to-transparent",
-  },
-  {
-    name: "Glassware & Roll-Ons",
-    slug: "bottles",
-    tagline: "Amber & Clear Vessels",
-    desc: "5ml, 10ml, and 1oz UV-shielding amber glass bottles with stainless steel roller balls.",
-    href: "/bottles",
-    icon: FlaskConical,
-    badge: "Bulk Fractioned",
-    bgGradient: "from-amber-500/10 via-amber-500/5 to-transparent",
-  },
-  {
-    name: "Custom Metallic Labels",
-    slug: "custom-labels",
-    tagline: "Gold Foil & Matte Vinyl",
-    desc: "Private label printing die-cut to exact bottle outer diameters with square-inch pricing.",
-    href: "/custom-labels",
-    icon: Tag,
-    badge: "Custom Die-Cut",
-    bgGradient: "from-amber-500/10 via-amber-500/5 to-transparent",
-  },
-  {
-    name: "Packaging & Presentation",
-    slug: "packaging",
-    tagline: "110 lb Cricut Boxes",
-    desc: "Luxury presentation boxes, POF heat shrink wrap, and holographic security seals.",
-    href: "/packaging",
-    icon: Box,
-    badge: "Retail Ready",
-    bgGradient: "from-amber-500/10 via-amber-500/5 to-transparent",
-  },
-  {
-    name: "Testing & Blotter Strips",
-    slug: "testing",
-    tagline: "Olfactory Evaluation",
-    desc: "Lint-free testing paper, trial vials, and 5ml fine mist evaluation atomizers.",
-    href: "/testing",
-    icon: Layers,
-    badge: "Evaluation Tools",
-    bgGradient: "from-amber-500/10 via-amber-500/5 to-transparent",
-  },
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { productService } from "@/lib/firestore/products";
+import { fragranceRepository } from "@/lib/firestore/fragrance";
+import { Product } from "@/types/product";
+import { FragranceOil } from "@/types/fragrance";
+
+interface TrendingCardItem {
+  id: string;
+  name: string;
+  category: string;
+  price: string;
+  sku: string;
+  href: string;
+  imageUrl?: string;
+  placeholderLabel?: string;
+}
+
+const categories = [
+  { label: "Fragrance Oils", desc: "1,600+ Grade-A concentrates", href: "/fragrance", badge: "Most Popular" },
+  { label: "Glass Bottles", desc: "Roll-ons, atomizers, droppers", href: "/bottles", badge: null },
+  { label: "Custom Labels", desc: "Metallic foil, oil-proof vinyl", href: "/custom-labels", badge: null },
+  { label: "Packaging", desc: "Boxes, shrink wrap, seals", href: "/packaging", badge: null },
+  { label: "Testing Supplies", desc: "Strips, blotters, pipettes", href: "/testing", badge: null },
+  { label: "Perfume Making", desc: "Solvents, bases, kits", href: "/perfume-making", badge: null },
 ];
 
-export default async function HomePage() {
-  const allProducts = await productService.getAllProducts();
-  const featuredProducts = allProducts.filter((p) => p.featured || p.status === "active").slice(0, 8);
+const stats = [
+  { value: "1,600+", label: "Fragrance References" },
+  { value: "Grade-A", label: "Uncut Concentrates" },
+  { value: "6 Sizes", label: "Per Fragrance" },
+  { value: "Same-Day", label: "US Dispatch" },
+];
+
+export default function HomePage() {
+  const [trendingProducts, setTrendingProducts] = useState<TrendingCardItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadTrendingEssentials() {
+      try {
+        const [activeProducts, activeFragrances] = await Promise.all([
+          productService.getAllProducts(),
+          fragranceRepository.getAllFragrances(),
+        ]);
+
+        const validProducts = (activeProducts || []).filter(
+          (p) => p && p.status === "active" && p.name && p.sku
+        );
+        const validFragrances = (activeFragrances || []).filter(
+          (f) => f && f.status === "active" && f.name
+        );
+
+        const cards: TrendingCardItem[] = [];
+
+        // 1. Featured / Best-Selling Physical Products
+        // Preferred order: Roll-On Bottle, Custom Labels, Roll-On Box
+        const prioritizedIds = [
+          "prod_rollon_10ml",
+          "prod_custom_labels",
+          "prod_box_10ml",
+          "prod_atomizer_10ml",
+          "prod_shrink_4x6",
+        ];
+
+        const sortedProducts = [...validProducts].sort((a, b) => {
+          const aIndex = prioritizedIds.indexOf(a.id);
+          const bIndex = prioritizedIds.indexOf(b.id);
+          if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+          if (aIndex !== -1) return -1;
+          if (bIndex !== -1) return 1;
+          if (a.featured && !b.featured) return -1;
+          if (!a.featured && b.featured) return 1;
+          return 0;
+        });
+
+        // Add top 3 physical products
+        for (const prod of sortedProducts.slice(0, 3)) {
+          let priceLabel = `From $${prod.basePrice.toFixed(2)}`;
+
+          if (prod.id === "prod_custom_labels") {
+            priceLabel = "From $12.50 (50 Labels)";
+          } else if (prod.id === "prod_rollon_10ml") {
+            priceLabel = "From $5.00 (10 Units)";
+          } else if (prod.id === "prod_box_10ml") {
+            priceLabel = "From $11.25 (25 Boxes)";
+          } else if (prod.packageOptions && prod.packageOptions.length > 0) {
+            const firstPkg = prod.packageOptions[0];
+            priceLabel = `From $${firstPkg.price.toFixed(2)} (${firstPkg.quantity}u)`;
+          }
+
+          let href = `/product/${prod.slug}`;
+          if (prod.id === "prod_custom_labels") href = "/custom-labels";
+
+          const imageUrl =
+            prod.media && prod.media[0]?.url
+              ? prod.media[0].url
+              : prod.primaryImageUrl || "";
+
+          cards.push({
+            id: prod.id,
+            name: prod.name,
+            category: (prod.subcategory || prod.category).toUpperCase(),
+            price: priceLabel,
+            sku: prod.sku,
+            href,
+            imageUrl: imageUrl || undefined,
+            placeholderLabel: prod.category,
+          });
+        }
+
+        // 2. Featured Fragrance Oil (e.g. Santal 33 Type)
+        if (validFragrances.length > 0) {
+          const topFragrance = validFragrances[0];
+          const activeVariants = (topFragrance.repackagingVariants || []).filter((v) => v.active);
+          const firstVariant = activeVariants[0];
+          const fragPrice = firstVariant
+            ? `From $${firstVariant.retailPrice.toFixed(2)} (${firstVariant.sellingSize} oz)`
+            : "From $8.50";
+
+          cards.push({
+            id: topFragrance.id,
+            name: topFragrance.name,
+            category: (topFragrance.scentFamily || "Fragrance Oil").toUpperCase(),
+            price: fragPrice,
+            sku: firstVariant?.sku || topFragrance.id,
+            href: `/fragrance/${topFragrance.slug}`,
+            imageUrl: topFragrance.primaryImage || topFragrance.images?.[0] || undefined,
+            placeholderLabel: topFragrance.scentFamily || "Fragrance",
+          });
+        }
+
+        setTrendingProducts(cards);
+      } catch (err) {
+        console.error("Failed to load real trending products from Firestore:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadTrendingEssentials();
+  }, []);
 
   return (
-    <div className="space-y-24 pb-24 font-sans text-stone-900">
-      
-      {/* 1. High-Impact Luxury Hero Section */}
-      <section className="relative pt-12 pb-20 md:pt-20 md:pb-28 border-b border-[#eae6df] bg-gradient-to-b from-[#fbf9f4] via-[#f7f5f0] to-[#fcfbf9] overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center space-y-6">
-            
-            {/* Prestige Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white border border-[#e5dfd5] text-[11px] font-semibold text-amber-800 tracking-wider uppercase shadow-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
-              DIRECT COMPOUNDING & PERFUMERY SUPPLIES
-            </div>
+    <main style={{ background: "white", color: "var(--sl-ink)" }}>
 
-            {/* Main Headline */}
-            <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-normal text-stone-950 tracking-tight leading-[1.12]">
-              The Fine Art of <br />
-              <span className="italic font-normal text-amber-800">
-                Fragrance Formulation
-              </span>
-            </h1>
+      {/* ━━━━ HERO ━━━━ */}
+      <section style={{ position: "relative", minHeight: "88vh", background: "#0E1A14", overflow: "hidden", display: "flex", alignItems: "flex-end" }}>
+        {/* Background */}
+        <div style={{
+          position: "absolute", inset: 0,
+          backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuDXDXBHARws9mKgORT8Phj-P4ilJYhjYYDSl_Mi7gmAfjUqAWCwXqnv_DyDaTgSUBD0plg4QWjpMthFrdNK4rAf85DeMHFgcEOKGDKfOyBPZMu-apkNe_XhNAshUgY7T3-QoLjjOUuZ1poiCmBsbZ0-J1g9RZXLpLeHo_zHBk3N-WiV_44Z-jOdRf-JOObHJ2vPDnBKQQ7LqxL0AdWXj9BKyzAJvZDUB_daAthYshQO5XCgND7DUPqGEQ')`,
+          backgroundSize: "cover", backgroundPosition: "center",
+          opacity: 0.3,
+        }} />
+        {/* Bottom gradient to white */}
+        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 120, background: "linear-gradient(to top, white, transparent)", zIndex: 10 }} />
 
-            {/* Sub-headline */}
-            <p className="text-base sm:text-lg text-stone-600 font-light leading-relaxed max-w-2xl mx-auto">
-              Everything you need to formulate, compound, bottle, label, and package commercial-grade perfumes. 
+        {/* Content */}
+        <div style={{ position: "relative", zIndex: 20, maxWidth: 1280, margin: "0 auto", padding: "0 40px 72px", width: "100%" }}>
+          <div style={{ maxWidth: 640 }}>
+            <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", color: "#5EAB85", marginBottom: 16 }}>
+              Wholesale Perfume Supplies · EST. 2024
             </p>
-
-            {/* Hero Integrated Search Bar */}
-            <div className="max-w-xl mx-auto pt-2">
-              <form action="/search" method="GET" className="relative shadow-md rounded-2xl">
-                <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
-                <input
-                  type="text"
-                  name="q"
-                  placeholder="Search pure fragrance oils, amber bottles, 200 proof alcohol, foil labels..."
-                  className="w-full text-sm pl-12 pr-28 py-3.5 bg-white border border-[#d6d0c4] rounded-2xl text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-amber-700 focus:ring-2 focus:ring-amber-700/20 transition-all"
-                />
-                <button
-                  type="submit"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition"
-                >
-                  Explore
-                </button>
-              </form>
-
-              {/* Quick search tags */}
-              <div className="flex flex-wrap items-center justify-center gap-2 mt-3 text-[11px] text-stone-500">
-                <span className="font-semibold uppercase tracking-wider text-stone-400">Popular:</span>
-                <Link href="/fragrance/santal-33" className="hover:text-amber-800 hover:underline">Santal 33 Oil</Link>
-                <span>&bull;</span>
-                <Link href="/bottles" className="hover:text-amber-800 hover:underline">10ml Amber Roll-Ons</Link>
-                <span>&bull;</span>
-                <Link href="/perfume-making" className="hover:text-amber-800 hover:underline">Perfumer&apos;s Base</Link>
-                <span>&bull;</span>
-                <Link href="/custom-labels" className="hover:text-amber-800 hover:underline">Gold Foil Labels</Link>
-                <span>&bull;</span>
-                <Link href="/testing" className="hover:text-amber-800 hover:underline">Blotter Strips</Link>
-              </div>
-            </div>
-
-            {/* Quick Action CTAs */}
-            <div className="flex flex-wrap items-center justify-center gap-3.5 pt-4">
-              <Link
-                href="/shop"
-                className="px-6 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-stone-900 text-white hover:bg-stone-800 transition flex items-center gap-2 shadow-md"
-              >
-                Browse Full Catalog <ArrowRight className="w-4 h-4" />
+            <h1 style={{ fontSize: "clamp(36px, 6vw, 64px)", fontWeight: 300, color: "white", lineHeight: 1.08, letterSpacing: "-0.02em", marginBottom: 20, fontFamily: "var(--font-cormorant), Georgia, serif" }}>
+              Everything You Need<br />
+              <em style={{ fontStyle: "normal", color: "#8FD5B0" }}>to Craft Perfumes.</em>
+            </h1>
+            <p style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", fontWeight: 300, lineHeight: 1.7, maxWidth: 440, marginBottom: 36 }}>
+              Fragrance oils, bottles, custom labels and packaging for perfume makers, indie brands and formulators.
+            </p>
+            <div style={{ display: "flex", alignItems: "center", gap: 28, flexWrap: "wrap" }}>
+              <Link href="/fragrance" style={{
+                padding: "13px 32px", background: "#2B5F4A", color: "white",
+                fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase",
+                textDecoration: "none", transition: "background 0.15s",
+                display: "inline-block",
+              }}>
+                Shop Fragrances
               </Link>
-              <Link
-                href="/custom-labels"
-                className="px-6 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white text-amber-900 border border-[#d6d0c4] hover:bg-stone-50 transition flex items-center gap-2 shadow-sm"
-              >
-                <Sparkles className="w-4 h-4 text-amber-700" /> Custom Label Studio
+              <Link href="/shop" style={{
+                fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase",
+                color: "rgba(255,255,255,0.5)", textDecoration: "none", display: "flex", alignItems: "center", gap: 8,
+              }}>
+                All Categories <ArrowRight style={{ width: 14, height: 14 }} />
               </Link>
             </div>
-
           </div>
         </div>
       </section>
 
-      {/* 2. Curated Formulation Categories Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10 pb-4 border-b border-[#eae6df]">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-widest text-amber-800">
-              Curated Atelier Supplies
-            </span>
-            <h2 className="font-serif text-3xl font-normal text-stone-950 mt-1">
-              Formulation Categories
-            </h2>
-          </div>
-          <Link
-            href="/shop"
-            className="text-xs font-bold uppercase tracking-wider text-amber-800 hover:text-amber-900 flex items-center gap-1"
-          >
-            View All Categories <ChevronRight className="w-4 h-4" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {CATEGORY_SHOWCASE.map((cat) => {
-            const Icon = cat.icon;
-            return (
-              <Link
-                key={cat.slug}
-                href={cat.href}
-                className="luxury-card rounded-2xl p-6 flex flex-col justify-between group transition-all"
-              >
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200/60 flex items-center justify-center text-amber-800 group-hover:scale-105 transition">
-                      <Icon className="w-6 h-6 stroke-[1.5]" />
-                    </div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#f5f3ee] text-stone-700 border border-[#e5dfd5]">
-                      {cat.badge}
-                    </span>
-                  </div>
-
-                  <div>
-                    <span className="text-[11px] font-semibold text-amber-800 block">
-                      {cat.tagline}
-                    </span>
-                    <h3 className="font-serif text-xl font-bold text-stone-900 group-hover:text-amber-800 transition mt-0.5">
-                      {cat.name}
-                    </h3>
-                    <p className="text-xs text-stone-500 mt-2 leading-relaxed">
-                      {cat.desc}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="pt-5 mt-4 border-t border-[#f0ece5] flex items-center justify-between text-xs font-bold text-stone-900 group-hover:text-amber-800">
-                  <span>Explore Collection</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* 3. Featured Compounding Essentials Products Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10 pb-4 border-b border-[#eae6df]">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-widest text-amber-800">
-              Formulation Direct Supplies
-            </span>
-            <h2 className="font-serif text-3xl font-normal text-stone-950 mt-1">
-              Featured Compounding Essentials
-            </h2>
-          </div>
-          <Link
-            href="/shop"
-            className="text-xs font-bold uppercase tracking-wider text-amber-800 hover:text-amber-900 flex items-center gap-1"
-          >
-            Explore Complete Shop <ChevronRight className="w-4 h-4" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+      {/* ━━━━ STATS STRIP ━━━━ */}
+      <div style={{ borderBottom: "1px solid var(--sl-gray-light)", background: "white" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 40px", display: "grid", gridTemplateColumns: "repeat(4, 1fr)" }}>
+          {stats.map((s) => (
+            <div key={s.label} style={{ padding: "20px 24px", borderRight: "1px solid var(--sl-gray-light)" }}>
+              <p style={{ fontSize: 20, fontWeight: 600, color: "var(--sl-ink)", margin: 0, letterSpacing: "-0.01em" }}>{s.value}</p>
+              <p style={{ fontSize: 9, fontWeight: 600, color: "var(--sl-gray-mid)", textTransform: "uppercase", letterSpacing: "0.2em", margin: "4px 0 0" }}>{s.label}</p>
+            </div>
           ))}
         </div>
-      </section>
+      </div>
 
-      {/* 4. The 4-Step Formulation Atelier Compounding Guide */}
-      <section className="border-y border-[#eae6df] bg-[#fbf9f4] py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-amber-800">
-              Laboratory Standard Operating Procedure
-            </span>
-            <h2 className="font-serif text-3xl font-normal text-stone-950">
-              The Complete Perfume Formulation Workflow
-            </h2>
-            <p className="text-xs text-stone-600 leading-relaxed">
-              From pure uncut raw essence to retail presentation packaging in 4 streamlined compounding phases.
-            </p>
+      {/* ━━━━ CATEGORY TILES ━━━━ */}
+      <section style={{ background: "#F6F6F4", padding: "56px 0" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 40px" }}>
+          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 32 }}>
+            <div>
+              <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", color: "#2B5F4A", marginBottom: 8 }}>Shop by Category</p>
+              <h2 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 300, color: "var(--sl-ink)", letterSpacing: "-0.01em", margin: 0 }}>
+                Everything a Perfumer Needs
+              </h2>
+            </div>
+            <Link href="/shop" style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--sl-gray-mid)", textDecoration: "none", display: "flex", alignItems: "center", gap: 8 }}>
+              View All <ArrowRight style={{ width: 13, height: 13 }} />
+            </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-white p-6 rounded-2xl border border-[#e5dfd5] space-y-3 shadow-sm">
-              <span className="text-xs font-mono font-bold text-amber-700 block">STEP 01</span>
-              <h3 className="font-serif text-lg font-bold text-stone-900">Select Grade-A Essence</h3>
-              <p className="text-xs text-stone-500 leading-relaxed">
-                Choose pure uncut fragrance oil essences fractioned into accessible trial or compounding bottles.
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-2xl border border-[#e5dfd5] space-y-3 shadow-sm">
-              <span className="text-xs font-mono font-bold text-amber-700 block">STEP 02</span>
-              <h3 className="font-serif text-lg font-bold text-stone-900">Compound With Base</h3>
-              <p className="text-xs text-stone-500 leading-relaxed">
-                Dilute precisely with 200-Proof SDA-40B perfumer&apos;s alcohol using graduated pipettes.
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-2xl border border-[#e5dfd5] space-y-3 shadow-sm">
-              <span className="text-xs font-mono font-bold text-amber-700 block">STEP 03</span>
-              <h3 className="font-serif text-lg font-bold text-stone-900">Bottle & Seal</h3>
-              <p className="text-xs text-stone-500 leading-relaxed">
-                Transfer into UV-shielding amber glass roll-on bottles with stainless steel balls or spray atomizers.
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-2xl border border-[#e5dfd5] space-y-3 shadow-sm">
-              <span className="text-xs font-mono font-bold text-amber-700 block">STEP 04</span>
-              <h3 className="font-serif text-lg font-bold text-stone-900">Brand & Package</h3>
-              <p className="text-xs text-stone-500 leading-relaxed">
-                Apply custom gold metallic foil labels, presentation gift boxes, and tamper-evident shrink seals.
-              </p>
-            </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 1, background: "var(--sl-gray-light)" }}>
+            {categories.map((cat) => (
+              <Link key={cat.href} href={cat.href} style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "28px 24px", background: "white", textDecoration: "none", minHeight: 160, transition: "background 0.15s", position: "relative" }}
+                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "#F6FAF8")}
+                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "white")}
+              >
+                {cat.badge && (
+                  <span style={{ position: "absolute", top: 12, right: 12, fontSize: 8, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", padding: "2px 7px", background: "#E8F0EC", color: "#2B5F4A", border: "1px solid #C5DDD3" }}>
+                    {cat.badge}
+                  </span>
+                )}
+                <div>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: "var(--sl-ink)", margin: "0 0 6px", lineHeight: 1.3 }}>{cat.label}</p>
+                  <p style={{ fontSize: 11, color: "var(--sl-gray-mid)", margin: 0, fontWeight: 300 }}>{cat.desc}</p>
+                </div>
+                <ArrowRight style={{ width: 14, height: 14, color: "#2B5F4A", marginTop: 16 }} />
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* 5. Custom Label Atelier Banner */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative rounded-3xl bg-stone-950 text-white p-8 md:p-14 overflow-hidden shadow-2xl">
-          <div className="max-w-2xl space-y-6 relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-[10px] font-bold text-amber-300 uppercase tracking-widest">
-              <Sparkles className="w-3.5 h-3.5" /> PRIVATE LABEL ATELIER
+      {/* ━━━━ TRENDING PRODUCTS (DYNAMIC REAL CATALOG ONLY) ━━━━ */}
+      <section style={{ padding: "56px 0", background: "white" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 40px" }}>
+          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 32, paddingBottom: 20, borderBottom: "1px solid var(--sl-gray-light)" }}>
+            <div>
+              <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", color: "#2B5F4A", marginBottom: 8 }}>Curated Selection</p>
+              <h2 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 300, color: "var(--sl-ink)", letterSpacing: "-0.01em", margin: 0 }}>Trending Essentials</h2>
             </div>
-
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal leading-tight">
-              Die-Cut Gold Foil & Metallic Labels <br />
-              <span className="italic text-amber-400">Tailored to Your Glassware</span>
-            </h2>
-
-            <p className="text-xs sm:text-sm text-stone-300 leading-relaxed font-light">
-              Upload your brand logo and custom artwork. Our automated system calculates the exact circumference and height for your bottles, computing sheet yield and square-inch pricing with gold foil, matte black, or gloss clear vinyl.
-            </p>
-
-            <div className="pt-2 flex flex-wrap items-center gap-4">
-              <Link
-                href="/custom-labels"
-                className="px-6 py-3.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg transition flex items-center gap-2"
-              >
-                Launch Custom Label Studio <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                href="/shop"
-                className="px-6 py-3.5 bg-stone-900 hover:bg-stone-800 text-stone-300 text-xs font-bold uppercase tracking-wider rounded-xl border border-stone-800 transition"
-              >
-                Explore All Products
-              </Link>
-            </div>
+            <Link href="/shop" style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--sl-gray-mid)", textDecoration: "none", display: "flex", alignItems: "center", gap: 8 }}>
+              View All <ArrowRight style={{ width: 13, height: 13 }} />
+            </Link>
           </div>
+
+          {/* Grid adapts to actual number of products (up to 4) */}
+          {trendingProducts.length > 0 ? (
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${trendingProducts.length}, 1fr)`, gap: 1, background: "var(--sl-gray-light)" }}>
+              {trendingProducts.map((prod) => (
+                <Link key={prod.id} href={prod.href} style={{ display: "block", textDecoration: "none", background: "white" }}
+                  className="sl-card"
+                >
+                  <div className="sl-card-image" style={{ aspectRatio: "4/5" }}>
+                    {prod.imageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={prod.imageUrl} alt={prod.name}
+                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "transform 0.4s ease" }} />
+                    ) : (
+                      <div className="sl-card-placeholder">
+                        <div className="sl-card-placeholder-line" />
+                        <span className="sl-card-placeholder-label">{prod.placeholderLabel || prod.category}</span>
+                        <div className="sl-card-placeholder-line" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="sl-card-body">
+                    <span className="sl-card-eyebrow">{prod.category}</span>
+                    <h3 className="sl-card-name">{prod.name}</h3>
+                    <div className="sl-card-footer">
+                      <span className="sl-price">{prod.price}</span>
+                      <span className="text-[10px] text-gray-400 font-mono">SKU: {prod.sku}</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div style={{ padding: "48px 0", textAlign: "center" }}>
+              <p style={{ fontSize: 13, color: "var(--sl-gray-mid)" }}>
+                {loading ? "Loading catalog essentials..." : "No featured products currently active."}
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
-    </div>
+      {/* ━━━━ CTA BANNER ━━━━ */}
+      <section style={{ background: "#0E1A14", padding: "56px 40px" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 40, flexWrap: "wrap" }}>
+          <div>
+            <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.28em", textTransform: "uppercase", color: "#5EAB85", marginBottom: 12 }}>Wholesale Scale · US Logistics</p>
+            <h2 style={{ fontSize: "clamp(22px, 3vw, 36px)", fontWeight: 300, color: "white", letterSpacing: "-0.01em", margin: "0 0 10px", fontFamily: "var(--font-cormorant), Georgia, serif" }}>
+              Same-Day Dispatch on Commercial Orders
+            </h2>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", fontWeight: 300, margin: 0, maxWidth: 500 }}>
+              Volume tier discounting in real-time. Direct Shippo API with discounted freight across North America.
+            </p>
+          </div>
+          <Link href="/shop" style={{
+            padding: "14px 40px", background: "#2B5F4A", color: "white", textDecoration: "none",
+            fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", whiteSpace: "nowrap",
+            flexShrink: 0, display: "inline-block",
+          }}>
+            Browse Full Catalog
+          </Link>
+        </div>
+      </section>
+
+    </main>
   );
 }

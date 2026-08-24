@@ -56,6 +56,7 @@ export interface InventoryItem {
 export type Inventory = InventoryItem;
 
 export type InventoryTransactionType =
+  | "initial_stock"
   | "purchase"
   | "sale"
   | "reservation"

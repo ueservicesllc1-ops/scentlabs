@@ -41,10 +41,19 @@ export default function CustomerOrdersPage() {
 
     for (const item of order.items) {
       const liveProduct = INITIAL_PRODUCTS.find((p) => p.id === item.productId);
-      if (liveProduct && liveProduct.status === "active" && liveProduct.inventory.availableQuantity >= item.quantity) {
+      const stockAvailable = liveProduct?.inventory
+        ? (liveProduct.inventory.availableQuantity ?? liveProduct.inventory.quantityInStock ?? 0)
+        : 999;
+      if (liveProduct && liveProduct.status === "active" && stockAvailable >= item.quantity) {
         const pkg =
-          liveProduct.packageOptions.find((p) => p.quantity === item.selectedOptions?.packageQuantity) ||
-          liveProduct.packageOptions[0];
+          liveProduct.packageOptions?.find((p) => p.quantity === item.selectedOptions?.packageQuantity) ||
+          liveProduct.packageOptions?.[0] || {
+            id: "pkg_default",
+            name: "Standard Pack",
+            quantity: 1,
+            price: liveProduct.basePrice,
+            unitPrice: liveProduct.basePrice,
+          };
         
         addItem(liveProduct, pkg, item.selectedOptions?.packageCount || 1);
         readdedCount++;

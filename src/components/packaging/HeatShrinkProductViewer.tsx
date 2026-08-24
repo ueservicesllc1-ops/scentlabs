@@ -1,162 +1,162 @@
 "use client";
 
 import React, { useState } from "react";
-import { SHRINK_WRAP_VARIANTS } from "@/data/packaging";
+import { SHRINK_WRAP_VARIANTS } from "@/data/products";
 import { useCart } from "@/context/CartContext";
-import { formatCurrency, formatUnitPrice } from "@/lib/utils";
-import { Layers, ShoppingBag, Check, ShieldCheck, Sparkles } from "lucide-react";
+import { ShoppingBag, Check } from "lucide-react";
 
 export function HeatShrinkProductViewer() {
   const { addItem } = useCart();
-  const [selectedSize, setSelectedSize] = useState<string>("6x8");
-  const [selectedQty, setSelectedQty] = useState<50 | 100>(50);
+  const [selectedVariantId, setSelectedVariantId] = useState<string>(SHRINK_WRAP_VARIANTS[0].id);
+  const [selectedPkgIndex, setSelectedPkgIndex] = useState<number>(0);
   const [added, setAdded] = useState(false);
 
-  const activeVariant = SHRINK_WRAP_VARIANTS.find((v) => v.sizeName.startsWith(selectedSize)) || SHRINK_WRAP_VARIANTS[2];
-
-  const currentPrice = selectedQty === 50 ? activeVariant.price50 : activeVariant.price100;
-  const currentUnitPrice = currentPrice / selectedQty;
+  const activeShrink = SHRINK_WRAP_VARIANTS.find((v) => v.id === selectedVariantId) || SHRINK_WRAP_VARIANTS[0];
+  const activePkg = (activeShrink.packageOptions && activeShrink.packageOptions[selectedPkgIndex]) || 
+    (activeShrink.packageOptions && activeShrink.packageOptions[0]) || {
+      id: "pkg_default",
+      name: "Default Pack",
+      quantity: 50,
+      price: 5.0,
+      unitPrice: 0.1,
+    };
 
   const handleAddToCart = () => {
     const cartProductProxy: any = {
       id: "prod_shrink_wrap_bags",
-      name: `Heat Shrink Wrap Bags (${activeVariant.sizeName} - ${selectedQty}u Pack)`,
+      name: `${activeShrink.name} (${activePkg.quantity}u Pack)`,
       slug: "heat-shrink-wrap-bags",
       category: "packaging",
-      sku: `${activeVariant.sku}-${selectedQty}`,
-      basePrice: currentPrice,
-      media: [{ url: "/images/products/shrink-wrap-bags.jpg", type: "image", isPrimary: true, altText: "Heat Shrink Wrap Bags" }],
-      packageOptions: [
-        {
-          id: `pkg_shrink_${activeVariant.id}_${selectedQty}`,
-          quantity: selectedQty,
-          price: currentPrice,
-          unitPrice: currentUnitPrice,
-        },
-      ],
-      pricingTiers: [],
+      sku: activeShrink.sku,
+      basePrice: activePkg.price,
+      media: [{ url: "/images/products/shrink-wrap.jpg", type: "image", isPrimary: true, altText: activeShrink.name }],
+      packageOptions: activeShrink.packageOptions || [activePkg],
     };
 
-    const selectedPkg = {
-      id: `pkg_shrink_${activeVariant.id}_${selectedQty}`,
-      quantity: selectedQty,
-      price: currentPrice,
-      unitPrice: currentUnitPrice,
-    };
-
-    addItem(cartProductProxy, selectedPkg, 1);
+    addItem(cartProductProxy, activePkg, 1);
     setAdded(true);
-    setTimeout(() => setAdded(false), 2500);
+    setTimeout(() => setAdded(false), 2000);
   };
 
   return (
-    <div className="p-6 rounded-2xl border border-lab-800 bg-lab-950 font-mono space-y-6 shadow-2xl">
-      <div className="border-b border-lab-800 pb-4 flex justify-between items-start">
+    <div className="p-6 sm:p-8 border border-gray-200 bg-white space-y-6 shadow-sm">
+      <div className="border-b border-gray-100 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <div>
-          <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest block">
-            Professional Thermal Packaging
+          <span className="text-[10px] font-semibold tracking-[0.2em] text-[#2B5F4A] uppercase block">
+            Tamper-Evident &bull; 100 Gauge POF Film
           </span>
-          <h2 className="text-xl font-bold text-white uppercase">Heat Shrink Wrap Bags</h2>
+          <h3 className="text-lg font-semibold text-gray-950 mt-1 uppercase tracking-tight">
+            POF Heat Shrink Wrap Bags
+          </h3>
         </div>
-        <span className="px-2.5 py-1 rounded bg-indigo-950/80 border border-indigo-500/30 text-indigo-400 text-xs font-bold uppercase">
-          7 Sizes
+        <span className="font-mono text-[11px] text-gray-500 bg-gray-50 px-2.5 py-1 border border-gray-200">
+          SKU: {activeShrink.sku}
         </span>
       </div>
 
-      {/* 1. Size Selector Matrix */}
-      <div className="space-y-2">
-        <label className="text-xs font-bold text-white uppercase block">
-          1. Select Bag Size (Inches)
-        </label>
-        <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
-          {["4x6", "6x6", "6x8", "8x12", "10x14", "12x18", "14x20"].map((size) => {
-            const isSelected = selectedSize === size;
-            return (
-              <button
-                key={size}
-                type="button"
-                onClick={() => setSelectedSize(size)}
-                className={`py-2.5 px-2 rounded-xl text-center border text-xs font-bold transition flex flex-col items-center justify-center ${
-                  isSelected
-                    ? "border-amber-500 bg-amber-500/10 text-amber-400 shadow-md shadow-amber-500/10"
-                    : "border-lab-800 bg-lab-900/60 text-lab-400 hover:text-white hover:border-lab-700"
-                }`}
-              >
-                <span>{size}</span>
-                <span className="text-[9px] text-lab-500 font-normal">in</span>
-              </button>
-            );
-          })}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        
+        {/* Variant Buttons */}
+        <div className="space-y-3">
+          <label className="text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-900 block">
+            Select Compatible Bottle Size:
+          </label>
+          <div className="grid grid-cols-1 gap-2">
+            {SHRINK_WRAP_VARIANTS.map((variant) => {
+              const isSelected = selectedVariantId === variant.id;
+              const firstPkg = variant.packageOptions?.[0];
+              const dimensions = (variant.attributes as any)?.dimensions || variant.name;
+              return (
+                <button
+                  key={variant.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedVariantId(variant.id);
+                    setSelectedPkgIndex(0);
+                  }}
+                  className={`p-3 text-left transition border flex items-center justify-between ${
+                    isSelected
+                      ? "bg-[#F6FAF8] text-gray-950 border-[#2B5F4A] shadow-xs"
+                      : "bg-white text-gray-800 border-gray-200 hover:border-gray-400"
+                  }`}
+                >
+                  <div>
+                    <span className="text-xs font-semibold uppercase tracking-wider block">{variant.name}</span>
+                    <span className={`text-[10px] font-mono ${isSelected ? "text-[#2B5F4A]" : "text-gray-500"}`}>
+                      {dimensions} (100G POF)
+                    </span>
+                  </div>
+                  {firstPkg && (
+                    <span className={`font-mono text-xs font-semibold ${isSelected ? "text-[#2B5F4A]" : "text-gray-900"}`}>
+                      ${firstPkg.price.toFixed(2)} / {firstPkg.quantity}u
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
 
-      {/* 2. Quantity Selector (50 vs 100) */}
-      <div className="space-y-2">
-        <label className="text-xs font-bold text-white uppercase block">
-          2. Select Pack Quantity
-        </label>
-        <div className="grid grid-cols-2 gap-3">
+        {/* Spec Sheet & Add to Cart */}
+        <div className="p-6 bg-gray-50 border border-gray-200 space-y-4">
+          <div>
+            <span className="text-[10px] font-semibold tracking-[0.2em] text-gray-500 uppercase block">Pack Pricing</span>
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className="text-2xl font-semibold text-gray-950">${activePkg.price.toFixed(2)}</span>
+              <span className="text-xs font-mono text-gray-500">(${activePkg.unitPrice.toFixed(3)} / bag)</span>
+            </div>
+          </div>
+
+          <div className="space-y-2 text-xs border-t border-gray-200 pt-3 text-gray-600">
+            <div className="flex justify-between">
+              <span>Film Spec:</span>
+              <span className="font-medium text-gray-900">100 Gauge Polyolefin (POF)</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Heat Activation:</span>
+              <span className="font-medium text-gray-900">250°F – 320°F Heat Gun</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Closure:</span>
+              <span className="font-medium text-gray-900">Pre-sealed bottom, open top</span>
+            </div>
+          </div>
+
           <button
             type="button"
-            onClick={() => setSelectedQty(50)}
-            className={`p-4 rounded-xl border text-left transition flex justify-between items-center ${
-              selectedQty === 50
-                ? "border-amber-500 bg-amber-500/10 text-white"
-                : "border-lab-800 bg-lab-900/40 text-lab-400 hover:border-lab-700 hover:text-white"
-            }`}
+            onClick={handleAddToCart}
+            style={{
+              background: added ? "#2B5F4A" : "#1A1A1A",
+              color: "white",
+              padding: "12px 24px",
+              width: "100%",
+              fontSize: "11px",
+              fontWeight: 700,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              border: "none",
+              cursor: "pointer",
+              transition: "background 0.2s ease",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px"
+            }}
+            onMouseEnter={(e) => { if (!added) (e.target as HTMLElement).style.background = "#2B5F4A"; }}
+            onMouseLeave={(e) => { if (!added) (e.target as HTMLElement).style.background = "#1A1A1A"; }}
           >
-            <div>
-              <span className="text-xs font-bold block uppercase">50 Bags Pack</span>
-              <span className="text-[11px] text-lab-400">{formatUnitPrice(activeVariant.price50 / 50)} / unit</span>
-            </div>
-            <span className="text-sm font-black text-amber-400">{formatCurrency(activeVariant.price50)}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setSelectedQty(100)}
-            className={`p-4 rounded-xl border text-left transition flex justify-between items-center ${
-              selectedQty === 100
-                ? "border-amber-500 bg-amber-500/10 text-white"
-                : "border-lab-800 bg-lab-900/40 text-lab-400 hover:border-lab-700 hover:text-white"
-            }`}
-          >
-            <div>
-              <span className="text-xs font-bold block uppercase">100 Bags Pack</span>
-              <span className="text-[11px] text-emerald-400 font-bold">
-                {formatUnitPrice(activeVariant.price100 / 100)} / unit (Best Value)
-              </span>
-            </div>
-            <span className="text-sm font-black text-amber-400">{formatCurrency(activeVariant.price100)}</span>
+            {added ? (
+              <>
+                <Check className="w-4 h-4" /> Added to Order
+              </>
+            ) : (
+              <>
+                <ShoppingBag className="w-4 h-4" /> Add {activePkg.quantity} Shrink Bags
+              </>
+            )}
           </button>
         </div>
-      </div>
 
-      {/* 3. Pricing Summary & Add to Cart */}
-      <div className="p-4 rounded-xl border border-lab-700 bg-lab-900/60 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <span className="text-[10px] text-lab-500 uppercase block">Selected Configuration</span>
-          <span className="text-xs text-white font-bold block">
-            {activeVariant.sizeName} • {selectedQty} Units
-          </span>
-          <span className="text-2xl font-black text-amber-400">{formatCurrency(currentPrice)}</span>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleAddToCart}
-          className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-lab-950 font-bold text-xs uppercase tracking-wider hover:brightness-110 transition flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
-        >
-          {added ? (
-            <>
-              <Check className="w-4 h-4 text-emerald-950" /> Added to Cart!
-            </>
-          ) : (
-            <>
-              <ShoppingBag className="w-4 h-4" /> Add Pack to Cart
-            </>
-          )}
-        </button>
       </div>
     </div>
   );

@@ -18,8 +18,8 @@ export const recommendationService = {
       if (!sourceProduct) return [];
 
       const targetIds = [
-        ...sourceProduct.complementaryProductIds,
-        ...sourceProduct.recommendedProductIds,
+        ...(sourceProduct.complementaryProductIds || []),
+        ...(sourceProduct.recommendedProductIds || []),
       ];
       return INITIAL_PRODUCTS.filter((p) => targetIds.includes(p.id));
     }
@@ -31,7 +31,7 @@ export const recommendationService = {
         const sourceProduct = INITIAL_PRODUCTS.find((p) => p.id === productId);
         if (!sourceProduct) return [];
         return INITIAL_PRODUCTS.filter((p) =>
-          sourceProduct.complementaryProductIds.includes(p.id)
+          (sourceProduct.complementaryProductIds || []).includes(p.id)
         );
       }
 

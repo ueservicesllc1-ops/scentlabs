@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-surface" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SCENTLAB Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Bodoni+Moda:opsz,wght@6..96,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "inverse-on-surface": "#f2f1ee",
+                "on-secondary-fixed": "#1c1b1a",
+                "on-tertiary-fixed-variant": "#594313",
+                "surface-container-low": "#f4f3f1",
+                "primary-fixed": "#e5e2e1",
+                "on-surface-variant": "#444748",
+                "on-background": "#1a1c1a",
+                "error": "#ba1a1a",
+                "primary-fixed-dim": "#c8c6c5",
+                "on-tertiary-fixed": "#261900",
+                "surface-dim": "#dbdad7",
+                "surface-variant": "#e3e2e0",
+                "secondary-fixed": "#e6e2de",
+                "tertiary": "#000000",
+                "surface-bright": "#faf9f6",
+                "on-surface": "#1a1c1a",
+                "surface-container-lowest": "#ffffff",
+                "inverse-surface": "#2f312f",
+                "error-container": "#ffdad6",
+                "primary": "#000000",
+                "on-primary-container": "#858383",
+                "primary-container": "#1c1b1b",
+                "surface-container-highest": "#e3e2e0",
+                "surface-container": "#efeeeb",
+                "surface-container-high": "#e9e8e5",
+                "tertiary-fixed-dim": "#e2c286",
+                "secondary-container": "#e6e2de",
+                "on-secondary": "#ffffff",
+                "outline-variant": "#c4c7c7",
+                "on-error-container": "#93000a",
+                "on-secondary-fixed-variant": "#484644",
+                "on-primary-fixed-variant": "#474646",
+                "on-tertiary-container": "#9b804a",
+                "on-error": "#ffffff",
+                "tertiary-fixed": "#ffdea1",
+                "tertiary-container": "#261900",
+                "secondary": "#605e5c",
+                "on-primary-fixed": "#1c1b1b",
+                "on-secondary-container": "#666461",
+                "inverse-primary": "#c8c6c5",
+                "background": "#faf9f6",
+                "surface": "#faf9f6",
+                "secondary-fixed-dim": "#c9c6c3",
+                "on-primary": "#ffffff",
+                "surface-tint": "#5f5e5e",
+                "on-tertiary": "#ffffff",
+                "outline": "#747878"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+        },
+        "spacing": {
+                "container-max": "1440px",
+                "gutter": "24px",
+                "stack-md": "16px",
+                "stack-sm": "8px",
+                "section-gap": "120px",
+                "margin-mobile": "20px",
+                "stack-lg": "32px",
+                "margin-desktop": "64px"
+        },
+        "fontFamily": {
+                "headline-lg": [
+                        "Inter"
+                ],
+                "caption": [
+                        "Inter"
+                ],
+                "body-md": [
+                        "Inter"
+                ],
+                "body-lg": [
+                        "Inter"
+                ],
+                "label-caps": [
+                        "Inter"
+                ],
+                "headline-lg-mobile": [
+                        "Inter"
+                ],
+                "display-hero": [
+                        "Bodoni Moda"
+                ],
+                "headline-md": [
+                        "Inter"
+                ]
+        },
+        "fontSize": {
+                "headline-lg": [
+                        "40px",
+                        {
+                                "lineHeight": "48px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "500"
+                        }
+                ],
+                "caption": [
+                        "13px",
+                        {
+                                "lineHeight": "18px",
+                                "letterSpacing": "0.01em",
+                                "fontWeight": "400"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "letterSpacing": "0.01em",
+                                "fontWeight": "400"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "letterSpacing": "0.01em",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-caps": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.1em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg-mobile": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "500"
+                        }
+                ],
+                "display-hero": [
+                        "80px",
+                        {
+                                "lineHeight": "96px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "letterSpacing": "0em",
+                                "fontWeight": "500"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+</head>
+<body class="h-full flex antialiased bg-background text-on-surface font-body-md">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col h-full w-64 docked left-0 bg-primary-container dark:bg-surface-container-lowest py-8 px-4 flex-shrink-0 border-r border-outline-variant">
+<div class="mb-stack-lg flex items-center gap-4 px-2">
+<img alt="Admin Profile" class="w-10 h-10 rounded-full object-cover border border-outline-variant" data-alt="A minimalist black and white geometric profile avatar for an admin user, high contrast editorial style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVqefHXdLWE8x3_475k-KclbGr3_PDw2Wqo2D9K0scn2r0_-i2YrXIRESL4FUQAo_BAfisUeYkGbw7KftmvwkZj5zeb26kVzJnC2Bq8NgABjtStRQojH8c9ImvZK0ZCuJMT2PFKcPlH5Nku9IRx_Jzuywmat8EtqcqgmYEt_j9mInkcKgldLhJo0t79UQ3i3EfvnqiKbYSxdx7VyPry0r710twT2t3M-m7EUnY0zK19ypG2KQ4Id_Jqw"/>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-primary-container tracking-tight">SCENTLAB Admin</h2>
+<p class="font-caption text-caption text-on-primary-container/70">Wholesale Portal</p>
+</div>
+</div>
+<ul class="flex flex-col flex-grow gap-stack-sm mt-stack-md font-label-caps text-label-caps">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded bg-surface-container-highest dark:bg-surface-container text-primary dark:text-primary-fixed font-bold scale-95 transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+                    Dashboard
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded text-on-primary-container dark:text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">inventory_2</span>
+                    Inventory
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded text-on-primary-container dark:text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+                    Orders
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded text-on-primary-container dark:text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">group</span>
+                    Customers
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded text-on-primary-container dark:text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">analytics</span>
+                    Analytics
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded text-on-primary-container dark:text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+                    Settings
+                </a>
+</li>
+</ul>
+<ul class="flex flex-col gap-stack-sm mt-auto border-t border-outline-variant pt-stack-md font-label-caps text-label-caps">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded text-on-primary-container dark:text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+                    Support
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded text-on-primary-container dark:text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+                    Logout
+                </a>
+</li>
+</ul>
+</nav>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col h-full overflow-hidden bg-background">
+<!-- Header -->
+<header class="flex-shrink-0 bg-surface border-b border-outline-variant px-margin-mobile md:px-margin-desktop py-6 flex items-center justify-between z-10 sticky top-0">
+<div>
+<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Overview</h1>
+<p class="font-body-md text-body-md text-secondary mt-1">Today's performance and recent activity.</p>
+</div>
+<!-- Quick Actions -->
+<div class="hidden md:flex items-center gap-4">
+<button class="bg-primary text-on-primary px-6 py-3 rounded font-label-caps text-label-caps hover:bg-[#2A2927] transition-colors duration-200 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                    Add Product
+                </button>
+<button class="border border-primary text-primary bg-transparent px-6 py-3 rounded font-label-caps text-label-caps hover:bg-surface-container-low transition-colors duration-200 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">local_shipping</span>
+                    Process Shipments
+                </button>
+</div>
+<!-- Mobile Menu Toggle -->
+<button class="md:hidden text-primary p-2">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</header>
+<!-- Scrollable Workspace -->
+<div class="flex-1 overflow-y-auto px-margin-mobile md:px-margin-desktop py-stack-lg bg-background">
+<!-- Metrics Grid -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter mb-section-gap max-w-container-max mx-auto">
+<!-- Metric Card 1 -->
+<div class="bg-surface p-6 border border-outline-variant rounded flex flex-col gap-2 hover:bg-surface-container-low transition-colors">
+<div class="flex items-center justify-between text-secondary">
+<span class="font-label-caps text-label-caps">Total Sales</span>
+<span class="material-symbols-outlined text-[20px]">payments</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg">$124,500</span>
+<span class="font-caption text-caption text-[#2e7d32] bg-[#e8f5e9] px-2 py-0.5 rounded">+12%</span>
+</div>
+<p class="font-caption text-caption text-secondary">vs. last 30 days</p>
+</div>
+<!-- Metric Card 2 -->
+<div class="bg-surface p-6 border border-outline-variant rounded flex flex-col gap-2 hover:bg-surface-container-low transition-colors">
+<div class="flex items-center justify-between text-secondary">
+<span class="font-label-caps text-label-caps">Active Orders</span>
+<span class="material-symbols-outlined text-[20px]">shopping_bag</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg">342</span>
+<span class="font-caption text-caption text-[#2e7d32] bg-[#e8f5e9] px-2 py-0.5 rounded">+5%</span>
+</div>
+<p class="font-caption text-caption text-secondary">Awaiting fulfillment</p>
+</div>
+<!-- Metric Card 3 -->
+<div class="bg-surface p-6 border border-outline-variant rounded flex flex-col gap-2 hover:bg-surface-container-low transition-colors">
+<div class="flex items-center justify-between text-secondary">
+<span class="font-label-caps text-label-caps">Inventory Items</span>
+<span class="material-symbols-outlined text-[20px]">inventory_2</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg">1,204</span>
+</div>
+<p class="font-caption text-caption text-secondary">Total unique SKUs</p>
+</div>
+<!-- Metric Card 4 -->
+<div class="bg-surface p-6 border border-outline-variant rounded flex flex-col gap-2 hover:bg-surface-container-low transition-colors">
+<div class="flex items-center justify-between text-error">
+<span class="font-label-caps text-label-caps">Low Stock Alerts</span>
+<span class="material-symbols-outlined text-[20px]">warning</span>
+</div>
+<div class="flex items-baseline gap-2 text-error">
+<span class="font-headline-lg text-headline-lg">18</span>
+</div>
+<button class="font-caption text-caption text-primary border-b border-primary self-start hover:text-secondary transition-colors mt-1">View Details</button>
+</div>
+</section>
+<!-- Lower Section: Activity & Quick Actions -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-gutter max-w-container-max mx-auto mb-section-gap">
+<!-- Activity Feed -->
+<div class="lg:col-span-2 flex flex-col gap-stack-md">
+<h3 class="font-headline-md text-headline-md text-on-surface border-b border-outline-variant pb-4">Recent Activity</h3>
+<div class="flex flex-col border border-outline-variant rounded bg-surface divide-y divide-outline-variant">
+<!-- Feed Item 1 -->
+<div class="p-4 flex items-start gap-4 hover:bg-surface-container-low transition-colors">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center flex-shrink-0 text-primary">
+<span class="material-symbols-outlined text-[20px]">local_mall</span>
+</div>
+<div class="flex-1">
+<p class="font-body-md text-body-md text-on-surface"><span class="font-medium">Order #9824</span> was placed by <span class="font-medium">Le Labo Boutique</span>.</p>
+<p class="font-caption text-caption text-secondary mt-1">12 mins ago • Wholesale Order</p>
+</div>
+<button class="font-label-caps text-label-caps text-primary border-b border-primary hover:text-secondary">View</button>
+</div>
+<!-- Feed Item 2 -->
+<div class="p-4 flex items-start gap-4 hover:bg-surface-container-low transition-colors">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center flex-shrink-0 text-primary">
+<span class="material-symbols-outlined text-[20px]">brush</span>
+</div>
+<div class="flex-1">
+<p class="font-body-md text-body-md text-on-surface"><span class="font-medium">Custom Label Design</span> uploaded for Order #9820.</p>
+<p class="font-caption text-caption text-secondary mt-1">45 mins ago • Pending Review</p>
+</div>
+<button class="font-label-caps text-label-caps text-primary border-b border-primary hover:text-secondary">Review</button>
+</div>
+<!-- Feed Item 3 -->
+<div class="p-4 flex items-start gap-4 hover:bg-surface-container-low transition-colors">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center flex-shrink-0 text-primary">
+<span class="material-symbols-outlined text-[20px]">move_up</span>
+</div>
+<div class="flex-1">
+<p class="font-body-md text-body-md text-on-surface">Inventory adjustment: <span class="font-medium">Santal 33 Essence</span> (-5L).</p>
+<p class="font-caption text-caption text-secondary mt-1">2 hours ago • Manual Adjustment</p>
+</div>
+<button class="font-label-caps text-label-caps text-primary border-b border-primary hover:text-secondary">Details</button>
+</div>
+</div>
+</div>
+<!-- Action Panel -->
+<div class="flex flex-col gap-stack-md">
+<h3 class="font-headline-md text-headline-md text-on-surface border-b border-outline-variant pb-4">Quick Links</h3>
+<div class="flex flex-col gap-4">
+<a class="group p-6 border border-outline-variant rounded bg-surface hover:bg-primary hover:text-on-primary transition-all duration-300 flex flex-col items-center justify-center text-center gap-3" href="#">
+<span class="material-symbols-outlined text-[32px] group-hover:text-on-primary text-primary transition-colors">view_in_ar</span>
+<span class="font-label-caps text-label-caps">Manage Bottles</span>
+</a>
+<a class="group p-6 border border-outline-variant rounded bg-surface hover:bg-primary hover:text-on-primary transition-all duration-300 flex flex-col items-center justify-center text-center gap-3" href="#">
+<span class="material-symbols-outlined text-[32px] group-hover:text-on-primary text-primary transition-colors">science</span>
+<span class="font-label-caps text-label-caps">Fragrance Formulas</span>
+</a>
+</div>
+</div>
+</section>
+</div>
+</main>
+</body></html>

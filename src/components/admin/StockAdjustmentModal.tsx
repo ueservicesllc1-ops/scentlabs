@@ -50,10 +50,20 @@ export default function StockAdjustmentModal({
 
     setIsSubmitting(true);
     try {
-      await inventoryRepository.adjustStock(
+      const reasonMap: Record<string, "Count Correction" | "Damaged" | "Lost" | "Found" | "Waste" | "Other"> = {
+        recount: "Count Correction",
+        damage: "Damaged",
+        loss: "Lost",
+        found: "Found",
+        waste: "Waste",
+        other: "Other",
+      };
+      const mappedReason = reasonMap[reason] || "Other";
+
+      await inventoryRepository.adjustInventory(
         productId,
-        delta,
-        reason,
+        calculatedNewStock,
+        mappedReason,
         notes ? `${notes} (Admin UI Adjustment)` : `Manual stock adjustment (${reason})`,
         "ueservicesllc1@gmail.com"
       );

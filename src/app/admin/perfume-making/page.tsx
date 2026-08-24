@@ -39,140 +39,113 @@ export default function AdminPerfumeMakingDashboardPage() {
 
   return (
     <AdminGuard>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 font-mono">
-        {/* Header */}
-        <div className="border-b border-lab-800 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+      <div className="space-y-8 font-sans">
+        
+        {/* ━━━━ HEADER ━━━━ */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 pb-6 border-b border-gray-200">
           <div>
-            <div className="flex items-center gap-2 text-amber-400 text-xs uppercase tracking-widest font-bold mb-1">
-              <Sparkles className="w-3.5 h-3.5" /> PERFUME MAKING & STUDIO COMPOUNDING
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-800 border border-gray-300 mb-2">
+              <Sparkles className="w-3 h-3 text-gray-600" /> Perfume Making & Studio Compounding
             </div>
-            <h1 className="text-3xl font-black text-white uppercase">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-950 tracking-tight">
               Perfume Making Management
             </h1>
-            <p className="text-xs text-lab-400 mt-1">
+            <p className="text-xs text-gray-600 mt-1 max-w-2xl leading-relaxed">
               Manage perfumer&apos;s base alcohol, Steve Spangler containers, fractioning presentations (1L, 500ml, 250ml), and compounding studio kits.
             </p>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 shrink-0">
             <Link
               href="/admin/perfume-making/bases"
-              className="px-4 py-2 rounded-lg bg-lab-900 border border-lab-800 text-lab-300 hover:text-white text-xs flex items-center gap-1.5"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 text-gray-800 text-xs font-semibold shadow-xs transition"
             >
-              <FlaskConical className="w-3.5 h-3.5 text-indigo-400" /> Base Formulations
+              <FlaskConical className="w-3.5 h-3.5 text-gray-500" /> Base Formulations
             </Link>
 
             <Link
               href="/admin/perfume-making/kits"
-              className="px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 text-lab-950 font-bold uppercase text-xs hover:brightness-110 flex items-center gap-1.5 shadow"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-[#2B5F4A] hover:bg-[#1E4233] text-white font-bold uppercase tracking-wider text-xs rounded-lg shadow-xs transition"
             >
-              <Plus className="w-3.5 h-3.5" /> Studio Kits Builder
+              <Plus className="w-4 h-4" /> Studio Kits Builder
             </Link>
           </div>
         </div>
 
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
-          <div className="p-4 rounded-xl border border-lab-800 bg-lab-900/40 space-y-1">
-            <span className="text-lab-500 uppercase block text-[10px]">Bulk Base Alcohol</span>
-            <span className="text-2xl font-black text-amber-400">{Math.round(totalBaseLiters * 10) / 10} Liters</span>
-            <span className="text-[10px] text-lab-400 block">Nature&apos;s Oil 200-Proof</span>
+        {/* ━━━━ KPI CARDS ━━━━ */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="p-5 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
+            <span className="text-[11px] font-semibold text-gray-500 uppercase block">Bulk Base Alcohol</span>
+            <div className="text-2xl font-bold text-[#2B5F4A]">{Math.round(totalBaseLiters * 10) / 10} Liters</div>
+            <span className="text-[11px] text-gray-500 block">Nature&apos;s Oil 200-Proof</span>
           </div>
 
-          <div className="p-4 rounded-xl border border-lab-800 bg-lab-900/40 space-y-1">
-            <span className="text-lab-500 uppercase block text-[10px]">1L Steve Spangler Bottles</span>
-            <span className="text-2xl font-black text-indigo-400">45 Units</span>
-            <span className="text-[10px] text-lab-400 block">Dispensing containers in stock</span>
+          <div className="p-5 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
+            <span className="text-[11px] font-semibold text-gray-500 uppercase block">1L Steve Spangler Bottles</span>
+            <div className="text-2xl font-bold text-gray-950">45 Units</div>
+            <span className="text-[11px] text-gray-500 block">Dispensing containers in stock</span>
           </div>
 
-          <div className="p-4 rounded-xl border border-lab-800 bg-lab-900/40 space-y-1">
-            <span className="text-lab-500 uppercase block text-[10px]">Studio Compounding Kits</span>
-            <span className="text-2xl font-black text-white">{kits.length} Bundles</span>
-            <span className="text-[10px] text-emerald-400 block">Active studio bundles</span>
+          <div className="p-5 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
+            <span className="text-[11px] font-semibold text-gray-500 uppercase block">Studio Compounding Kits</span>
+            <div className="text-2xl font-bold text-gray-950">{kits.length} Bundles</div>
+            <span className="text-[11px] text-[#166534] block">Active studio bundles</span>
           </div>
 
-          <div className="p-4 rounded-xl border border-lab-800 bg-lab-900/40 space-y-1">
-            <span className="text-lab-500 uppercase block text-[10px]">Base Retail Pricing</span>
-            <span className="text-2xl font-black text-white">$21.99 / Liter</span>
-            <span className="text-[10px] text-lab-400 block">58.4% gross profit margin</span>
+          <div className="p-5 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
+            <span className="text-[11px] font-semibold text-gray-500 uppercase block">Base Retail Pricing</span>
+            <div className="text-2xl font-bold text-gray-950">$21.99 / Liter</div>
+            <span className="text-[11px] text-gray-500 block">58.4% gross profit margin</span>
           </div>
         </div>
 
-        {/* Perfume Bases & Kits Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left: Perfumer's Base Variants */}
-          <div className="lg:col-span-7 space-y-4">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <FlaskConical className="w-4 h-4 text-indigo-400" /> Perfumer&apos;s Base Presentations & Costs
-            </h3>
-
-            <div className="overflow-x-auto rounded-xl border border-lab-800 bg-lab-900/40">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-lab-950 border-b border-lab-800 text-lab-400 uppercase text-[10px]">
-                  <tr>
-                    <th className="p-3">Presentation</th>
-                    <th className="p-3">Container</th>
-                    <th className="p-3">Unit Cost</th>
-                    <th className="p-3">Selling Price</th>
-                    <th className="p-3">Margin</th>
-                    <th className="p-3">Stock</th>
+        {/* ━━━━ BASES TABLE ━━━━ */}
+        <div className="rounded-xl border border-gray-200 bg-white shadow-xs overflow-hidden">
+          <div className="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-900">
+              Compounding Base Presentations
+            </span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="bg-gray-50/50 text-[10px] text-gray-600 uppercase font-bold border-b border-gray-200">
+                  <th className="py-3 px-4">Base Formulation</th>
+                  <th className="py-3 px-4">Supplier</th>
+                  <th className="py-3 px-4 text-right">Volume</th>
+                  <th className="py-3 px-4 text-right">Cost / L</th>
+                  <th className="py-3 px-4 text-right">Presentations</th>
+                  <th className="py-3 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {bases.map((b) => (
+                  <tr key={b.id} className="hover:bg-gray-50/80 transition">
+                    <td className="py-3 px-4">
+                      <div className="font-semibold text-gray-950">{b.name}</div>
+                      <div className="text-[10px] text-gray-500 font-mono">{b.slug}</div>
+                    </td>
+                    <td className="py-3 px-4 text-gray-700">{b.supplierName || "Nature's Oil"}</td>
+                    <td className="py-3 px-4 text-right font-mono text-gray-900 font-semibold">{b.inventoryVolumeLiters} L</td>
+                    <td className="py-3 px-4 text-right font-mono text-gray-600">${b.costPerLiter?.toFixed(2) || "13.21"}</td>
+                    <td className="py-3 px-4 text-right font-mono font-bold text-gray-950">
+                      {b.repackagingVariants?.length || 0} sizes
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      <Link
+                        href={`/admin/perfume-making/bases/${b.id}`}
+                        className="px-2.5 py-1 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 text-gray-800 text-[11px] font-semibold inline-flex items-center gap-1 shadow-xs transition"
+                      >
+                        <Edit3 className="w-3 h-3 text-gray-500" /> Edit
+                      </Link>
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-lab-800/60">
-                  {bases[0]?.repackagingVariants.map((v) => (
-                    <tr key={v.id}>
-                      <td className="p-3 font-bold text-white uppercase">{v.name}</td>
-                      <td className="p-3 text-lab-400">
-                        {v.size >= 1 ? "Steve Spangler 1L Soda Bottle ($1.43)" : "Glass Dispensing Bottle"}
-                      </td>
-                      <td className="p-3 font-bold text-amber-400">{formatUnitPrice(v.unitCost)}</td>
-                      <td className="p-3 font-bold text-white">{formatUnitPrice(v.retailPrice)}</td>
-                      <td className="p-3 text-emerald-400 font-bold">{v.marginPercent}%</td>
-                      <td className="p-3 text-indigo-400 font-bold">{v.inventoryQuantity} u</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Right: Active Studio Kits */}
-          <div className="lg:col-span-5 space-y-4">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-amber-400" /> Studio Bundles & Kits
-            </h3>
-
-            <div className="space-y-3">
-              {kits.map((kit) => (
-                <div key={kit.id} className="p-5 rounded-2xl border border-lab-800 bg-lab-950 space-y-3 text-xs">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="font-bold text-white uppercase">{kit.name}</h4>
-                      <span className="text-[10px] text-emerald-400 font-bold">
-                        {kit.discountPercent}% Bundle Savings (${kit.savings.toFixed(2)})
-                      </span>
-                    </div>
-                    <span className="text-base font-black text-amber-400">{formatCurrency(kit.kitPrice)}</span>
-                  </div>
-
-                  <div className="space-y-1 text-lab-400 text-[11px] border-t border-lab-900 pt-2">
-                    {kit.items.map((it, idx) => (
-                      <div key={idx} className="flex justify-between">
-                        <span>• {it.quantity}x {it.productName}</span>
-                        <span className="font-mono text-lab-500">{formatCurrency(it.unitPrice * it.quantity)}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="pt-2 border-t border-lab-900 flex justify-between items-center text-[10px] text-lab-500">
-                    <span>Individual Sum: {formatCurrency(kit.individualTotal)}</span>
-                    <span className="font-bold text-indigo-400">{kit.inventoryQuantity} Kits Ready</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
+
       </div>
     </AdminGuard>
   );

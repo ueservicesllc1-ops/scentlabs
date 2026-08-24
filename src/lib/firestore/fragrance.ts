@@ -32,7 +32,7 @@ export const fragranceRepository = {
     }
 
     try {
-      const q = query(collection(db, FRAGRANCE_COLLECTION), orderBy("name", "asc"), limit(200));
+      const q = query(collection(db, FRAGRANCE_COLLECTION), orderBy("name", "asc"));
       const snapshot = await getDocs(q);
       const docs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as FragranceOil));
       return docs.length > 0 ? docs : Array.from(LOCAL_FRAGRANCES.values());

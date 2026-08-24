@@ -39,11 +39,11 @@ export default function BuildYourProductPage() {
   const labelProduct = INITIAL_PRODUCTS[4]; // Custom labels
 
   // Calculate estimated total package for the bundle
-  const bottlePack = bottle.packageOptions.find((p) => p.quantity >= selectedUnits) || bottle.packageOptions[2];
-  const labelPack = labelProduct.packageOptions.find((p) => p.quantity >= selectedUnits) || labelProduct.packageOptions[1];
-  const boxPack = boxProduct.packageOptions.find((p) => p.quantity >= selectedUnits) || boxProduct.packageOptions[1];
-  const secPack = securityProduct.packageOptions.find((p) => p.quantity >= selectedUnits) || securityProduct.packageOptions[0];
-  const tagsPack = tagsProduct.packageOptions.find((p) => p.quantity >= selectedUnits) || tagsProduct.packageOptions[0];
+  const bottlePack = (bottle.packageOptions || []).find((p) => p.quantity >= selectedUnits) || (bottle.packageOptions || [])[2] || { id: "pkg_default", name: "Default Pack", quantity: 1, price: bottle.basePrice, unitPrice: bottle.basePrice };
+  const labelPack = (labelProduct.packageOptions || []).find((p) => p.quantity >= selectedUnits) || (labelProduct.packageOptions || [])[1] || { id: "pkg_default", name: "Default Pack", quantity: 1, price: labelProduct.basePrice, unitPrice: labelProduct.basePrice };
+  const boxPack = (boxProduct.packageOptions || []).find((p) => p.quantity >= selectedUnits) || (boxProduct.packageOptions || [])[1] || { id: "pkg_default", name: "Default Pack", quantity: 1, price: boxProduct.basePrice, unitPrice: boxProduct.basePrice };
+  const secPack = (securityProduct.packageOptions || []).find((p) => p.quantity >= selectedUnits) || (securityProduct.packageOptions || [])[0] || { id: "pkg_default", name: "Default Pack", quantity: 1, price: securityProduct.basePrice, unitPrice: securityProduct.basePrice };
+  const tagsPack = (tagsProduct.packageOptions || []).find((p) => p.quantity >= selectedUnits) || (tagsProduct.packageOptions || [])[0] || { id: "pkg_default", name: "Default Pack", quantity: 1, price: tagsProduct.basePrice, unitPrice: tagsProduct.basePrice };
 
   let estimatedBundleCost = bottlePack.price + labelPack.price;
   if (includeBox) estimatedBundleCost += boxPack.price;

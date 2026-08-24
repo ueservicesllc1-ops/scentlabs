@@ -7,9 +7,9 @@ export function calculatePrice(
   requestedQuantity: number,
   variant?: ProductVariant
 ): CalculatedPriceResult {
-  const packageOptions = variant?.packageOptions || product.packageOptions;
+  const packageOptions = variant?.packageOptions || product.packageOptions || [];
   const volumeTiers = variant?.volumePricing || product.volumePricing || [];
-  const costPerUnit = variant?.costData.totalUnitCost || product.costData.totalUnitCost;
+  const costPerUnit = variant?.costData?.totalUnitCost || product.costData?.totalUnitCost || 0;
   const minMargin = product.minimumDiscountMargin || 0.25;
 
   // 1. Check if there is an exact package match (e.g. 50 units)

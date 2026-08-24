@@ -74,19 +74,33 @@ export async function revalidateCartItemsServerSide(
       }
     }
 
-    const availablePackageOptions = matchingVariant
-      ? matchingVariant.packageOptions
-      : product.packageOptions;
-
     // 4. Calculate real price and match package tier
     const requestedQty = clientItem.selectedPackage?.quantity || 1;
     const requestedCount = Math.max(1, clientItem.packageCount || 1);
     const totalUnitsNeeded = requestedQty * requestedCount;
 
+    const availablePackageOptions = (matchingVariant
+      ? matchingVariant.packageOptions
+      : product.packageOptions) || [
+        {
+          id: "pkg_default",
+          name: "Default Pack",
+          quantity: requestedQty,
+          price: product.basePrice,
+          unitPrice: product.basePrice,
+        },
+      ];
+
     // Match exact package or closest volume tier
     const exactPackage =
       availablePackageOptions.find((p) => p.quantity === requestedQty) ||
-      availablePackageOptions[0];
+      availablePackageOptions[0] || {
+        id: "pkg_default",
+        name: "Default Pack",
+        quantity: requestedQty,
+        price: product.basePrice,
+        unitPrice: product.basePrice,
+      };
 
     // Determine unit price
     let realUnitPrice = exactPackage.unitPrice;
@@ -102,9 +116,10 @@ export async function revalidateCartItemsServerSide(
     const realLinePrice = Math.round(realPackagePrice * requestedCount * 100) / 100;
 
     // 5. Confirm inventory availability
-    const availableStock = matchingVariant
-      ? matchingVariant.inventory.availableQuantity
-      : product.inventory.availableQuantity;
+    const availableStock =
+      (matchingVariant
+        ? matchingVariant.inventory?.availableQuantity
+        : product.inventory?.availableQuantity) ?? 9999;
 
     if (totalUnitsNeeded > availableStock) {
       return {

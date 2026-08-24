@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Inter, Bodoni_Moda, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -6,19 +7,29 @@ import { CartDrawer } from "@/components/cart/CartDrawer";
 import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
 
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const bodoni = Bodoni_Moda({
+  subsets: ["latin"],
+  variable: "--font-bodoni",
+  display: "swap",
+});
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  variable: "--font-cormorant",
+  weight: ["300", "400", "500", "600"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "SCENTLAB — Professional Fragrance Supplies & Custom Labels",
+  title: "SCENTLAB | Wholesale Fragrance & Packaging",
   description:
-    "Everything you need to create, package and sell your own fragrances. High-grade perfume bases, roll-on bottles, atomizers, custom foil labels, pipettes, and wholesale fractioning.",
-  keywords: [
-    "fragrance supplies",
-    "perfume bottles",
-    "custom perfume labels",
-    "roll on bottles 10ml",
-    "perfume base",
-    "blotter strips",
-    "perfume packaging",
-  ],
+    "Premium fragrance oils, clinical-grade packaging, and custom foil labels for creators, perfumers and growing fragrance brands.",
 };
 
 export default function RootLayout({
@@ -27,8 +38,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className="min-h-screen bg-[#09090b] text-[#f4f4f5] flex flex-col antialiased">
+    <html lang="en" className={`light ${inter.variable} ${bodoni.variable} ${cormorant.variable}`}>
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="min-h-screen bg-surface text-on-surface font-body-md antialiased flex flex-col selection:bg-primary selection:text-on-primary">
         <AuthProvider>
           <CartProvider>
             <Navbar />

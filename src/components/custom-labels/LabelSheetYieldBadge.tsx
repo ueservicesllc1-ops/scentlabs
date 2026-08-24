@@ -2,7 +2,7 @@
 
 import React from "react";
 import { calculateLabelSheetYield } from "@/lib/custom-labels/sheet-calculator";
-import { Layers, FileText } from "lucide-react";
+import { Layers } from "lucide-react";
 
 interface LabelSheetYieldBadgeProps {
   width: number;
@@ -18,18 +18,16 @@ export function LabelSheetYieldBadge({
   const yieldInfo = calculateLabelSheetYield(width, height, quantity);
 
   return (
-    <div className="p-3 rounded-xl bg-lab-900/50 border border-lab-800 text-[11px] font-mono text-lab-300 flex flex-wrap items-center justify-between gap-2">
+    <div className="p-2.5 bg-gray-50 border border-gray-200 text-xs text-gray-600 flex items-center justify-between">
       <div className="flex items-center gap-2">
-        <Layers className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+        <Layers className="w-3.5 h-3.5 text-[#2B5F4A] flex-shrink-0" />
         <span>
-          Production Yield: <strong className="text-white">{yieldInfo.optimalLabelsPerSheet} labels</strong> per 8.5&quot; × 11&quot; sheet ({yieldInfo.optimalOrientation})
+          Sheet Yield: <strong className="text-gray-900 font-semibold">{yieldInfo.optimalLabelsPerSheet} labels</strong> / sheet
         </span>
       </div>
-
-      <div className="flex items-center gap-1.5 text-lab-400">
-        <FileText className="w-3 h-3 text-lab-500" />
-        <span>Est. ~<strong>{yieldInfo.estimatedSheetsRequired} sheets</strong> (includes 10% scrap/bleed buffer)</span>
-      </div>
+      <span className="font-mono text-[11px] text-gray-500">
+        ~{yieldInfo.estimatedSheetsRequired} sheets total
+      </span>
     </div>
   );
 }

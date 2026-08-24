@@ -24,9 +24,9 @@ import {
 } from "lucide-react";
 
 export default function AdminLabelPricingPage() {
-  const [selectedSizeId, setSelectedSizeId] = useState(STANDARD_LABEL_SIZES[4].id); // 1.5 x 2.25
+  const [selectedSizeId, setSelectedSizeId] = useState(STANDARD_LABEL_SIZES[5]?.id || "size_1_5x2_5"); // 1.5 x 2.5 in
   const [selectedMaterialId, setSelectedMaterialId] = useState(STANDARD_LABEL_MATERIALS[0].id); // Gold Foil
-  const [quantity, setQuantity] = useState<number>(100);
+  const [quantity, setQuantity] = useState<number>(50);
 
   // Cost Configuration parameters
   const [wasteFactor, setWasteFactor] = useState(0.10); // 10%
@@ -34,7 +34,7 @@ export default function AdminLabelPricingPage() {
   const [packagingCost, setPackagingCost] = useState(1.50); // $1.50 per order
   const [targetMargin, setTargetMargin] = useState(0.45); // 45%
 
-  const selectedSize = STANDARD_LABEL_SIZES.find((s) => s.id === selectedSizeId) || STANDARD_LABEL_SIZES[0];
+  const selectedSize = STANDARD_LABEL_SIZES.find((s) => s.id === selectedSizeId) || STANDARD_LABEL_SIZES[5];
   const selectedMaterial = STANDARD_LABEL_MATERIALS.find((m) => m.id === selectedMaterialId) || STANDARD_LABEL_MATERIALS[0];
 
   const breakdown = calculateLabelCost(
@@ -119,7 +119,7 @@ export default function AdminLabelPricingPage() {
 
                 <div className="sm:col-span-2">
                   <label className="text-lab-400 block mb-1 text-[10px] uppercase">Batch Quantity</label>
-                  <div className="grid grid-cols-6 gap-2">
+                  <div className="grid grid-cols-5 gap-2">
                     {STANDARD_LABEL_QUANTITIES.map((q) => (
                       <button
                         key={q}
@@ -200,6 +200,58 @@ export default function AdminLabelPricingPage() {
                   <span className="text-[10px] text-emerald-400 mt-0.5 block">Target margin floor (45%)</span>
                 </div>
               </div>
+            </div>
+
+            {/* Active Pricing Tiers Schedule */}
+            <div className="p-6 rounded-2xl border border-lab-800 bg-lab-900/40 space-y-3 text-xs">
+              <div className="flex justify-between items-center border-b border-lab-800 pb-2">
+                <span className="text-xs font-bold text-white uppercase tracking-wider">
+                  Active Pricing Schedule (1.5 × 2.5 in)
+                </span>
+                <span className="text-[10px] text-emerald-400 font-bold uppercase">LIVE</span>
+              </div>
+              <table className="w-full text-left text-xs">
+                <thead className="bg-lab-950 text-lab-400 uppercase text-[10px]">
+                  <tr>
+                    <th className="p-2">Quantity</th>
+                    <th className="p-2">Total Price</th>
+                    <th className="p-2">Price Per Unit</th>
+                    <th className="p-2">Active</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-lab-800/60 font-mono">
+                  <tr>
+                    <td className="p-2 font-bold text-white">50 Labels</td>
+                    <td className="p-2 text-amber-400 font-bold">$12.50</td>
+                    <td className="p-2 text-lab-300">$0.25 / label</td>
+                    <td className="p-2"><span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300">YES</span></td>
+                  </tr>
+                  <tr>
+                    <td className="p-2 font-bold text-white">100 Labels</td>
+                    <td className="p-2 text-amber-400 font-bold">$22.00</td>
+                    <td className="p-2 text-lab-300">$0.22 / label</td>
+                    <td className="p-2"><span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300">YES</span></td>
+                  </tr>
+                  <tr>
+                    <td className="p-2 font-bold text-white">250 Labels</td>
+                    <td className="p-2 text-amber-400 font-bold">$50.00</td>
+                    <td className="p-2 text-lab-300">$0.20 / label</td>
+                    <td className="p-2"><span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300">YES</span></td>
+                  </tr>
+                  <tr>
+                    <td className="p-2 font-bold text-white">500 Labels</td>
+                    <td className="p-2 text-amber-400 font-bold">$90.00</td>
+                    <td className="p-2 text-lab-300">$0.18 / label</td>
+                    <td className="p-2"><span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300">YES</span></td>
+                  </tr>
+                  <tr>
+                    <td className="p-2 font-bold text-white">1000 Labels</td>
+                    <td className="p-2 text-amber-400 font-bold">$160.00</td>
+                    <td className="p-2 text-lab-300">$0.16 / label</td>
+                    <td className="p-2"><span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300">YES</span></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 

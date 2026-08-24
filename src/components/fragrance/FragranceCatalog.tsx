@@ -1,172 +1,207 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { FragranceOil, ScentFamily } from "@/types/fragrance";
+import React, { useEffect, useState, useMemo } from "react";
+import { FragranceOil } from "@/types/fragrance";
 import { fragranceRepository } from "@/lib/firestore/fragrance";
 import { FragranceCard } from "./FragranceCard";
-import { 
-  Sparkles, 
-  Search, 
-  Filter, 
-  FlaskConical, 
-  SlidersHorizontal, 
-  Droplet 
-} from "lucide-react";
+import { Search, X } from "lucide-react";
 
-const SCENT_FAMILIES: ScentFamily[] = [
-  "All",
-  "Woody",
-  "Amber",
-  "Tobacco",
-  "Fresh",
-  "Floral",
-  "Citrus",
-  "Oriental",
-  "Musk",
-  "Gourmand",
-  "Spicy",
-  "Green",
-  "Leather",
+const FAMILIES = [
+  "All", "Woody", "Amber", "Floral", "Fresh", "Citrus",
+  "Oriental", "Musk", "Gourmand", "Spicy", "Tobacco", "Green", "Leather",
 ];
+const PAGE_SIZE = 48;
 
 export function FragranceCatalog() {
   const [fragrances, setFragrances] = useState<FragranceOil[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedFamily, setSelectedFamily] = useState<string>("All");
-  const [selectedGender, setSelectedGender] = useState<string>("all");
-  const [sortBy, setSortBy] = useState<"name" | "price_asc" | "price_desc">("name");
+  const [search, setSearch] = useState("");
+  const [family, setFamily] = useState("All");
+  const [gender, setGender] = useState("all");
+  const [sort, setSort] = useState<"name" | "price_asc" | "price_desc">("name");
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
-    const fetchFragrances = async () => {
-      const all = await fragranceRepository.getAllFragrances();
+    fragranceRepository.getAllFragrances().then((all) => {
       setFragrances(all);
       setLoading(false);
-    };
-
-    fetchFragrances();
+    });
   }, []);
 
-  const filteredFragrances = fragrances
-    .filter((f) => {
-      const matchesSearch =
-        f.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        f.scentFamily.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (f.fragranceReference && f.fragranceReference.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filtered = useMemo(() => {
+    return fragrances
+      .filter((f) => {
+        const q = search.toLowerCase();
+        const matchQ = !q || f.name.toLowerCase().includes(q) ||
+          (f.scentFamily && f.scentFamily.toLowerCase().includes(q)) ||
+          (f.fragranceReference && f.fragranceReference.toLowerCase().includes(q));
+        const matchF = family === "All" || f.scentFamily?.toLowerCase() === family.toLowerCase();
+        const matchG = gender === "all" || f.gender?.toLowerCase() === gender.toLowerCase();
+        return matchQ && matchF && matchG;
+      })
+      .sort((a, b) => {
+        if (sort === "name") return a.name.localeCompare(b.name);
+        const pa = a.repackagingVariants?.length ? Math.min(...a.repackagingVariants.map((v) => v.retailPrice)) : 0;
+        const pb = b.repackagingVariants?.length ? Math.min(...b.repackagingVariants.map((v) => v.retailPrice)) : 0;
+        return sort === "price_asc" ? pa - pb : pb - pa;
+      });
+  }, [fragrances, search, family, gender, sort]);
 
-      const matchesFamily =
-        selectedFamily === "All" || f.scentFamily.toLowerCase() === selectedFamily.toLowerCase();
+  const paginated = filtered.slice(0, page * PAGE_SIZE);
+  const hasMore = page * PAGE_SIZE < filtered.length;
+  const hasFilters = search || family !== "All" || gender !== "all";
 
-      const matchesGender =
-        selectedGender === "all" || (f.gender && f.gender.toLowerCase() === selectedGender.toLowerCase());
-
-      return matchesSearch && matchesFamily && matchesGender;
-    })
-    .sort((a, b) => {
-      if (sortBy === "name") return a.name.localeCompare(b.name);
-      const minA = Math.min(...a.repackagingVariants.map((v) => v.retailPrice));
-      const minB = Math.min(...b.repackagingVariants.map((v) => v.retailPrice));
-      if (sortBy === "price_asc") return minA - minB;
-      if (sortBy === "price_desc") return minB - minA;
-      return 0;
-    });
+  const reset = () => { setSearch(""); setFamily("All"); setGender("all"); setSort("name"); setPage(1); };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 font-mono">
-      {/* Header */}
-      <div className="border-b border-lab-800 pb-6 space-y-2">
-        <div className="flex items-center gap-2 text-xs text-amber-400 font-bold uppercase tracking-widest">
-          <Droplet className="w-4 h-4" /> UNCUT PERFUME & BODY OIL FRACTIONS
+    <div style={{ background: "white", minHeight: "100vh" }}>
+
+      {/* ── Page Header ── */}
+      <div className="max-w-screen-xl mx-auto px-6 lg:px-10">
+        <div className="sl-catalog-header">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+            <div>
+              <span className="sl-catalog-eyebrow">Pure Concentration · Grade-A</span>
+              <h1 className="sl-catalog-title">Fragrance Oils</h1>
+              <p className="sl-catalog-subtitle">
+                1,600+ wholesale fragrance concentrates fractioned to order.
+              </p>
+            </div>
+            {/* Search */}
+            <div style={{ position: "relative", width: "100%", maxWidth: 280 }}>
+              <Search style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", width: 14, height: 14, color: "#8A8A8A" }} />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                placeholder="Search fragrances…"
+                style={{
+                  width: "100%",
+                  fontSize: 12,
+                  paddingLeft: 36,
+                  paddingRight: search ? 32 : 12,
+                  paddingTop: 8,
+                  paddingBottom: 8,
+                  border: "1px solid var(--sl-gray-light)",
+                  background: "white",
+                  color: "var(--sl-ink)",
+                  outline: "none",
+                }}
+                onFocus={(e) => (e.target.style.borderColor = "var(--sl-green)")}
+                onBlur={(e) => (e.target.style.borderColor = "var(--sl-gray-light)")}
+              />
+              {search && (
+                <button type="button" onClick={() => setSearch("")}
+                  style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", color: "#8A8A8A", background: "none", border: "none", cursor: "pointer" }}>
+                  <X style={{ width: 13, height: 13 }} />
+                </button>
+              )}
+            </div>
+          </div>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-black text-white uppercase tracking-tight">
-          Pure Fragrance Oils Catalog
-        </h1>
-        <p className="text-xs text-lab-400 max-w-3xl leading-relaxed">
-          Laboratory-grade, Grade-A uncut fragrance oils. Sourced directly in bulk and fractioned into 1 oz, 2 oz, 4 oz, 8 oz, and 16 oz dark glass containers with precision volume scaling.
-        </p>
       </div>
 
-      {/* Scent Family Pill Filter Bar */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-        {SCENT_FAMILIES.map((family) => {
-          const isSelected = selectedFamily === family;
-          return (
-            <button
-              key={family}
-              type="button"
-              onClick={() => setSelectedFamily(family)}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition border ${
-                isSelected
-                  ? "bg-amber-500 text-lab-950 border-amber-400 shadow-md shadow-amber-500/20"
-                  : "bg-lab-900/60 text-lab-400 border-lab-800 hover:text-white hover:border-lab-700"
-              }`}
+      {/* ── Sticky Filter Bar ── */}
+      <div className="sl-filter-bar" style={{ top: 48 }}>
+        <div style={{ display: "flex", alignItems: "center", maxWidth: "100%", paddingLeft: 24, paddingRight: 24, gap: 0, flex: 1 }}>
+
+          {/* Family pills */}
+          {FAMILIES.map((f) => (
+            <button key={f} type="button"
+              className={`sl-filter-pill ${family === f ? "active" : ""}`}
+              onClick={() => { setFamily(f); setPage(1); }}
             >
-              {family}
+              {f}
             </button>
-          );
-        })}
-      </div>
-
-      {/* Search & Secondary Filter Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 text-xs">
-        <div className="sm:col-span-6 relative">
-          <Search className="w-4 h-4 text-lab-500 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search fragrance oils, olfactive accords, or inspiration..."
-            className="w-full bg-lab-950 border border-lab-800 rounded-xl pl-9 pr-3 py-2.5 text-white placeholder-lab-600 focus:outline-none focus:border-amber-500"
-          />
-        </div>
-
-        <div className="sm:col-span-3">
-          <select
-            value={selectedGender}
-            onChange={(e) => setSelectedGender(e.target.value)}
-            className="w-full bg-lab-950 border border-lab-800 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-500"
-          >
-            <option value="all">All Gender Accords</option>
-            <option value="unisex">Unisex</option>
-            <option value="masculine">Masculine</option>
-            <option value="feminine">Feminine</option>
-          </select>
-        </div>
-
-        <div className="sm:col-span-3">
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
-            className="w-full bg-lab-950 border border-lab-800 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-500"
-          >
-            <option value="name">Sort by Name (A-Z)</option>
-            <option value="price_asc">Price: Low to High</option>
-            <option value="price_desc">Price: High to Low</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Catalog Grid */}
-      {loading ? (
-        <div className="min-h-[40vh] flex items-center justify-center text-xs text-lab-400">
-          <div className="w-8 h-8 rounded-full border-2 border-amber-500 border-t-transparent animate-spin mr-3" />
-          Loading fragrance oils catalog...
-        </div>
-      ) : filteredFragrances.length === 0 ? (
-        <div className="p-16 text-center border border-lab-800 rounded-2xl bg-lab-950/40 space-y-3 max-w-md mx-auto">
-          <FlaskConical className="w-10 h-10 text-lab-600 mx-auto" />
-          <h3 className="text-sm font-bold text-white uppercase">No Fragrance Oils Found</h3>
-          <p className="text-xs text-lab-400">
-            No formulations matched your filters. Try clearing your search query or selecting &quot;All&quot; scent families.
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredFragrances.map((fragrance) => (
-            <FragranceCard key={fragrance.id} fragrance={fragrance} />
           ))}
+
+          {/* Spacer */}
+          <div style={{ flex: 1 }} />
+
+          {/* Gender */}
+          <select value={gender} onChange={(e) => { setGender(e.target.value); setPage(1); }}
+            style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", border: "none", background: "transparent", color: "var(--sl-gray-mid)", cursor: "pointer", padding: "14px 8px", outline: "none" }}>
+            <option value="all">All</option>
+            <option value="women">Women</option>
+            <option value="men">Men</option>
+            <option value="unisex">Unisex</option>
+          </select>
+
+          <div style={{ width: 1, height: 16, background: "var(--sl-gray-light)", margin: "0 4px" }} />
+
+          {/* Sort */}
+          <select value={sort} onChange={(e) => setSort(e.target.value as any)}
+            style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", border: "none", background: "transparent", color: "var(--sl-gray-mid)", cursor: "pointer", padding: "14px 8px", outline: "none" }}>
+            <option value="name">A–Z</option>
+            <option value="price_asc">Price ↑</option>
+            <option value="price_desc">Price ↓</option>
+          </select>
+
+          {hasFilters && (
+            <>
+              <div style={{ width: 1, height: 16, background: "var(--sl-gray-light)", margin: "0 4px" }} />
+              <button type="button" onClick={reset}
+                style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", border: "none", background: "transparent", color: "#C8963E", cursor: "pointer", padding: "14px 8px" }}>
+                Reset
+              </button>
+            </>
+          )}
         </div>
-      )}
+      </div>
+
+      {/* ── Grid ── */}
+      <div className="max-w-screen-xl mx-auto px-6 lg:px-10 py-8">
+
+        <p style={{ fontSize: 10, color: "var(--sl-gray-mid)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 20 }}>
+          {loading ? "Loading…" : `${filtered.length.toLocaleString()} references`}
+        </p>
+
+        {loading ? (
+          <div style={{ paddingTop: 120, paddingBottom: 120, display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+            <div style={{ width: 18, height: 18, border: "2px solid var(--sl-green)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+            <p style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--sl-gray-mid)" }}>Loading essences…</p>
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div style={{ paddingTop: 80, paddingBottom: 80, textAlign: "center" }}>
+            <p style={{ fontSize: 13, color: "var(--sl-gray-mid)" }}>No fragrances match your selection.</p>
+            <button type="button" onClick={reset}
+              style={{ marginTop: 12, fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", background: "none", border: "none", color: "var(--sl-green)", cursor: "pointer", textDecoration: "underline" }}>
+              Clear Filters
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* 4-column grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1, background: "var(--sl-gray-light)" }}>
+              {paginated.map((frag) => (
+                <div key={frag.id} style={{ background: "white" }}>
+                  <FragranceCard fragrance={frag} />
+                </div>
+              ))}
+            </div>
+
+            {/* Responsive override */}
+            <style>{`
+              @media (max-width: 1024px) { .frag-grid { grid-template-columns: repeat(3, 1fr) !important; } }
+              @media (max-width: 640px)  { .frag-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+            `}</style>
+
+            {/* Load more */}
+            {hasMore && (
+              <div style={{ display: "flex", justifyContent: "center", marginTop: 48 }}>
+                <button type="button" onClick={() => setPage((p) => p + 1)}
+                  style={{ padding: "12px 40px", border: "1px solid var(--sl-ink)", background: "transparent", color: "var(--sl-ink)", fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.15s" }}
+                  onMouseEnter={(e) => { (e.target as HTMLButtonElement).style.background = "var(--sl-ink)"; (e.target as HTMLButtonElement).style.color = "white"; }}
+                  onMouseLeave={(e) => { (e.target as HTMLButtonElement).style.background = "transparent"; (e.target as HTMLButtonElement).style.color = "var(--sl-ink)"; }}
+                >
+                  Load More ({filtered.length - page * PAGE_SIZE} remaining)
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

@@ -68,7 +68,7 @@ export const INITIAL_PERFUME_BASES: PerfumeBase[] = [
       },
       {
         id: "var_base_500ml",
-        name: "500 ml Glass Dispensing Bottle",
+        name: "500 ml Compounding Bottle",
         size: 0.5,
         unit: "liter",
         sku: "BASE-ALC-500ML",
@@ -84,7 +84,7 @@ export const INITIAL_PERFUME_BASES: PerfumeBase[] = [
       },
       {
         id: "var_base_250ml",
-        name: "250 ml Glass Dispensing Bottle",
+        name: "250 ml Compounding Bottle",
         size: 0.25,
         unit: "liter",
         sku: "BASE-ALC-250ML",

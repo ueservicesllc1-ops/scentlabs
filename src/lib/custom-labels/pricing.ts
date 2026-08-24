@@ -1,4 +1,8 @@
-import { BASE_SHEET_CONFIG, STANDARD_LABEL_MATERIALS } from "@/config/custom-labels";
+import { 
+  BASE_SHEET_CONFIG, 
+  STANDARD_LABEL_MATERIALS, 
+  OFFICIAL_LABEL_PRICING_TIERS 
+} from "@/config/custom-labels";
 import { LabelCostBreakdown, LabelMaterial } from "@/types/custom-label";
 import { calculateLabelSheetYield } from "./sheet-calculator";
 
@@ -6,11 +10,11 @@ export interface CustomLabelPricingConfig {
   wasteFactor?: number;
   laborRatePerSheet?: number;
   packagingCost?: number;
-  targetGrossMargin?: number; // default 0.45 (45%)
+  targetGrossMargin?: number;
 }
 
 /**
- * Calculates detailed internal manufacturing cost for custom labels (Admin view).
+ * Calculates internal manufacturing cost for custom labels (Admin breakdown).
  */
 export function calculateLabelCost(
   width: number,
@@ -22,7 +26,6 @@ export function calculateLabelCost(
   const wasteFactor = config.wasteFactor ?? BASE_SHEET_CONFIG.defaultWasteFactor;
   const laborRate = config.laborRatePerSheet ?? BASE_SHEET_CONFIG.defaultLaborRatePerSheet;
   const packagingCost = config.packagingCost ?? BASE_SHEET_CONFIG.defaultPackagingCostPerOrder;
-  const targetGrossMargin = config.targetGrossMargin ?? 0.45;
 
   const areaPerLabel = width * height;
   const rawMaterialCost = areaPerLabel * material.materialCostPerSqIn * quantity;
@@ -39,20 +42,10 @@ export function calculateLabelCost(
   const totalCost = Math.round((totalMaterialWithWaste + productionCost + laborCost + packagingCost) * 100) / 100;
   const unitCost = Math.round((totalCost / Math.max(1, quantity)) * 1000) / 1000;
 
-  // Calculate selling price with volume discounts and margin floor
-  const baseSellingPrice = totalCost / (1 - targetGrossMargin);
-
-  // Volume discount scale based on batch size
-  let volumeMultiplier = 1.0;
-  if (quantity >= 1000) volumeMultiplier = 0.70;
-  else if (quantity >= 500) volumeMultiplier = 0.75;
-  else if (quantity >= 250) volumeMultiplier = 0.82;
-  else if (quantity >= 100) volumeMultiplier = 0.88;
-  else if (quantity >= 50) volumeMultiplier = 0.94;
-
-  let calculatedPrice = Math.max(totalCost * 1.35, baseSellingPrice * volumeMultiplier); // Ensure 35% minimum margin floor
-  const sellingPrice = Math.round(calculatedPrice * 100) / 100;
-  const unitPrice = Math.round((sellingPrice / quantity) * 1000) / 1000;
+  // Match selling price with official tier pricing
+  const pricing = calculateLabelPricing(width, height, quantity, material.id);
+  const sellingPrice = pricing.totalPrice;
+  const unitPrice = pricing.unitPrice;
 
   const grossMarginDollar = Math.round((sellingPrice - totalCost) * 100) / 100;
   const grossMarginPercent = Math.round((grossMarginDollar / Math.max(1, sellingPrice)) * 1000) / 10;
@@ -78,7 +71,14 @@ export function calculateLabelCost(
 }
 
 /**
- * Public facing price calculator for storefront customers.
+ * SINGLE SOURCE OF TRUTH for Custom Label Pricing across SCENTLAB.
+ *
+ * Official Tiers:
+ * - 50 LABELS:   $12.50 ($0.25 / label)
+ * - 100 LABELS:  $22.00 ($0.22 / label)
+ * - 250 LABELS:  $50.00 ($0.20 / label)
+ * - 500 LABELS:  $90.00 ($0.18 / label)
+ * - 1000 LABELS: $160.00 ($0.16 / label)
  */
 export function calculateLabelPricing(
   width: number,
@@ -92,19 +92,49 @@ export function calculateLabelPricing(
   volumeTierSavingsPercent: number;
 } {
   const material = STANDARD_LABEL_MATERIALS.find((m) => m.id === materialId) || STANDARD_LABEL_MATERIALS[0];
-  const breakdown = calculateLabelCost(width, height, quantity, material);
 
-  // Compare to base 25-unit price to calculate savings %
-  const base25 = calculateLabelCost(width, height, 25, material);
-  const baselineUnitPrice = base25.unitPrice;
+  // Exact tier lookup
+  const exactTier = OFFICIAL_LABEL_PRICING_TIERS.find((t) => t.quantity === quantity);
+
+  let unitPrice: number;
+  let totalPrice: number;
+
+  if (exactTier) {
+    unitPrice = exactTier.unitPrice;
+    totalPrice = exactTier.totalPrice;
+  } else {
+    // Continuous volume rate for custom quantities (minimum 50 labels = $12.50)
+    if (quantity < 50) {
+      unitPrice = 0.25;
+      totalPrice = 12.50; // Minimum order constraint ($12.50)
+    } else if (quantity < 100) {
+      unitPrice = 0.25;
+      totalPrice = Math.round(quantity * 0.25 * 100) / 100;
+    } else if (quantity < 250) {
+      unitPrice = 0.22;
+      totalPrice = Math.round(quantity * 0.22 * 100) / 100;
+    } else if (quantity < 500) {
+      unitPrice = 0.20;
+      totalPrice = Math.round(quantity * 0.20 * 100) / 100;
+    } else if (quantity < 1000) {
+      unitPrice = 0.18;
+      totalPrice = Math.round(quantity * 0.18 * 100) / 100;
+    } else {
+      unitPrice = 0.16;
+      totalPrice = Math.round(quantity * 0.16 * 100) / 100;
+    }
+  }
+
+  // Base comparison is 50-unit price ($0.25)
+  const baseUnitPrice = 0.25;
   const savingsPercent = Math.max(
     0,
-    Math.round(((baselineUnitPrice - breakdown.unitPrice) / baselineUnitPrice) * 100)
+    Math.round(((baseUnitPrice - unitPrice) / baseUnitPrice) * 100)
   );
 
   return {
-    unitPrice: breakdown.unitPrice,
-    totalPrice: breakdown.sellingPrice,
+    unitPrice,
+    totalPrice,
     materialName: material.name,
     volumeTierSavingsPercent: savingsPercent,
   };

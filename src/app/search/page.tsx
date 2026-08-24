@@ -3,9 +3,9 @@
 import React, { useEffect, useState, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Product } from "@/types/product";
-import { productRepository } from "@/lib/firestore/products";
+import { productService } from "@/lib/firestore/products";
 import { ProductCard } from "@/components/catalog/ProductCard";
-import { Search, SlidersHorizontal, ArrowUpDown, Package, X, Sparkles } from "lucide-react";
+import { Search, Package, X } from "lucide-react";
 
 function SearchContent() {
   const searchParams = useSearchParams();
@@ -19,7 +19,7 @@ function SearchContent() {
 
   useEffect(() => {
     const load = async () => {
-      const all = await productRepository.getAll();
+      const all = await productService.getAllProducts();
       setProducts(all);
       setLoading(false);
     };
@@ -30,149 +30,143 @@ function SearchContent() {
     const q = query.trim().toLowerCase();
     return products
       .filter((p) => {
-        // Customer Privacy: Only active public catalog items
         if (p.status !== "active") return false;
 
         const matchesQuery =
           !q ||
           p.name.toLowerCase().includes(q) ||
-          p.description.toLowerCase().includes(q) ||
+          (p.description && p.description.toLowerCase().includes(q)) ||
           p.sku.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q) ||
+          (p.category && (p.category as string).toLowerCase().includes(q)) ||
+          (p.categoryName && p.categoryName.toLowerCase().includes(q)) ||
           (p.subcategory && p.subcategory.toLowerCase().includes(q));
 
         const matchesCat =
           selectedCategory === "all" ||
-          p.category.toLowerCase() === selectedCategory.toLowerCase();
+          (p.category && (p.category as string).toLowerCase().includes(selectedCategory.toLowerCase())) ||
+          (p.categoryId && p.categoryId.toLowerCase().includes(selectedCategory.toLowerCase()));
 
         return matchesQuery && matchesCat;
       })
       .sort((a, b) => {
-        if (sortBy === "price-asc") return a.basePrice - b.basePrice;
-        if (sortBy === "price-desc") return b.basePrice - a.basePrice;
+        if (sortBy === "price-asc") return (a.basePrice || 0) - (b.basePrice || 0);
+        if (sortBy === "price-desc") return (b.basePrice || 0) - (a.basePrice || 0);
         return 0;
       });
   }, [products, query, selectedCategory, sortBy]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 font-mono">
-      {/* Search Header */}
-      <div className="border-b border-lab-800 pb-6 space-y-2">
-        <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-widest">
-          <Search className="w-4 h-4" /> UNIVERSAL CATALOG SEARCH
+    <div style={{ background: "white", minHeight: "100vh" }}>
+      
+      {/* ── Search Header ── */}
+      <div className="max-w-screen-xl mx-auto px-6 lg:px-10">
+        <div className="sl-catalog-header">
+          <span className="sl-catalog-eyebrow">Universal Catalog Search</span>
+          <h1 className="sl-catalog-title">Search Supplies</h1>
+          <p className="sl-catalog-subtitle">
+            Find fragrance oils, perfumer&apos;s alcohol, roll-ons, atomizers, transfer pipettes, and custom labels.
+          </p>
         </div>
-        <h1 className="text-3xl font-black text-white uppercase tracking-tight">
-          Search Products & Formulation Supplies
-        </h1>
-        <p className="text-xs text-lab-400">
-          Instant search across pure fragrance oils, perfumer&apos;s base alcohol, roll-on vials, pipettes, and custom packaging.
-        </p>
       </div>
 
-      {/* Search Input & Category Filters */}
-      <div className="space-y-4">
-        <div className="relative max-w-2xl">
-          <Search className="w-5 h-5 text-lab-500 absolute left-4 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by name, SKU, fragrance notes, or supply type (e.g. santal, 10ml, pipettes)..."
-            className="w-full bg-lab-950 border border-lab-800 rounded-2xl pl-12 pr-10 py-3.5 text-sm text-white placeholder-lab-600 focus:outline-none focus:border-amber-500 shadow-inner"
-            autoFocus
-          />
-          {query && (
-            <button
-              type="button"
-              onClick={() => setQuery("")}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-lab-500 hover:text-white"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-
-        {/* Filter Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-          {[
-            { id: "all", label: "All Categories" },
-            { id: "fragrance", label: "Fragrance Oils" },
-            { id: "bottles", label: "Bottles & Roll-Ons" },
-            { id: "packaging", label: "Packaging & Boxes" },
-            { id: "testing", label: "Testing Supplies" },
-            { id: "custom-labels", label: "Custom Labels" },
-          ].map((cat) => {
-            const isSelected = selectedCategory === cat.id;
-            return (
+      <div className="max-w-screen-xl mx-auto px-6 lg:px-10 py-8 space-y-6">
+        
+        {/* Search Input & Category Filters */}
+        <div className="space-y-4">
+          <div className="relative max-w-xl">
+            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search by name, SKU, or supply type (e.g. santal, 10ml, pipettes)..."
+              className="w-full bg-white border border-gray-200 pl-10 pr-10 py-2.5 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#2B5F4A]"
+              autoFocus
+            />
+            {query && (
               <button
-                key={cat.id}
                 type="button"
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition border ${
-                  isSelected
-                    ? "bg-amber-500 text-lab-950 border-amber-400 shadow-md shadow-amber-500/20"
-                    : "bg-lab-900/60 text-lab-400 border-lab-800 hover:text-white hover:border-lab-700"
-                }`}
+                onClick={() => setQuery("")}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
-                {cat.label}
+                <X className="w-3.5 h-3.5" />
               </button>
-            );
-          })}
-        </div>
+            )}
+          </div>
 
-        {/* Results Counter & Sort */}
-        <div className="flex justify-between items-center text-xs text-lab-400 pt-2">
-          <span>
-            Found <strong className="text-white">{results.length}</strong> matching supplies
-          </span>
-
-          <div className="flex items-center gap-2">
-            <ArrowUpDown className="w-3.5 h-3.5 text-lab-500" />
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-lab-950 border border-lab-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500"
-            >
-              <option value="featured">Sort: Featured</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-            </select>
+          {/* Filter Pills */}
+          <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none">
+            {[
+              { id: "all", label: "All" },
+              { id: "fragrance", label: "Fragrance Oils" },
+              { id: "bottles", label: "Bottles" },
+              { id: "perfume-making", label: "Perfume Making" },
+              { id: "packaging", label: "Packaging" },
+              { id: "testing", label: "Testing" },
+              { id: "custom-labels", label: "Custom Labels" },
+            ].map((cat) => {
+              const isSelected = selectedCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider transition border ${
+                    isSelected
+                      ? "bg-[#2B5F4A] text-white border-[#2B5F4A]"
+                      : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              );
+            })}
           </div>
         </div>
-      </div>
 
-      {/* Results Grid */}
-      {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="h-80 rounded-2xl bg-lab-900/40 border border-lab-800 animate-pulse" />
-          ))}
-        </div>
-      ) : results.length === 0 ? (
-        <div className="p-16 text-center border border-lab-800 rounded-2xl bg-lab-950/40 space-y-4 max-w-md mx-auto">
-          <Package className="w-10 h-10 text-lab-600 mx-auto" />
-          <h3 className="text-sm font-bold text-white uppercase">No Matching Products Found</h3>
-          <p className="text-xs text-lab-400">
-            We couldn&apos;t find any supplies matching &quot;{query}&quot;. Try checking for spelling or searching broader terms like &quot;amber&quot;, &quot;bottles&quot;, or &quot;pipettes&quot;.
-          </p>
-          <button
-            type="button"
-            onClick={() => {
-              setQuery("");
-              setSelectedCategory("all");
-            }}
-            className="px-4 py-2 rounded-lg bg-lab-800 hover:bg-amber-500 hover:text-lab-950 text-white font-bold text-xs uppercase transition"
+        {/* Results Bar */}
+        <div className="flex items-center justify-between text-xs text-gray-500 border-t border-gray-100 pt-4">
+          <span>
+            Showing <strong>{results.length}</strong> items {query ? `for "${query}"` : ""}
+          </span>
+
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as any)}
+            className="text-xs px-2.5 py-1 bg-white border border-gray-200 text-gray-800 focus:outline-none focus:border-[#2B5F4A]"
           >
-            Clear Search
-          </button>
+            <option value="featured">Featured First</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+          </select>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {results.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      )}
+
+        {/* Results Grid */}
+        {loading ? (
+          <div style={{ paddingTop: 60, paddingBottom: 60, display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+            <div style={{ width: 18, height: 18, border: "2px solid var(--sl-green)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+            <p style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--sl-gray-mid)" }}>Searching catalog…</p>
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+          </div>
+        ) : results.length === 0 ? (
+          <div className="py-20 text-center space-y-2">
+            <Package className="w-8 h-8 text-gray-400 mx-auto" />
+            <h3 className="text-base font-semibold text-gray-950">No Matches Found</h3>
+            <p className="text-xs text-gray-500 max-w-sm mx-auto font-light">
+              We couldn&apos;t find any formulation supplies matching &quot;{query}&quot;.
+            </p>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1, background: "var(--sl-gray-light)" }}>
+            {results.map((product) => (
+              <div key={product.id} style={{ background: "white" }}>
+                <ProductCard product={product} />
+              </div>
+            ))}
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }
@@ -181,9 +175,8 @@ export default function SearchPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-[50vh] flex items-center justify-center font-mono text-xs text-lab-400">
-          <div className="w-8 h-8 rounded-full border-2 border-amber-500 border-t-transparent animate-spin mr-3" />
-          Initializing universal search...
+        <div className="min-h-screen bg-white flex items-center justify-center text-xs text-gray-400">
+          Loading search...
         </div>
       }
     >

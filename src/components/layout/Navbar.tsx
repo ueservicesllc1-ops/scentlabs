@@ -3,225 +3,252 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { 
-  ShoppingBag, 
-  Search, 
-  Menu, 
-  X, 
-  User, 
-  Sparkles,
-  Droplet,
-  Box,
-  FlaskConical,
-  Tag,
-  Shield,
-  Layers,
-  ChevronRight
-} from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
-
-const MAIN_NAVIGATION = [
-  { name: "All Products", href: "/shop", icon: Layers },
-  { name: "Fragrance Oils", href: "/fragrance", icon: Droplet },
-  { name: "Perfume Making", href: "/perfume-making", icon: Sparkles },
-  { name: "Glassware & Bottles", href: "/bottles", icon: FlaskConical },
-  { name: "Packaging & Boxes", href: "/packaging", icon: Box },
-  { name: "Custom Labels", href: "/custom-labels", icon: Tag, highlight: true },
-];
+import { Search, ShoppingBag, User, Menu, X, Shield } from "lucide-react";
+import { AdminPinModal } from "@/components/auth/AdminPinModal";
 
 export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { itemCount, setIsCartDrawerOpen } = useCart();
+  const { itemCount } = useCart();
   const { user } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [adminPinModalOpen, setAdminPinModalOpen] = useState(false);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchOpen(false);
     }
   };
 
+  const navLinks = [
+    { name: "Fragrances", href: "/fragrance" },
+    { name: "Perfumes", href: "/perfumes" },
+    { name: "Packaging & Boxes", href: "/packaging" },
+    { name: "Bottles", href: "/bottles" },
+    { name: "Custom Labels", href: "/custom-labels" },
+    { name: "Supplies", href: "/testing" },
+    { name: "Catalog", href: "/shop" },
+  ];
+
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-[#eae6df] shadow-sm">
-      {/* Top Banner */}
-      <div className="bg-[#1c1917] text-white text-[11px] py-1.5 px-4 flex justify-between items-center tracking-wider">
-        <div className="max-w-7xl mx-auto w-full flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-            <span className="font-medium text-stone-200">
-              COMMERCIAL GRADE PERFUMERY &bull; PURE OILS &bull; FRACTIONED WHOLESALE
-            </span>
-          </div>
-          <div className="hidden md:flex items-center gap-6 text-stone-400 text-[10px] uppercase font-medium">
-            <span>Volume Tier Discounts Active</span>
-            <span>&bull;</span>
-            <span>Same-Day US Dispatch</span>
-          </div>
-        </div>
+    <>
+      {/* ── Top Announcement Bar ── */}
+      <div style={{ background: "#2B5F4A", color: "rgba(255,255,255,0.95)", padding: "7px 16px", textAlign: "center" }}>
+        <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase" }}>
+          Free Shipping on Orders Over $500 &nbsp;·&nbsp; Wholesale Perfume Compounding & Supplies
+        </span>
       </div>
 
-      {/* Main Navbar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20 gap-6">
+      {/* ── Main Top Navbar ── */}
+      <header style={{ background: "rgba(255,255,255,0.98)", backdropFilter: "blur(8px)", position: "sticky", top: 0, zIndex: 50, borderBottom: "1px solid #EEEEEE" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", maxWidth: "1280px", margin: "0 auto", padding: "14px 24px" }}>
           
-          {/* Brand Logo */}
-          <Link href="/" className="flex items-center gap-3 group shrink-0">
-            <div className="w-10 h-10 rounded-full bg-[#fbf9f4] border border-[#e5dfd5] flex items-center justify-center text-amber-700 shadow-sm group-hover:border-amber-600 transition">
-              <FlaskConical className="w-5 h-5 stroke-[1.5]" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-serif text-2xl font-bold tracking-[0.15em] text-[#1c1917] uppercase">
-                SCENTLAB
-              </span>
-              <span className="text-[9px] text-[#8c827a] tracking-[0.25em] uppercase -mt-0.5">
-                Formulation &bull; Atelier
-              </span>
-            </div>
+          {/* Logo */}
+          <Link
+            href="/"
+            style={{ fontSize: "15px", fontWeight: 800, letterSpacing: "0.25em", color: "#111111", textDecoration: "none", textTransform: "uppercase" }}
+          >
+            SCENTLAB
           </Link>
 
-          {/* Desktop Search Bar */}
-          <form
-            onSubmit={handleSearchSubmit}
-            className="hidden md:flex flex-1 max-w-md relative"
-          >
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search fragrance oils, amber bottles, perfumer base..."
-              className="w-full text-xs pl-10 pr-4 py-2 bg-[#f6f5f0] border border-[#e5e0d8] rounded-full text-stone-800 placeholder:text-stone-400 focus:bg-white focus:border-amber-600 focus:outline-none focus:ring-1 focus:ring-amber-600/30 transition-all"
-            />
-          </form>
+          {/* Desktop Navigation Links */}
+          <nav className="hidden md:flex items-center gap-7">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href || (link.href !== "/" && pathname?.startsWith(link.href));
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  style={{
+                    fontSize: "11px",
+                    fontWeight: isActive ? 700 : 500,
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    color: isActive ? "#2B5F4A" : "#666666",
+                    textDecoration: "none",
+                    borderBottom: isActive ? "2px solid #2B5F4A" : "2px solid transparent",
+                    paddingBottom: "3px",
+                    transition: "color 0.15s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) (e.target as HTMLElement).style.color = "#111111";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) (e.target as HTMLElement).style.color = "#666666";
+                  }}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
+          </nav>
 
-          {/* Right Action Icons */}
-          <div className="flex items-center gap-3 shrink-0">
+          {/* Actions: Search, Account, Cart */}
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             
-            {/* Account Link */}
-            <Link
-              href={user ? "/account" : "/account/profile"}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-stone-700 hover:text-amber-800 rounded-full hover:bg-stone-100 transition"
-            >
-              <User className="w-4 h-4 text-stone-600" />
-              <span>{user ? "My Account" : "Sign In"}</span>
-            </Link>
-
-            {/* Shopping Cart Button */}
+            {/* Search Button */}
             <button
               type="button"
-              onClick={() => setIsCartDrawerOpen(true)}
-              className="relative p-2.5 rounded-full bg-[#fbf9f4] border border-[#e5dfd5] text-stone-800 hover:border-amber-600 hover:bg-white transition flex items-center gap-2 shadow-sm"
-              aria-label="Shopping Cart"
+              aria-label="Search"
+              onClick={() => setSearchOpen(!searchOpen)}
+              style={{ background: "none", border: "none", cursor: "pointer", color: "#333333", padding: "4px" }}
             >
-              <ShoppingBag className="w-5 h-5 text-stone-800 stroke-[1.75]" />
+              <Search style={{ width: 18, height: 18 }} />
+            </button>
+
+            {/* Admin Shield Access */}
+            <button
+              type="button"
+              aria-label="Admin Shield Access"
+              title="Panel de Administración (PIN 1619)"
+              onClick={() => setAdminPinModalOpen(true)}
+              style={{ background: "none", border: "none", cursor: "pointer", color: "#2B5F4A", padding: "4px", display: "inline-flex", alignItems: "center" }}
+              className="hover:opacity-80 transition"
+            >
+              <Shield style={{ width: 18, height: 18 }} />
+            </button>
+
+            {/* Customer Account */}
+            <Link
+              href="/account"
+              aria-label="Customer Account"
+              style={{ color: "#333333", padding: "4px", display: "inline-flex" }}
+            >
+              <User style={{ width: 18, height: 18 }} />
+            </Link>
+
+            {/* Shopping Cart */}
+            <Link
+              href="/cart"
+              aria-label="Shopping Cart"
+              style={{ color: "#333333", padding: "4px", position: "relative", display: "inline-flex", alignItems: "center" }}
+            >
+              <ShoppingBag style={{ width: 18, height: 18 }} />
               {itemCount > 0 && (
-                <span className="w-5 h-5 rounded-full bg-amber-700 text-white text-[11px] font-bold flex items-center justify-center">
+                <span
+                  style={{
+                    position: "absolute",
+                    top: -2,
+                    right: -4,
+                    background: "#2B5F4A",
+                    color: "white",
+                    fontSize: "9px",
+                    fontWeight: 700,
+                    width: "16px",
+                    height: "16px",
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
                   {itemCount}
                 </span>
               )}
-            </button>
+            </Link>
 
             {/* Mobile Menu Toggle */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-lg text-stone-700 hover:bg-stone-100"
+              className="md:hidden"
+              style={{ background: "none", border: "none", cursor: "pointer", color: "#333333", padding: "4px" }}
+              aria-label="Toggle navigation menu"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X style={{ width: 22, height: 22 }} /> : <Menu style={{ width: 22, height: 22 }} />}
             </button>
           </div>
+
         </div>
 
-        {/* Secondary Category Menu (Desktop) */}
-        <nav className="hidden lg:flex items-center justify-between border-t border-[#f0ece5] py-2.5 text-xs font-medium text-stone-700">
-          <div className="flex items-center gap-6">
-            {MAIN_NAVIGATION.map((item) => {
-              const isActive = pathname === item.href || (item.href !== "/shop" && pathname.startsWith(item.href));
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`py-1 tracking-wide transition flex items-center gap-1.5 ${
-                    isActive
-                      ? "text-amber-800 font-bold border-b-2 border-amber-700"
-                      : item.highlight
-                      ? "text-amber-700 hover:text-amber-900 font-semibold"
-                      : "text-stone-600 hover:text-stone-900"
-                  }`}
+        {/* Expandable Search Input */}
+        {searchOpen && (
+          <div style={{ borderTop: "1px solid #EEEEEE", background: "#FAFAFA", padding: "12px 24px" }}>
+            <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+              <form onSubmit={handleSearchSubmit} style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                <Search style={{ position: "absolute", left: 12, width: 16, height: 16, color: "#888888" }} />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search fragrance oils, glass bottles, packaging boxes, custom labels..."
+                  style={{
+                    width: "100%",
+                    fontSize: "12px",
+                    padding: "9px 36px 9px 36px",
+                    background: "white",
+                    border: "1px solid #DDDDDD",
+                    color: "#111111",
+                    outline: "none",
+                  }}
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => setSearchOpen(false)}
+                  style={{ position: "absolute", right: 10, background: "none", border: "none", cursor: "pointer", color: "#888888" }}
                 >
-                  {item.name}
-                  {item.highlight && (
-                    <span className="text-[9px] uppercase px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded font-bold">
-                      Custom
-                    </span>
-                  )}
+                  <X style={{ width: 14, height: 14 }} />
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Mobile Menu Drawer */}
+        {mobileMenuOpen && (
+          <div className="md:hidden" style={{ borderTop: "1px solid #EEEEEE", background: "white", padding: "20px 24px" }}>
+            <nav style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    letterSpacing: "0.15em",
+                    textTransform: "uppercase",
+                    color: "#222222",
+                    padding: "8px 0",
+                    textDecoration: "none",
+                    borderBottom: "1px solid #F0F0F0",
+                  }}
+                >
+                  {link.name}
                 </Link>
-              );
-            })}
-          </div>
-
-          <Link
-            href="/admin"
-            className="text-[11px] font-semibold text-stone-500 hover:text-amber-800 flex items-center gap-1"
-          >
-            <Shield className="w-3 h-3 text-amber-600" /> Admin Portal
-          </Link>
-        </nav>
-      </div>
-
-      {/* Mobile Drawer Menu */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden bg-white border-t border-[#eae6df] px-4 py-6 space-y-4 shadow-xl">
-          <form onSubmit={handleSearchSubmit} className="relative mb-4">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search catalog..."
-              className="w-full text-xs pl-10 pr-4 py-2.5 bg-[#f6f5f0] border border-[#e5e0d8] rounded-xl text-stone-800"
-            />
-          </form>
-
-          <div className="space-y-1">
-            {MAIN_NAVIGATION.map((item) => (
+              ))}
               <Link
-                key={item.href}
-                href={item.href}
+                href="/account"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-between p-3 rounded-xl text-sm font-medium text-stone-800 hover:bg-[#f6f5f0]"
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  letterSpacing: "0.15em",
+                  textTransform: "uppercase",
+                  color: "#2B5F4A",
+                  padding: "8px 0",
+                  textDecoration: "none",
+                }}
               >
-                <div className="flex items-center gap-3">
-                  <item.icon className="w-4 h-4 text-amber-700" />
-                  <span>{item.name}</span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-stone-400" />
+                Mi Cuenta / Portal
               </Link>
-            ))}
+            </nav>
           </div>
+        )}
+      </header>
 
-          <div className="pt-4 border-t border-[#eae6df] space-y-2">
-            <Link
-              href="/account"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-center py-2.5 rounded-xl border border-[#d6d0c4] text-xs font-bold text-stone-800"
-            >
-              My Customer Account
-            </Link>
-            <Link
-              href="/admin"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-center py-2.5 rounded-xl bg-stone-900 text-white text-xs font-bold"
-            >
-              Admin Portal
-            </Link>
-          </div>
-        </div>
-      )}
-    </header>
+      {/* Admin Quick PIN Access Modal */}
+      <AdminPinModal
+        isOpen={adminPinModalOpen}
+        onClose={() => setAdminPinModalOpen(false)}
+      />
+    </>
   );
 }

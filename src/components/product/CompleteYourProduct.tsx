@@ -32,10 +32,14 @@ export function CompleteYourProduct({
     INITIAL_PRODUCTS.find((p) => p.slug === "custom-perfume-labels") ||
     INITIAL_PRODUCTS[4];
 
+  const packageOptions = labelProduct.packageOptions || [
+    { id: "pkg_50", name: "50 Labels", quantity: 50, price: 34.99, unitPrice: 0.70 },
+  ];
+
   // Auto-select the label package that covers the selected bottle quantity
   const matchingPackage: ProductPackage =
-    labelProduct.packageOptions.find((p) => p.quantity >= selectedBottleQuantity) ||
-    labelProduct.packageOptions[labelProduct.packageOptions.length - 1];
+    packageOptions.find((p) => p.quantity >= selectedBottleQuantity) ||
+    packageOptions[packageOptions.length - 1];
 
   const handleAddMatchingLabel = () => {
     addItem(
@@ -57,25 +61,24 @@ export function CompleteYourProduct({
   };
 
   const headerTitle = currentProduct.subcategory?.toLowerCase() === "roll-on"
-    ? "COMPLETE YOUR ROLL-ON"
-    : `COMPLETE YOUR ${currentProduct.name.toUpperCase()}`;
+    ? "Complete Your Roll-On Line"
+    : `Complete Your ${currentProduct.name} Packaging`;
+
+  const primaryImg = (labelProduct.media && labelProduct.media[0]?.url) || labelProduct.primaryImageUrl || "/images/products/custom-labels.jpg";
 
   return (
-    <div className="rounded-2xl border border-amber-500/40 bg-gradient-to-br from-amber-500/10 via-lab-900/80 to-lab-950 p-6 shadow-2xl relative overflow-hidden font-mono">
-      {/* Background Ambient Glow */}
-      <div className="absolute -right-12 -top-12 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="flex items-center gap-2 text-amber-400 text-xs font-bold tracking-widest uppercase mb-4">
-        <Sparkles className="w-4 h-4" />
+    <div className="rounded-sm border border-outline-variant bg-surface-container-low p-6 relative overflow-hidden font-body-md">
+      <div className="flex items-center gap-2 text-primary font-label-caps text-label-caps uppercase tracking-wider mb-4">
+        <Sparkles className="w-4 h-4 text-primary" />
         {headerTitle}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
         {/* Spec Information */}
         <div className="flex gap-4 items-center md:col-span-2">
-          <div className="w-20 h-20 rounded-xl bg-lab-950 border border-amber-500/30 flex-shrink-0 overflow-hidden relative">
+          <div className="w-20 h-20 rounded-sm bg-surface border border-outline-variant flex-shrink-0 overflow-hidden relative">
             <ProductMediaViewer
-              src={labelProduct.media[0]?.url}
+              src={primaryImg}
               alt="Custom Label Specimen"
               category="custom"
               sku={labelProduct.sku}
@@ -84,27 +87,27 @@ export function CompleteYourProduct({
           </div>
 
           <div className="space-y-1">
-            <h4 className="text-sm font-bold text-white uppercase tracking-wide">
+            <h4 className="font-label-caps text-label-caps text-primary uppercase">
               Custom Label for {currentProduct.name}
             </h4>
-            <div className="text-amber-400 font-bold text-xs">
+            <div className="font-mono text-primary font-semibold text-xs">
               {config.recommendedWidthInches} x {config.recommendedHeightInches}&quot;
               {config.recommendedWidthCm && (
-                <span className="text-lab-400 font-normal text-[11px] ml-1.5">
+                <span className="text-secondary font-normal text-[11px] ml-1.5">
                   ({config.recommendedWidthCm} x {config.recommendedHeightCm} cm)
                 </span>
               )}
             </div>
-            <p className="text-xs text-lab-300 leading-relaxed pt-0.5">
+            <p className="font-caption text-caption text-secondary leading-relaxed pt-0.5 font-light">
               {config.calloutText || "Add your logo, brand and fragrance name."}
             </p>
           </div>
         </div>
 
         {/* Action Controls */}
-        <div className="space-y-3 md:border-l md:border-lab-800 md:pl-6">
+        <div className="space-y-3 md:border-l md:border-outline-variant md:pl-6">
           <div>
-            <label className="text-[10px] text-lab-400 uppercase block mb-1">
+            <label className="font-label-caps text-[10px] text-secondary uppercase block mb-1">
               Select Finish:
             </label>
             <div className="flex gap-1.5">
@@ -113,10 +116,10 @@ export function CompleteYourProduct({
                   key={mat}
                   type="button"
                   onClick={() => setMaterial(mat)}
-                  className={`text-[10px] px-2 py-1 rounded border transition ${
+                  className={`text-[10px] px-2 py-1 rounded-sm border font-label-caps uppercase transition ${
                     material === mat
-                      ? "bg-amber-500 text-lab-950 font-bold border-amber-400"
-                      : "bg-lab-900 text-lab-300 border-lab-700 hover:text-white"
+                      ? "bg-primary text-on-primary border-primary shadow-xs"
+                      : "bg-surface text-primary border-outline-variant hover:border-primary"
                   }`}
                 >
                   {mat}
@@ -127,11 +130,12 @@ export function CompleteYourProduct({
 
           <div className="space-y-2">
             <button
+              type="button"
               onClick={handleAddMatchingLabel}
-              className={`w-full py-2.5 px-3 rounded text-xs font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5 shadow ${
+              className={`w-full py-2.5 px-3 rounded-sm text-xs font-label-caps uppercase tracking-wider transition flex items-center justify-center gap-1.5 shadow-xs ${
                 added
-                  ? "bg-emerald-500 text-lab-950"
-                  : "bg-gradient-to-r from-amber-500 to-amber-600 text-lab-950 hover:brightness-110"
+                  ? "bg-emerald-700 text-white"
+                  : "flat-btn"
               }`}
             >
               {added ? (
@@ -148,7 +152,7 @@ export function CompleteYourProduct({
 
             <Link
               href={`/custom-labels/${currentProduct.slug || currentProduct.id}`}
-              className="w-full py-2 rounded text-center text-xs font-bold uppercase bg-lab-900 border border-lab-700 text-amber-400 hover:text-amber-300 hover:border-amber-500/50 transition flex items-center justify-center gap-1"
+              className="w-full py-2 text-center text-xs font-label-caps uppercase bg-surface border border-outline-variant text-primary hover:border-primary transition rounded-sm flex items-center justify-center gap-1"
             >
               Customize Your Label <ArrowRight className="w-3.5 h-3.5" />
             </Link>

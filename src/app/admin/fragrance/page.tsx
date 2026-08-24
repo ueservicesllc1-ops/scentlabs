@@ -18,7 +18,9 @@ import {
   Edit3, 
   UploadCloud, 
   SlidersHorizontal,
-  RefreshCw 
+  RefreshCw,
+  Building2,
+  Tag
 } from "lucide-react";
 
 export default function AdminFragranceDashboardPage() {
@@ -40,177 +42,270 @@ export default function AdminFragranceDashboardPage() {
 
   const totalBulkOz = fragrances.reduce((acc, f) => acc + (f.inventoryVolumeOz || 0), 0);
   const totalRepackagedUnits = fragrances.reduce(
-    (acc, f) => acc + f.repackagingVariants.reduce((sum, v) => sum + (v.inventoryQuantity || 0), 0),
+    (acc, f) => acc + (f.repackagingVariants || []).reduce((sum, v) => sum + (v.inventoryQuantity || 0), 0),
     0
   );
-  const lowStockCount = fragrances.filter((f) => f.inventoryVolumeOz < 32).length;
+  const lowStockCount = fragrances.filter((f) => (f.inventoryVolumeOz || 0) < 32).length;
+
+  const ALLOWED_SIZES = [1, 2, 4, 8, 16];
 
   const filtered = fragrances.filter((f) => {
+    const q = searchQuery.toLowerCase().trim();
     const matchesSearch =
-      f.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      f.scentFamily.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (f.supplierProductId && f.supplierProductId.toLowerCase().includes(searchQuery.toLowerCase()));
+      !q ||
+      f.name.toLowerCase().includes(q) ||
+      f.scentFamily.toLowerCase().includes(q) ||
+      (f.supplierProductId && f.supplierProductId.toLowerCase().includes(q)) ||
+      (f.fragranceReference && f.fragranceReference.toLowerCase().includes(q));
     const matchesFamily = familyFilter === "all" || f.scentFamily.toLowerCase() === familyFilter.toLowerCase();
     return matchesSearch && matchesFamily;
   });
 
   return (
     <AdminGuard>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 font-mono">
-        {/* Header */}
-        <div className="border-b border-lab-800 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+      <div className="space-y-8 font-sans">
+        
+        {/* ━━━━ HEADER & ACTIONS ━━━━ */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 pb-6 border-b border-gray-200">
           <div>
-            <div className="flex items-center gap-2 text-amber-400 text-xs uppercase tracking-widest font-bold mb-1">
-              <Droplet className="w-3.5 h-3.5" /> BULK REPACKAGING & OIL FORMULATION
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#F0FDF4] text-[#166534] border border-[#BBF7D0] mb-2">
+              <Droplet className="w-3 h-3 text-[#166534]" /> Bulk Repackaging & Oil Formulation
             </div>
-            <h1 className="text-3xl font-black text-white uppercase">
-              Fragrance Oils Management
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-950 tracking-tight">
+              Fragrance Oils
             </h1>
-            <p className="text-xs text-lab-400 mt-1">
-              Track source purchases (Africa Imports), bulk inventory, fractioning conversions, and retail margins.
+            <p className="text-xs text-gray-600 mt-1 max-w-2xl leading-relaxed">
+              Track source bulk purchases (Africa Imports), on-hand warehouse volume, fractioning conversions, and retail margins.
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2.5 shrink-0">
             <Link
               href="/admin/imports"
-              className="px-4 py-2 rounded-lg bg-lab-900 border border-lab-800 text-lab-300 hover:text-white text-xs flex items-center gap-1.5"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-gray-300 text-xs font-semibold text-gray-800 hover:bg-gray-50 hover:text-gray-950 transition shadow-xs"
             >
-              <UploadCloud className="w-3.5 h-3.5 text-indigo-400" /> Import CSV
+              <UploadCloud className="w-3.5 h-3.5 text-gray-500" />
+              <span>Import CSV</span>
             </Link>
 
             <Link
               href="/admin/fragrance/new"
-              className="px-4 py-2 rounded-lg bg-amber-500 text-lab-950 hover:brightness-110 text-xs font-bold uppercase flex items-center gap-1.5 shadow"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#2B5F4A] text-white hover:bg-[#1E4233] text-xs font-bold uppercase tracking-wider transition shadow-xs"
             >
-              <Plus className="w-3.5 h-3.5" /> New Fragrance Oil
+              <Plus className="w-3.5 h-3.5" />
+              <span>New Fragrance Oil</span>
             </Link>
           </div>
         </div>
 
-        {/* KPI Summary Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
-          <div className="p-4 rounded-xl border border-lab-800 bg-lab-900/40 space-y-1">
-            <span className="text-lab-500 uppercase block text-[10px]">Total Formulations</span>
-            <span className="text-2xl font-black text-white">{fragrances.length} Oils</span>
+        {/* ━━━━ KPI SUMMARY CARDS ━━━━ */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <div className="p-5 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
+            <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider block">
+              Total Formulations
+            </span>
+            <div className="text-2xl font-bold text-gray-950">
+              {fragrances.length.toLocaleString()} Oils
+            </div>
+            <p className="text-[11px] text-gray-500">Active catalog references</p>
           </div>
 
-          <div className="p-4 rounded-xl border border-lab-800 bg-lab-900/40 space-y-1">
-            <span className="text-lab-500 uppercase block text-[10px]">Bulk Inventory</span>
-            <span className="text-2xl font-black text-amber-400">{Math.round(totalBulkOz)} fl oz</span>
-            <span className="text-[10px] text-lab-400 block">~{Math.round((totalBulkOz / 128) * 10) / 10} gallons</span>
+          <div className="p-5 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
+            <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider block">
+              Bulk Inventory
+            </span>
+            <div className="text-2xl font-bold text-[#2B5F4A]">
+              {Math.round(totalBulkOz).toLocaleString()} fl oz
+            </div>
+            <p className="text-[11px] text-gray-500">≈ {(totalBulkOz / 128).toFixed(1)} gallons on hand</p>
           </div>
 
-          <div className="p-4 rounded-xl border border-lab-800 bg-lab-900/40 space-y-1">
-            <span className="text-lab-500 uppercase block text-[10px]">Repackaged Stock</span>
-            <span className="text-2xl font-black text-indigo-400">{totalRepackagedUnits} Units</span>
-            <span className="text-[10px] text-lab-400 block">Bottled & ready to ship</span>
+          <div className="p-5 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
+            <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider block">
+              Repackaged Stock
+            </span>
+            <div className="text-2xl font-bold text-gray-950">
+              {totalRepackagedUnits.toLocaleString()} Units
+            </div>
+            <p className="text-[11px] text-gray-500">Fractioned ready to ship</p>
           </div>
 
-          <div className="p-4 rounded-xl border border-lab-800 bg-lab-900/40 space-y-1">
-            <span className="text-lab-500 uppercase block text-[10px]">Low Bulk Stock (&lt;32 oz)</span>
-            <span className="text-2xl font-black text-rose-400">{lowStockCount} Oils</span>
-            <span className="text-[10px] text-lab-400 block">Requires reorder</span>
+          <div className="p-5 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
+            <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider block">
+              Low Bulk Stock
+            </span>
+            <div className="text-2xl font-bold text-amber-700">
+              {lowStockCount} Oils
+            </div>
+            <p className="text-[11px] text-gray-500">&lt; 32 fl oz remaining</p>
           </div>
+
         </div>
 
-        {/* Filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 text-xs">
-          <div className="sm:col-span-8 relative">
-            <Search className="w-4 h-4 text-lab-500 absolute left-3 top-1/2 -translate-y-1/2" />
+        {/* ━━━━ SEARCH & FILTER BAR ━━━━ */}
+        <div className="p-4 rounded-xl border border-gray-200 bg-white shadow-xs flex flex-col sm:flex-row gap-3 items-center justify-between">
+          <div className="relative w-full sm:max-w-md">
+            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
+              placeholder="Search fragrance name, accord, or supplier SKU..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by fragrance name, accord, or supplier SKU..."
-              className="w-full bg-lab-950 border border-lab-800 rounded-lg pl-9 pr-3 py-2 text-white placeholder-lab-600 focus:outline-none focus:border-amber-500"
+              className="w-full pl-9 pr-4 py-2 bg-white border border-gray-300 rounded-lg text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#2B5F4A] focus:ring-1 focus:ring-[#2B5F4A] transition"
             />
           </div>
 
-          <div className="sm:col-span-4">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
             <select
               value={familyFilter}
               onChange={(e) => setFamilyFilter(e.target.value)}
-              className="w-full bg-lab-950 border border-lab-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+              aria-label="Filter by scent family"
+              className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-xs text-gray-800 focus:outline-none focus:border-[#2B5F4A]"
             >
               <option value="all">All Scent Families</option>
               <option value="woody">Woody</option>
               <option value="amber">Amber</option>
-              <option value="tobacco">Tobacco</option>
-              <option value="fresh">Fresh</option>
               <option value="floral">Floral</option>
+              <option value="fresh">Fresh</option>
               <option value="citrus">Citrus</option>
+              <option value="oriental">Oriental</option>
+              <option value="tobacco">Tobacco</option>
+              <option value="gourmand">Gourmand</option>
             </select>
+
+            <button
+              onClick={fetchFragrances}
+              className="p-2 rounded-lg border border-gray-300 text-gray-600 hover:text-gray-950 hover:bg-gray-50 transition"
+              title="Refresh dataset"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+            </button>
           </div>
         </div>
 
-        {/* Fragrance Table */}
-        <div className="overflow-x-auto rounded-xl border border-lab-800 bg-lab-900/40">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-lab-950 border-b border-lab-800 text-lab-400 uppercase text-[10px]">
-              <tr>
-                <th className="p-3">Fragrance Oil</th>
-                <th className="p-3">Scent Family</th>
-                <th className="p-3">Supplier</th>
-                <th className="p-3">Source Purchase</th>
-                <th className="p-3">Cost / Oz</th>
-                <th className="p-3">Bulk Stock</th>
-                <th className="p-3">Variants</th>
-                <th className="p-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-lab-800/60">
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="p-8 text-center text-lab-500">
-                    No fragrance oils found.
-                  </td>
+        {/* ━━━━ FRAGRANCE DATA TABLE ━━━━ */}
+        <div className="rounded-xl border border-gray-200 bg-white shadow-xs overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-200 text-[10px] font-bold uppercase tracking-wider text-gray-600">
+                  <th className="py-3.5 px-4">Fragrance Oil</th>
+                  <th className="py-3.5 px-4">Scent Family</th>
+                  <th className="py-3.5 px-4">Supplier</th>
+                  <th className="py-3.5 px-4">Source Purchase</th>
+                  <th className="py-3.5 px-4">Cost / Oz</th>
+                  <th className="py-3.5 px-4">Bulk Stock</th>
+                  <th className="py-3.5 px-4">Selling Sizes</th>
+                  <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
-              ) : (
-                filtered.map((f) => (
-                  <tr key={f.id} className="hover:bg-lab-800/30 transition">
-                    <td className="p-3">
-                      <div className="font-bold text-white uppercase">{f.name}</div>
-                      <div className="text-[10px] text-lab-500 font-mono">{f.slug}</div>
-                    </td>
-                    <td className="p-3">
-                      <span className="px-2 py-0.5 rounded bg-lab-950 border border-amber-500/30 text-amber-400 text-[10px] font-bold uppercase">
-                        {f.scentFamily}
-                      </span>
-                    </td>
-                    <td className="p-3 text-lab-300">
-                      <div>{f.supplierName || "Africa Imports"}</div>
-                      <div className="text-[10px] text-lab-500">{f.supplierProductId || "N/A"}</div>
-                    </td>
-                    <td className="p-3 text-lab-300">
-                      <div>{f.sourceSize} {f.sourceUnit}</div>
-                      <div className="text-[10px] text-lab-500">{formatCurrency(f.sourceCost)} total</div>
-                    </td>
-                    <td className="p-3 font-bold text-amber-400">
-                      {formatUnitPrice(f.costPerOz)}/oz
-                    </td>
-                    <td className="p-3">
-                      <span className={`font-bold ${f.inventoryVolumeOz < 32 ? "text-rose-400" : "text-emerald-400"}`}>
-                        {f.inventoryVolumeOz} oz
-                      </span>
-                    </td>
-                    <td className="p-3 text-lab-300">
-                      {f.repackagingVariants.length} sizes ({f.repackagingVariants.map((v) => `${v.sellingSize}oz`).join(", ")})
-                    </td>
-                    <td className="p-3 text-right">
-                      <Link
-                        href={`/admin/fragrance/${f.id}`}
-                        className="px-3 py-1.5 rounded bg-lab-800 hover:bg-lab-700 text-white transition text-[11px] inline-flex items-center gap-1 border border-lab-700"
-                      >
-                        <Edit3 className="w-3 h-3" /> Edit / Fraction
-                      </Link>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filtered.map((f) => {
+                  const activeApprovedVariants = (f.repackagingVariants || []).filter(
+                    (v) => v.active && ALLOWED_SIZES.includes(v.sellingSize)
+                  );
+                  const isLowBulk = (f.inventoryVolumeOz || 0) < 32;
+
+                  return (
+                    <tr key={f.id} className="hover:bg-gray-50/80 transition">
+                      
+                      {/* Name & Reference */}
+                      <td className="py-3.5 px-4">
+                        <div className="font-semibold text-gray-950">{f.name}</div>
+                        <div className="text-[10px] text-gray-500 font-mono mt-0.5">
+                          REF: {f.fragranceReference || f.id}
+                        </div>
+                      </td>
+
+                      {/* Scent Family */}
+                      <td className="py-3.5 px-4">
+                        <span className="inline-block px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wider bg-gray-100 text-gray-800 border border-gray-200">
+                          {f.scentFamily}
+                        </span>
+                      </td>
+
+                      {/* Supplier */}
+                      <td className="py-3.5 px-4">
+                        <div className="text-gray-900 font-medium">{f.supplierName || "Africa Imports"}</div>
+                        <div className="text-[10px] text-gray-500 font-mono">
+                          SKU: {f.supplierProductId || "N/A"}
+                        </div>
+                      </td>
+
+                      {/* Source Purchase (Internal Supplier Data) */}
+                      <td className="py-3.5 px-4">
+                        <div className="text-gray-900 font-semibold font-mono">
+                          ${(f.sourceCost || 0).toFixed(2)}
+                        </div>
+                        <div className="text-[10px] text-gray-500 font-mono">
+                          per {f.sourceSize || 32} {f.sourceUnit || "oz"}
+                        </div>
+                      </td>
+
+                      {/* Cost / Oz */}
+                      <td className="py-3.5 px-4 font-mono font-semibold text-gray-900">
+                        ${(f.costPerOz || (f.sourceCost ? f.sourceCost / (f.sourceSize || 32) : 0)).toFixed(2)}
+                      </td>
+
+                      {/* Bulk Stock */}
+                      <td className="py-3.5 px-4 font-mono">
+                        <span className={`font-semibold ${isLowBulk ? "text-amber-700" : "text-gray-900"}`}>
+                          {f.inventoryVolumeOz || 0} fl oz
+                        </span>
+                        {isLowBulk && (
+                          <span className="block text-[9px] uppercase font-bold text-amber-700 mt-0.5">
+                            Low Stock
+                          </span>
+                        )}
+                      </td>
+
+                      {/* SCENTLAB Selling Sizes (Approved Customer Sizes Only) */}
+                      <td className="py-3.5 px-4">
+                        <div className="flex flex-wrap gap-1 max-w-[200px]">
+                          {activeApprovedVariants.length > 0 ? (
+                            activeApprovedVariants.map((v) => (
+                              <span
+                                key={v.id}
+                                className="px-1.5 py-0.5 rounded text-[9px] font-bold font-mono bg-[#F6FAF8] text-[#2B5F4A] border border-[#C5DDD3]"
+                              >
+                                {v.sellingSize}oz (${v.retailPrice?.toFixed(2)})
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-gray-400 text-[10px] italic">1oz, 2oz, 4oz</span>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* Action Button */}
+                      <td className="py-3.5 px-4 text-right">
+                        <Link
+                          href={`/admin/fragrance/${f.id}`}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white border border-gray-300 text-xs font-semibold text-gray-800 hover:bg-gray-100 hover:text-gray-950 transition shadow-xs"
+                        >
+                          <Edit3 className="w-3 h-3 text-gray-500" />
+                          <span>Edit / Fraction</span>
+                        </Link>
+                      </td>
+
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+
+            {filtered.length === 0 && !loading && (
+              <div className="p-12 text-center text-gray-500 space-y-2">
+                <p className="text-sm font-semibold text-gray-900">No fragrance oils found</p>
+                <p className="text-xs text-gray-500">
+                  Try adjusting your search query or scent family filter.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
+
       </div>
     </AdminGuard>
   );

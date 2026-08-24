@@ -3,7 +3,7 @@
 import React from "react";
 import { LabelMaterial } from "@/types/custom-label";
 import { STANDARD_LABEL_MATERIALS } from "@/config/custom-labels";
-import { Check, Sparkles } from "lucide-react";
+import { Check } from "lucide-react";
 
 interface LabelMaterialSelectorProps {
   selectedMaterial: LabelMaterial;
@@ -15,42 +15,44 @@ export function LabelMaterialSelector({
   onSelectMaterial,
 }: LabelMaterialSelectorProps) {
   return (
-    <div className="space-y-3 font-mono">
+    <div className="space-y-4">
       <div className="flex justify-between items-center text-xs">
-        <span className="font-bold text-white uppercase">2. Select Substrate & Foil Finish</span>
-        <span className="text-[11px] text-amber-400">Oil & Solvent Proof</span>
+        <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-gray-900">2. Select Material & Finish</span>
+        <span className="text-[10px] text-gray-500">
+          Finish: <strong className="text-gray-900 font-semibold">{selectedMaterial.finishType.replace("_", " ")}</strong>
+        </span>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-        {STANDARD_LABEL_MATERIALS.map((material) => {
-          const isSelected = selectedMaterial.id === material.id;
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {STANDARD_LABEL_MATERIALS.map((mat) => {
+          const isSelected = selectedMaterial.id === mat.id;
 
           return (
             <button
-              key={material.id}
+              key={mat.id}
               type="button"
-              onClick={() => onSelectMaterial(material)}
-              className={`p-3.5 rounded-xl border text-left transition relative flex items-start gap-3 ${
+              onClick={() => onSelectMaterial(mat)}
+              className={`p-4 border text-left transition flex items-start justify-between ${
                 isSelected
-                  ? "border-amber-500 bg-amber-500/10 text-white shadow-md shadow-amber-500/10"
-                  : "border-lab-800 bg-lab-950 text-lab-400 hover:border-lab-700 hover:text-white"
+                  ? "border-[#2B5F4A] bg-[#F6FAF8] text-gray-950 shadow-sm"
+                  : "border-gray-200 bg-white text-gray-800 hover:border-gray-400"
               }`}
             >
-              {/* Color / Finish Swatch */}
-              <div
-                style={{ backgroundColor: material.hexColorPreview || "#E5A93C" }}
-                className="w-5 h-5 rounded-full border border-lab-600 flex-shrink-0 mt-0.5 shadow-sm flex items-center justify-center text-[10px]"
-              />
-
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-white">{material.name}</span>
-                  {isSelected && <Check className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />}
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold uppercase tracking-wider">{mat.name}</span>
+                  {mat.finishType.includes("vinyl") && (
+                    <span className="text-[9px] px-1.5 py-0.2 uppercase font-semibold bg-[#E8F0EC] text-[#2B5F4A] border border-[#C5DDD3]">
+                      Oil-Proof
+                    </span>
+                  )}
                 </div>
-                <p className="text-[10px] text-lab-400 line-clamp-2 mt-0.5 leading-relaxed">
-                  {material.description}
+                <p className="text-[11px] text-gray-500 leading-relaxed font-light">
+                  {mat.description}
                 </p>
               </div>
+
+              {isSelected && <Check className="w-4 h-4 text-[#2B5F4A] shrink-0 ml-2 mt-0.5" />}
             </button>
           );
         })}

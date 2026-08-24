@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SCENTLAB - Product Editor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Bodoni+Moda:opsz,wght@6..96,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-on-surface": "#f2f1ee",
+                    "on-secondary-fixed": "#1c1b1a",
+                    "on-tertiary-fixed-variant": "#594313",
+                    "surface-container-low": "#f4f3f1",
+                    "primary-fixed": "#e5e2e1",
+                    "on-surface-variant": "#444748",
+                    "on-background": "#1a1c1a",
+                    "error": "#ba1a1a",
+                    "primary-fixed-dim": "#c8c6c5",
+                    "on-tertiary-fixed": "#261900",
+                    "surface-dim": "#dbdad7",
+                    "surface-variant": "#e3e2e0",
+                    "secondary-fixed": "#e6e2de",
+                    "tertiary": "#000000",
+                    "surface-bright": "#faf9f6",
+                    "on-surface": "#1a1c1a",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-surface": "#2f312f",
+                    "error-container": "#ffdad6",
+                    "primary": "#000000",
+                    "on-primary-container": "#858383",
+                    "primary-container": "#1c1b1b",
+                    "surface-container-highest": "#e3e2e0",
+                    "surface-container": "#efeeeb",
+                    "surface-container-high": "#e9e8e5",
+                    "tertiary-fixed-dim": "#e2c286",
+                    "secondary-container": "#e6e2de",
+                    "on-secondary": "#ffffff",
+                    "outline-variant": "#c4c7c7",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed-variant": "#484644",
+                    "on-primary-fixed-variant": "#474646",
+                    "on-tertiary-container": "#9b804a",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed": "#ffdea1",
+                    "tertiary-container": "#261900",
+                    "secondary": "#605e5c",
+                    "on-primary-fixed": "#1c1b1b",
+                    "on-secondary-container": "#666461",
+                    "inverse-primary": "#c8c6c5",
+                    "background": "#faf9f6",
+                    "surface": "#faf9f6",
+                    "secondary-fixed-dim": "#c9c6c3",
+                    "on-primary": "#ffffff",
+                    "surface-tint": "#5f5e5e",
+                    "on-tertiary": "#ffffff",
+                    "outline": "#747878"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "container-max": "1440px",
+                    "gutter": "24px",
+                    "stack-md": "16px",
+                    "stack-sm": "8px",
+                    "section-gap": "120px",
+                    "margin-mobile": "20px",
+                    "stack-lg": "32px",
+                    "margin-desktop": "64px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Inter"],
+                    "caption": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "display-hero": ["Bodoni Moda"],
+                    "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "caption": ["13px", {"lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "display-hero": ["80px", {"lineHeight": "96px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0em", "fontWeight": "500"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased min-h-screen flex">
+<!-- SideNavBar (Shared Component) -->
+<aside class="hidden md:flex flex-col h-full py-8 px-4 bg-primary-container dark:bg-surface-container-lowest docked left-0 h-full w-64 border-r border-outline-variant fixed top-0 bottom-0 z-40">
+<div class="mb-stack-lg px-2">
+<h1 class="font-headline-md text-headline-md text-on-primary-container tracking-tighter">SCENTLAB</h1>
+<p class="font-caption text-caption text-on-primary-container/70">Wholesale Portal</p>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded font-label-caps text-label-caps text-on-primary-container hover:bg-surface-container-low transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded font-label-caps text-label-caps bg-surface-container-highest text-primary font-bold active-nav" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="inventory_2" data-weight="fill" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+                Inventory
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded font-label-caps text-label-caps text-on-primary-container hover:bg-surface-container-low transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="shopping_cart">shopping_cart</span>
+                Orders
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded font-label-caps text-label-caps text-on-primary-container hover:bg-surface-container-low transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="group">group</span>
+                Customers
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded font-label-caps text-label-caps text-on-primary-container hover:bg-surface-container-low transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="analytics">analytics</span>
+                Analytics
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded font-label-caps text-label-caps text-on-primary-container hover:bg-surface-container-low transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="settings">settings</span>
+                Settings
+            </a>
+</nav>
+<div class="mt-auto space-y-2 pt-8 border-t border-surface-container-low/20">
+<a class="flex items-center gap-3 px-3 py-2 rounded font-label-caps text-label-caps text-on-primary-container hover:bg-surface-container-low transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="help">help</span>
+                Support
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded font-label-caps text-label-caps text-on-primary-container hover:bg-surface-container-low transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="logout">logout</span>
+                Logout
+            </a>
+<div class="mt-4 px-3 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="person">person</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-on-primary-container">Admin Profile</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-0 md:ml-64 flex flex-col min-h-screen bg-background relative">
+<!-- Sticky Editor Header -->
+<header class="sticky top-0 z-30 bg-surface/90 backdrop-blur-md border-b border-outline-variant px-margin-mobile md:px-margin-desktop py-4 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<a class="text-secondary hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</a>
+<div>
+<div class="flex items-center gap-2 font-caption text-caption text-secondary mb-1">
+<span>Products</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="chevron_right">chevron_right</span>
+<span class="text-primary font-medium">Edit 10ml Roll-On</span>
+<span class="material-symbols-outlined text-[16px] text-green-600 ml-2" data-icon="shield">shield</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-primary">10ml Roll-On Perfume Oil</h2>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-6 py-2 border border-primary text-primary font-label-caps text-label-caps rounded-DEFAULT hover:bg-surface-container-low transition-colors">
+                    PREVIEW
+                </button>
+<button class="px-6 py-2 bg-primary text-on-primary font-label-caps text-label-caps rounded-DEFAULT hover:opacity-90 transition-opacity">
+                    SAVE PRODUCT
+                </button>
+</div>
+</header>
+<!-- Editor Workspace -->
+<div class="flex-1 overflow-y-auto px-margin-mobile md:px-margin-desktop py-stack-lg max-w-[1200px] w-full mx-auto flex gap-gutter">
+<!-- Left Column: Tabs & Main Content -->
+<div class="w-full lg:w-2/3 flex flex-col gap-stack-lg">
+<!-- Navigation Tabs -->
+<nav class="flex border-b border-outline-variant overflow-x-auto hide-scrollbar">
+<button class="px-4 py-3 font-label-caps text-label-caps text-primary border-b-2 border-primary whitespace-nowrap">GENERAL</button>
+<button class="px-4 py-3 font-label-caps text-label-caps text-secondary hover:text-primary whitespace-nowrap">MEDIA</button>
+<button class="px-4 py-3 font-label-caps text-label-caps text-secondary hover:text-primary whitespace-nowrap">PRICING</button>
+<button class="px-4 py-3 font-label-caps text-label-caps text-secondary hover:text-primary whitespace-nowrap">VARIANTS</button>
+<button class="px-4 py-3 font-label-caps text-label-caps text-secondary hover:text-primary whitespace-nowrap">INVENTORY</button>
+<button class="px-4 py-3 font-label-caps text-label-caps text-secondary hover:text-primary whitespace-nowrap">SHIPPING</button>
+<button class="px-4 py-3 font-label-caps text-label-caps text-secondary hover:text-primary whitespace-nowrap">CUSTOM LABEL</button>
+</nav>
+<!-- General Info Panel -->
+<section class="bg-surface-bright border border-outline-variant rounded-DEFAULT p-stack-lg">
+<h3 class="font-headline-md text-headline-md mb-stack-md">General Information</h3>
+<div class="space-y-6">
+<div>
+<label class="block font-label-caps text-label-caps mb-2 text-secondary">PRODUCT NAME</label>
+<input class="w-full bg-transparent border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-2 font-body-md text-primary placeholder-secondary transition-colors" placeholder="Enter product name" type="text" value="10ml Roll-On Perfume Oil"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+<div>
+<label class="block font-label-caps text-label-caps mb-2 text-secondary">SKU</label>
+<input class="w-full bg-transparent border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-2 font-body-md text-primary placeholder-secondary transition-colors" type="text" value="SL-10ML-RO"/>
+</div>
+<div>
+<label class="block font-label-caps text-label-caps mb-2 text-secondary">CATEGORY</label>
+<select class="w-full bg-transparent border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-2 font-body-md text-primary transition-colors">
+<option>Fragrances</option>
+<option>Bottles</option>
+<option>Supplies</option>
+</select>
+</div>
+</div>
+<div>
+<label class="block font-label-caps text-label-caps mb-2 text-secondary">URL SLUG</label>
+<div class="flex items-center border-b border-outline-variant focus-within:border-primary transition-colors">
+<span class="text-secondary font-body-md pr-2 py-2">/products/</span>
+<input class="flex-1 bg-transparent border-none focus:ring-0 px-0 py-2 font-body-md text-primary placeholder-secondary" type="text" value="10ml-roll-on-perfume-oil"/>
+</div>
+</div>
+<div>
+<label class="block font-label-caps text-label-caps mb-2 text-secondary">DESCRIPTION</label>
+<textarea class="w-full bg-transparent border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-2 font-body-md text-primary placeholder-secondary transition-colors resize-none" rows="5">Premium glass 10ml roll-on bottle featuring a stainless steel rollerball. Ideal for concentrated perfume oils and essential oil blends. Minimalist design suitable for luxury custom labeling.</textarea>
+</div>
+</div>
+</section>
+<!-- Pricing Panel -->
+<section class="bg-surface-bright border border-outline-variant rounded-DEFAULT p-stack-lg">
+<h3 class="font-headline-md text-headline-md mb-stack-md">Pricing</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md mb-stack-lg">
+<div>
+<label class="block font-label-caps text-label-caps mb-2 text-secondary">RETAIL PRICE (BASE)</label>
+<div class="relative">
+<span class="absolute left-0 top-2 text-secondary font-body-md">$</span>
+<input class="w-full bg-transparent border-b border-outline-variant focus:border-primary focus:ring-0 pl-4 pr-0 py-2 font-body-md text-primary transition-colors" type="number" value="12.00"/>
+</div>
+</div>
+<div>
+<label class="block font-label-caps text-label-caps mb-2 text-secondary">COMPARE AT PRICE</label>
+<div class="relative">
+<span class="absolute left-0 top-2 text-secondary font-body-md">$</span>
+<input class="w-full bg-transparent border-b border-outline-variant focus:border-primary focus:ring-0 pl-4 pr-0 py-2 font-body-md text-primary transition-colors text-secondary line-through" type="number" value="15.00"/>
+</div>
+</div>
+</div>
+<div class="border-t border-outline-variant pt-stack-md">
+<div class="flex items-center justify-between mb-stack-md">
+<h4 class="font-label-caps text-label-caps text-primary">DYNAMIC VOLUME PRICING</h4>
+<button class="text-primary hover:text-secondary flex items-center gap-1 font-label-caps text-label-caps transition-colors">
+<span class="material-symbols-outlined text-[16px]" data-icon="add">add</span> ADD TIER
+                            </button>
+</div>
+<div class="space-y-3">
+<div class="flex items-center gap-4 bg-surface-container-low p-3 rounded-DEFAULT border border-outline-variant/50">
+<div class="flex-1">
+<label class="block font-caption text-caption text-secondary mb-1">MIN QTY</label>
+<input class="w-full bg-transparent border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-1 font-body-md text-primary transition-colors" type="number" value="50"/>
+</div>
+<div class="flex-1">
+<label class="block font-caption text-caption text-secondary mb-1">MAX QTY</label>
+<input class="w-full bg-transparent border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-1 font-body-md text-primary transition-colors" type="number" value="249"/>
+</div>
+<div class="flex-1">
+<label class="block font-caption text-caption text-secondary mb-1">PRICE / UNIT</label>
+<input class="w-full bg-transparent border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-1 font-body-md text-primary transition-colors" type="number" value="8.50"/>
+</div>
+<button class="text-secondary hover:text-error mt-4 transition-colors">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-low p-3 rounded-DEFAULT border border-outline-variant/50">
+<div class="flex-1">
+<label class="block font-caption text-caption text-secondary mb-1">MIN QTY</label>
+<input class="w-full bg-transparent border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-1 font-body-md text-primary transition-colors" type="number" value="250"/>
+</div>
+<div class="flex-1">
+<label class="block font-caption text-caption text-secondary mb-1">MAX QTY</label>
+<input class="w-full bg-transparent border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-1 font-body-md text-primary transition-colors text-center" disabled="" type="text" value="+"/>
+</div>
+<div class="flex-1">
+<label class="block font-caption text-caption text-secondary mb-1">PRICE / UNIT</label>
+<input class="w-full bg-transparent border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-1 font-body-md text-primary transition-colors" type="number" value="6.00"/>
+</div>
+<button class="text-secondary hover:text-error mt-4 transition-colors">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Status & Media Snippet -->
+<div class="hidden lg:flex flex-col gap-stack-lg w-1/3">
+<!-- Status Card -->
+<section class="bg-surface-bright border border-outline-variant rounded-DEFAULT p-stack-lg">
+<h3 class="font-label-caps text-label-caps text-secondary mb-stack-md">PRODUCT STATUS</h3>
+<select class="w-full bg-surface border border-outline-variant focus:border-primary focus:ring-0 px-4 py-2 font-body-md text-primary transition-colors rounded-DEFAULT mb-4">
+<option>Active</option>
+<option>Draft</option>
+<option>Archived</option>
+</select>
+<div class="flex items-center justify-between text-caption font-caption">
+<span class="text-secondary">Visibility</span>
+<span class="text-primary font-medium flex items-center gap-1"><span class="material-symbols-outlined text-[14px]" data-icon="public">public</span> Online Store</span>
+</div>
+</section>
+<!-- Media Preview -->
+<section class="bg-surface-bright border border-outline-variant rounded-DEFAULT p-stack-lg">
+<div class="flex items-center justify-between mb-stack-md">
+<h3 class="font-label-caps text-label-caps text-secondary">PRIMARY IMAGE</h3>
+<button class="text-primary text-caption font-label-caps hover:underline">EDIT</button>
+</div>
+<div class="aspect-square bg-surface-container-low border border-outline-variant rounded-DEFAULT overflow-hidden relative group cursor-pointer">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="A minimalist studio photography shot of a sleek 10ml glass roll-on perfume bottle standing upright on a stark white pedestal. The lighting is highly diffused, creating soft gradient reflections on the clear glass and the stainless steel rollerball. The background is a pristine, light-mode neutral tone, emphasizing a clean, clinical luxury aesthetic suitable for high-end cosmetic wholesale." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCPi1UKjVIlz7-URG93drCUuSuWfSfnpFlm58uCo68zJb5kwCK4cjOXhso9hsWmDPHYyQN1wGVBM7xpzMvxV8R5OOLThdEUTkPkVkRlSQQa1y6fwX4zaFeTHFpWKePQyA7QY2sqshFnler0EH3e2sEw0Ut6ANxlIofqZGcr37jJVgtxF2kymdMTU_QNS2rDZVnVk76hj2BJXgsaK7f9aLpPy4vx02i4tYRSYw51reLvcG-fjrGQp0NPcA')"></div>
+</div>
+</section>
+<!-- Organization -->
+<section class="bg-surface-bright border border-outline-variant rounded-DEFAULT p-stack-lg">
+<h3 class="font-label-caps text-label-caps text-secondary mb-stack-md">ORGANIZATION</h3>
+<div class="space-y-4">
+<div>
+<label class="block font-caption text-caption text-secondary mb-1">VENDOR</label>
+<input class="w-full bg-transparent border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-1 font-body-md text-primary transition-colors" type="text" value="SCENTLAB Wholesale"/>
+</div>
+<div>
+<label class="block font-caption text-caption text-secondary mb-1">TAGS</label>
+<input class="w-full bg-transparent border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-1 font-body-md text-primary transition-colors" type="text" value="roll-on, glass, 10ml, packaging"/>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+</body></html>

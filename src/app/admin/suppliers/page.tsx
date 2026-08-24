@@ -60,10 +60,12 @@ export default function AdminSuppliersPage() {
   const activeCount = suppliers.filter((s) => s.active).length;
 
   const filtered = suppliers.filter((s) => {
+    const q = search.toLowerCase().trim();
     const matchSearch =
-      s.name.toLowerCase().includes(search.toLowerCase()) ||
-      (s.contactName || "").toLowerCase().includes(search.toLowerCase()) ||
-      (s.email || "").toLowerCase().includes(search.toLowerCase());
+      !q ||
+      s.name.toLowerCase().includes(q) ||
+      (s.contactName || "").toLowerCase().includes(q) ||
+      (s.email || "").toLowerCase().includes(q);
     const matchStatus = statusFilter === "all" || (statusFilter === "active" ? s.active : !s.active);
     return matchSearch && matchStatus;
   });
@@ -105,321 +107,266 @@ export default function AdminSuppliersPage() {
 
   return (
     <AdminGuard>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-mono space-y-8">
-        <div className="border-b border-lab-800 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="space-y-8 font-sans">
+        
+        {/* ━━━━ HEADER ━━━━ */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 pb-6 border-b border-gray-200">
           <div>
-            <span className="text-xs text-amber-400 font-bold uppercase tracking-widest block mb-1">
-              RAW MATERIALS & VENDOR MANAGEMENT
-            </span>
-            <h1 className="text-2xl sm:text-3xl font-black text-white uppercase">
-              Suppliers & Vendors
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-800 border border-gray-300 mb-2">
+              <Building2 className="w-3 h-3 text-gray-600" /> Vendor Directory & Supply Chain Directory
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-950 tracking-tight">
+              Suppliers Directory ({suppliers.length})
             </h1>
+            <p className="text-xs text-gray-600 mt-1 max-w-2xl leading-relaxed">
+              Maintain domestic and international vendors (Africa Imports, Amazon ASINs, AliExpress containers, packaging cardstock).
+            </p>
           </div>
 
-          <div className="flex items-center gap-3 text-xs">
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-lab-950 font-bold uppercase hover:brightness-110 transition flex items-center gap-1.5 shadow-lg shadow-amber-500/10"
-            >
-              <Plus className="w-4 h-4" /> Add New Supplier
-            </button>
-
-            <Link
-              href="/admin/purchases"
-              className="px-3.5 py-2 rounded-xl bg-lab-900 border border-lab-800 text-lab-400 hover:text-white uppercase font-bold transition flex items-center gap-1"
-            >
-              <Boxes className="w-3.5 h-3.5 text-amber-400" /> Purchase Orders
-            </Link>
-          </div>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-[#2B5F4A] hover:bg-[#1E4233] text-white font-bold uppercase tracking-wider text-xs rounded-lg shadow-xs transition"
+          >
+            <Plus className="w-4 h-4" /> Add New Supplier
+          </button>
         </div>
 
-        {/* Top Summary KPI Cards */}
+        {/* ━━━━ KPI CARDS ━━━━ */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-5 rounded-2xl border border-lab-800 bg-lab-950 space-y-1">
-            <span className="text-[10px] text-lab-500 uppercase block font-bold">Total Suppliers</span>
-            <div className="text-2xl font-black text-white">{suppliers.length}</div>
-            <span className="text-[10px] text-lab-400">Africa Imports, Amazon, Nature's Oil</span>
+          <div className="p-5 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
+            <span className="text-[11px] font-semibold text-gray-500 uppercase block">Total Suppliers</span>
+            <div className="text-2xl font-bold text-gray-950">{suppliers.length}</div>
+            <span className="text-[11px] text-gray-500 block">Registered source accounts</span>
           </div>
 
-          <div className="p-5 rounded-2xl border border-lab-800 bg-lab-950 space-y-1">
-            <span className="text-[10px] text-lab-500 uppercase block font-bold">Active Suppliers</span>
-            <div className="text-2xl font-black text-emerald-400">{activeCount}</div>
-            <span className="text-[10px] text-lab-400">Approved for PO creation</span>
+          <div className="p-5 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
+            <span className="text-[11px] font-semibold text-gray-500 uppercase block">Active Suppliers</span>
+            <div className="text-2xl font-bold text-[#166534]">{activeCount}</div>
+            <span className="text-[11px] text-gray-500 block">Active purchasing channels</span>
           </div>
 
-          <div className="p-5 rounded-2xl border border-lab-800 bg-lab-950 space-y-1">
-            <span className="text-[10px] text-lab-500 uppercase block font-bold">Total Purchases Volume</span>
-            <div className="text-2xl font-black text-amber-400 font-mono">
+          <div className="p-5 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
+            <span className="text-[11px] font-semibold text-gray-500 uppercase block">Mapped Sourcing SKUs</span>
+            <div className="text-2xl font-bold text-gray-950">{supplierProducts.length}</div>
+            <span className="text-[11px] text-gray-500 block">Linked source catalog items</span>
+          </div>
+
+          <div className="p-5 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
+            <span className="text-[11px] font-semibold text-gray-500 uppercase block">Lifetime PO Volume</span>
+            <div className="text-2xl font-bold text-[#2B5F4A] font-mono">
               {formatCurrency(totalPurchasesVolume)}
             </div>
-            <span className="text-[10px] text-lab-400">Historical procurement spend</span>
-          </div>
-
-          <div className="p-5 rounded-2xl border border-lab-800 bg-lab-950 space-y-1">
-            <span className="text-[10px] text-lab-500 uppercase block font-bold">Mapped SKUs</span>
-            <div className="text-2xl font-black text-white">{supplierProducts.length}</div>
-            <span className="text-[10px] text-lab-400">Vendor product mappings</span>
+            <span className="text-[11px] text-gray-500 block">Completed raw materials</span>
           </div>
         </div>
 
-        {/* Filter bar */}
-        <div className="p-4 rounded-2xl border border-lab-800 bg-lab-950 flex flex-col md:flex-row justify-between gap-3 text-xs">
+        {/* ━━━━ SEARCH & FILTER ━━━━ */}
+        <div className="p-4 rounded-xl border border-gray-200 bg-white shadow-xs flex flex-col md:flex-row justify-between gap-3 text-xs">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-lab-500 absolute left-3 top-3" />
+            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by vendor name, contact person, or email..."
-              className="w-full bg-lab-900 border border-lab-800 rounded-xl pl-9 pr-4 py-2.5 text-white placeholder-lab-600 focus:outline-none focus:border-amber-500"
+              placeholder="Search supplier name, contact, or email..."
+              className="w-full bg-white border border-gray-300 rounded-lg pl-9 pr-4 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#2B5F4A] focus:ring-1 focus:ring-[#2B5F4A]"
             />
           </div>
 
-          <div>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-lab-900 border border-lab-800 rounded-xl px-3 py-2 text-white"
-            >
-              <option value="all">All Vendors</option>
-              <option value="active">Active Only</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            aria-label="Filter by vendor status"
+            className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:border-[#2B5F4A]"
+          >
+            <option value="all">All Vendors</option>
+            <option value="active">Active Only</option>
+            <option value="inactive">Inactive</option>
+          </select>
         </div>
 
-        {/* Suppliers Table */}
-        <div className="rounded-2xl border border-lab-800 bg-lab-950 overflow-hidden shadow-2xl">
-          <table className="w-full text-left text-xs font-mono">
-            <thead className="bg-lab-900/80 text-[10px] text-lab-400 uppercase border-b border-lab-800">
-              <tr>
-                <th className="p-3.5">Supplier Name</th>
-                <th className="p-3.5">Category / Channel</th>
-                <th className="p-3.5">Contact / Email</th>
-                <th className="p-3.5 text-center">Mapped SKUs</th>
-                <th className="p-3.5 text-right">Total Spend</th>
-                <th className="p-3.5 text-center">Status</th>
-                <th className="p-3.5 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-lab-900 text-lab-300">
-              {loading ? (
-                <tr>
-                  <td colSpan={7} className="p-8 text-center text-lab-500">Loading vendor records...</td>
+        {/* ━━━━ SUPPLIERS TABLE ━━━━ */}
+        <div className="rounded-xl border border-gray-200 bg-white shadow-xs overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="bg-gray-50 text-[10px] text-gray-600 uppercase font-bold border-b border-gray-200">
+                  <th className="py-3.5 px-4">Supplier Name</th>
+                  <th className="py-3.5 px-4">Source Channel</th>
+                  <th className="py-3.5 px-4">Contact Info</th>
+                  <th className="py-3.5 px-4 text-right">Linked SKUs</th>
+                  <th className="py-3.5 px-4 text-right">Total Purchases</th>
+                  <th className="py-3.5 px-4 text-center">Status</th>
+                  <th className="py-3.5 px-4 text-right">Action</th>
                 </tr>
-              ) : filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="p-8 text-center text-lab-500">No suppliers found.</td>
-                </tr>
-              ) : (
-                filtered.map((s) => {
-                  const mappedCount = supplierProducts.filter((sp) => sp.supplierId === s.id).length;
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filtered.map((s) => {
+                  const linkedCount = supplierProducts.filter((sp) => sp.supplierId === s.id).length;
+
                   return (
-                    <tr key={s.id} className="hover:bg-lab-900/40 transition">
-                      <td className="p-3.5">
-                        <div className="font-bold text-white uppercase text-[11px] leading-tight">
-                          {s.name}
-                        </div>
+                    <tr key={s.id} className="hover:bg-gray-50/80 transition">
+                      <td className="py-3.5 px-4">
+                        <div className="font-semibold text-gray-950 text-xs">{s.name}</div>
                         {s.website && (
                           <a
                             href={s.website}
                             target="_blank"
-                            rel="noreferrer"
-                            className="text-[10px] text-amber-400 hover:underline inline-flex items-center gap-1 mt-0.5"
+                            rel="noopener noreferrer"
+                            className="text-[10px] text-[#2B5F4A] hover:underline inline-flex items-center gap-0.5 mt-0.5"
                           >
-                            <Globe className="w-2.5 h-2.5" /> {s.website.replace(/^https?:\/\//, "")}
+                            <span>{s.website.replace(/^https?:\/\//, "")}</span>
+                            <ExternalLink className="w-2.5 h-2.5" />
                           </a>
                         )}
                       </td>
 
-                      <td className="p-3.5 text-[11px]">
-                        <span className="px-2 py-0.5 rounded bg-lab-900 text-lab-300 border border-lab-800 uppercase text-[10px]">
-                          {(s.sourceType || "Vendor").replace("_", " ")}
+                      <td className="py-3.5 px-4">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wider bg-gray-100 text-gray-800 border border-gray-200">
+                          {s.sourceType?.replace("_", " ") || "Manufacturer"}
                         </span>
                       </td>
 
-                      <td className="p-3.5 text-[11px]">
-                        <div className="text-white font-bold">{s.contactName || "—"}</div>
-                        <div className="text-[10px] text-lab-500">{s.email || s.phone || "—"}</div>
+                      <td className="py-3.5 px-4 text-gray-700">
+                        {s.contactName && <div className="font-medium text-gray-900">{s.contactName}</div>}
+                        {s.email && <div className="text-[11px] text-gray-500">{s.email}</div>}
+                        {s.phone && <div className="text-[10px] text-gray-500 font-mono">{s.phone}</div>}
                       </td>
 
-                      <td className="p-3.5 text-center font-bold text-white font-mono">
-                        {mappedCount}
+                      <td className="py-3.5 px-4 text-right font-mono font-semibold text-gray-900">
+                        {linkedCount} SKUs
                       </td>
 
-                      <td className="p-3.5 text-right font-mono font-bold text-amber-400">
+                      <td className="py-3.5 px-4 text-right font-mono font-bold text-[#2B5F4A]">
                         {formatCurrency(s.totalPurchasesAmount || 0)}
                       </td>
 
-                      <td className="p-3.5 text-center">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                          s.active
-                            ? "bg-emerald-950 text-emerald-400 border border-emerald-500/30"
-                            : "bg-rose-950 text-rose-400 border border-rose-500/30"
-                        }`}>
+                      <td className="py-3.5 px-4 text-center">
+                        <span
+                          className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                            s.active
+                              ? "bg-[#F0FDF4] border-[#BBF7D0] text-[#166534]"
+                              : "bg-gray-100 border-gray-200 text-gray-700"
+                          }`}
+                        >
                           {s.active ? "Active" : "Inactive"}
                         </span>
                       </td>
 
-                      <td className="p-3.5 text-right">
-                        <div className="flex justify-end gap-1.5">
-                          <Link
-                            href={`/admin/suppliers/${s.id}`}
-                            className="px-2.5 py-1 rounded-lg bg-lab-900 border border-lab-800 hover:border-amber-500/40 text-lab-300 hover:text-white text-[11px] font-bold uppercase transition"
-                          >
-                            Overview
-                          </Link>
-                          <Link
-                            href={`/admin/suppliers/${s.id}/products`}
-                            className="px-2.5 py-1 rounded-lg bg-lab-900 border border-lab-800 hover:border-amber-500/40 text-amber-400 hover:text-white text-[11px] font-bold uppercase transition"
-                          >
-                            Products
-                          </Link>
-                        </div>
+                      <td className="py-3.5 px-4 text-right">
+                        <Link
+                          href={`/admin/suppliers/${s.id}`}
+                          className="px-2.5 py-1 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 text-gray-800 text-[11px] font-semibold inline-flex items-center gap-1 shadow-xs transition"
+                        >
+                          View Vendor →
+                        </Link>
                       </td>
                     </tr>
                   );
-                })
-              )}
-            </tbody>
-          </table>
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        {/* Add Supplier Modal */}
+        {/* ━━━━ ADD SUPPLIER MODAL ━━━━ */}
         {isModalOpen && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="w-full max-w-lg rounded-2xl bg-lab-950 border border-lab-800 p-6 space-y-4 shadow-2xl font-mono text-xs max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-center border-b border-lab-900 pb-3">
-                <h3 className="font-bold text-white uppercase text-sm flex items-center gap-2">
-                  <Building2 className="w-4 h-4 text-amber-400" /> Register Supplier / Vendor
-                </h3>
-                <button type="button" onClick={() => setIsModalOpen(false)} className="text-lab-500 hover:text-white">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-xs">
+            <div className="bg-white rounded-xl border border-gray-200 p-6 max-w-lg w-full space-y-4 shadow-xl text-xs max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center border-b border-gray-200 pb-3">
+                <span className="font-bold text-gray-950 text-base">Add New Supply Vendor</span>
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-1 rounded-lg text-gray-500 hover:text-gray-950 hover:bg-gray-100"
+                >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
-              <form onSubmit={handleCreateSupplier} className="space-y-3">
+              <form onSubmit={handleCreateSupplier} className="space-y-4">
                 <div>
-                  <label className="text-lab-400 block mb-1 uppercase text-[10px]">Company Name</label>
+                  <label className="text-gray-700 font-semibold block mb-1">Company / Supplier Name</label>
                   <input
                     type="text"
-                    required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Africa Imports / Bulk Apothecary"
-                    className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3 py-2 text-white"
+                    placeholder="e.g. Africa Imports, Amazon Wholesale, Uline..."
+                    className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:border-[#2B5F4A] focus:outline-none"
+                    required
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-lab-400 block mb-1 uppercase text-[10px]">Website URL</label>
+                    <label className="text-gray-700 font-semibold block mb-1">Vendor Type</label>
+                    <select
+                      value={sourceType}
+                      onChange={(e) => setSourceType(e.target.value)}
+                      className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:border-[#2B5F4A] focus:outline-none"
+                    >
+                      <option value="domestic_manufacturer">Domestic Manufacturer</option>
+                      <option value="wholesaler_distributor">Wholesaler / Distributor</option>
+                      <option value="international_supplier">International Supplier</option>
+                      <option value="retail_arbitrage">Retail / Amazon ASIN</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-gray-700 font-semibold block mb-1">Website URL</label>
                     <input
                       type="url"
                       value={website}
                       onChange={(e) => setWebsite(e.target.value)}
-                      placeholder="https://africaimports.com"
-                      className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3 py-2 text-white"
+                      placeholder="https://..."
+                      className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:border-[#2B5F4A] focus:outline-none"
                     />
-                  </div>
-
-                  <div>
-                    <label className="text-lab-400 block mb-1 uppercase text-[10px]">Channel Type</label>
-                    <select
-                      value={sourceType}
-                      onChange={(e) => setSourceType(e.target.value)}
-                      className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3 py-2 text-white"
-                    >
-                      <option value="importer">Direct Importer</option>
-                      <option value="domestic_manufacturer">Domestic Manufacturer</option>
-                      <option value="amazon">Amazon Vendor / ASIN</option>
-                      <option value="craft_direct">Craft / Die-Cut Supply</option>
-                      <option value="specialty_distributor">Specialty Distributor</option>
-                      <option value="aliexpress">AliExpress Direct</option>
-                    </select>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-lab-400 block mb-1 uppercase text-[10px]">Contact Person</label>
+                    <label className="text-gray-700 font-semibold block mb-1">Contact Name</label>
                     <input
                       type="text"
                       value={contactName}
                       onChange={(e) => setContactName(e.target.value)}
-                      placeholder="Wholesale Accounts"
-                      className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3 py-2 text-white"
+                      className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:border-[#2B5F4A] focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="text-lab-400 block mb-1 uppercase text-[10px]">Email</label>
+                    <label className="text-gray-700 font-semibold block mb-1">Email Address</label>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="orders@supplier.com"
-                      className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3 py-2 text-white"
+                      className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:border-[#2B5F4A] focus:outline-none"
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-lab-400 block mb-1 uppercase text-[10px]">Phone Number</label>
-                    <input
-                      type="tel"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="+1 (800) 000-0000"
-                      className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3 py-2 text-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-lab-400 block mb-1 uppercase text-[10px]">Physical Address / Dock</label>
-                    <input
-                      type="text"
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                      placeholder="City, State"
-                      className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3 py-2 text-white"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-lab-400 block mb-1 uppercase text-[10px]">Procurement Notes</label>
-                  <textarea
-                    rows={2}
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Terms, minimum orders, discount codes, shipping accounts..."
-                    className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3 py-2 text-white placeholder-lab-600 focus:border-amber-500"
-                  />
-                </div>
-
-                <div className="pt-2 flex justify-end gap-2">
+                <div className="flex justify-end gap-2 pt-3 border-t border-gray-200">
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 rounded-xl bg-lab-900 text-lab-400 hover:text-white uppercase font-bold"
+                    className="px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={saving}
-                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-lab-950 font-bold uppercase"
+                    className="px-5 py-2 rounded-lg bg-[#2B5F4A] hover:bg-[#1E4233] text-white font-bold uppercase tracking-wider transition shadow-xs disabled:opacity-50"
                   >
-                    {saving ? "Saving..." : "Save Supplier"}
+                    {saving ? "Creating..." : "Save Supplier"}
                   </button>
                 </div>
               </form>
             </div>
           </div>
         )}
+
       </div>
     </AdminGuard>
   );

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SCENTLAB - Cart Drawer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Bodoni+Moda:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#f2f1ee",
+                        "on-secondary-fixed": "#1c1b1a",
+                        "on-tertiary-fixed-variant": "#594313",
+                        "surface-container-low": "#f4f3f1",
+                        "primary-fixed": "#e5e2e1",
+                        "on-surface-variant": "#444748",
+                        "on-background": "#1a1c1a",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#c8c6c5",
+                        "on-tertiary-fixed": "#261900",
+                        "surface-dim": "#dbdad7",
+                        "surface-variant": "#e3e2e0",
+                        "secondary-fixed": "#e6e2de",
+                        "tertiary": "#000000",
+                        "surface-bright": "#faf9f6",
+                        "on-surface": "#1a1c1a",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#2f312f",
+                        "error-container": "#ffdad6",
+                        "primary": "#000000",
+                        "on-primary-container": "#858383",
+                        "primary-container": "#1c1b1b",
+                        "surface-container-highest": "#e3e2e0",
+                        "surface-container": "#efeeeb",
+                        "surface-container-high": "#e9e8e5",
+                        "tertiary-fixed-dim": "#e2c286",
+                        "secondary-container": "#e6e2de",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#c4c7c7",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#484644",
+                        "on-primary-fixed-variant": "#474646",
+                        "on-tertiary-container": "#9b804a",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#ffdea1",
+                        "tertiary-container": "#261900",
+                        "secondary": "#605e5c",
+                        "on-primary-fixed": "#1c1b1b",
+                        "on-secondary-container": "#666461",
+                        "inverse-primary": "#c8c6c5",
+                        "background": "#faf9f6",
+                        "surface": "#faf9f6",
+                        "secondary-fixed-dim": "#c9c6c3",
+                        "on-primary": "#ffffff",
+                        "surface-tint": "#5f5e5e",
+                        "on-tertiary": "#ffffff",
+                        "outline": "#747878"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "container-max": "1440px",
+                        "gutter": "24px",
+                        "stack-md": "16px",
+                        "stack-sm": "8px",
+                        "section-gap": "120px",
+                        "margin-mobile": "20px",
+                        "stack-lg": "32px",
+                        "margin-desktop": "64px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "caption": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "display-hero": ["Bodoni Moda"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+                        "caption": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+                        "display-hero": ["80px", { "lineHeight": "96px", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "0em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .drawer-overlay {
+            background-color: rgba(17, 17, 17, 0.4);
+            backdrop-filter: blur(2px);
+        }
+        .drawer-panel {
+            box-shadow: -20px 0 50px rgba(0, 0, 0, 0.05);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        /* Custom scrollbar for webkit */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e3e2e0;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #c4c7c7;
+        }
+        .qty-btn {
+            transition: opacity 0.2s;
+        }
+        .qty-btn:hover {
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased overflow-hidden">
+<!-- Mock Main Content Layer (to demonstrate the overlay effect) -->
+<main class="h-screen w-full flex items-center justify-center p-8 bg-surface-bright">
+<div class="text-center max-w-2xl">
+<h1 class="font-headline-lg text-headline-lg mb-stack-md text-primary">SCENTLAB WHOLESALE</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-stack-lg">Background content simulating the storefront. The cart drawer is currently active and overlaying this area.</p>
+</div>
+</main>
+<!-- Cart Drawer Overlay -->
+<div aria-labelledby="cart-title" aria-modal="true" class="fixed inset-0 drawer-overlay z-40 flex justify-end" id="cart-overlay" role="dialog">
+<!-- Cart Drawer Panel -->
+<div class="drawer-panel bg-surface w-full max-w-[480px] h-full flex flex-col translate-x-0" id="cart-drawer">
+<!-- Header -->
+<header class="flex items-center justify-between p-stack-lg border-b border-outline-variant">
+<h2 class="font-headline-md text-headline-md text-primary tracking-tighter" id="cart-title">YOUR CART <span class="text-on-surface-variant text-body-md align-middle ml-2">(3 items)</span></h2>
+<button aria-label="Close cart" class="text-primary hover:opacity-70 transition-opacity p-2 -mr-2 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-transparent border-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 28px;">close</span>
+</button>
+</header>
+<!-- Scrollable Items Area -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-stack-lg flex flex-col gap-stack-lg">
+<!-- Item 1 -->
+<article class="flex gap-stack-md group">
+<div class="w-24 h-32 bg-surface-container shrink-0 rounded overflow-hidden">
+<img alt="Santal Minimalist Bottle" class="w-full h-full object-cover mix-blend-multiply" data-alt="A sleek, minimalist clear glass perfume bottle with a matte black cylindrical cap. The bottle is filled with a pale golden liquid. It sits on a stark white textured studio background under soft, high-end editorial lighting, casting a very subtle, long shadow. The aesthetic is extremely clean, modern, and luxurious." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFYeqzJv28Z8AN-_Oyr64zwZKepUtIpboiVS9oLuGwu_OpyCBp_ehVQ3oB4xPL1j95vrn38fn2FXdc7fOGXeBECMbnHv3oaUlEmukL2c77-vZE-p_gdx4dytqnu6LXOKgLv0TDW3SvFc7j5Ne5tVD69b92seI2nbGOM9pLOkv2Ajm5nfI7CIp3lLgeBERZ-v9QuyTgq-ho2Za_SThfoho_lr1sqvV9px0MsuIpYsk_q6dlXV5VpaRxug"/>
+</div>
+<div class="flex flex-col flex-1 py-1 justify-between">
+<div>
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-body-md text-body-md text-primary leading-tight">Santal 33 - 50ml</h3>
+<button aria-label="Remove item" class="text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20; font-size: 20px;">delete</span>
+</button>
+</div>
+<p class="font-caption text-caption text-secondary mb-2">Variant: Eau de Parfum</p>
+</div>
+<div class="flex items-center justify-between mt-auto">
+<!-- Quantity Control -->
+<div class="flex items-center border border-outline-variant rounded h-8">
+<button aria-label="Decrease quantity" class="qty-btn px-3 h-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-size: 16px;">remove</span>
+</button>
+<span class="font-label-caps text-label-caps w-8 text-center text-primary">2</span>
+<button aria-label="Increase quantity" class="qty-btn px-3 h-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-size: 16px;">add</span>
+</button>
+</div>
+<!-- Price -->
+<span class="font-body-md text-body-md text-primary font-medium">$380.00</span>
+</div>
+</div>
+</article>
+<hr class="border-t border-outline-variant"/>
+<!-- Item 2 -->
+<article class="flex gap-stack-md group">
+<div class="w-24 h-32 bg-surface-container shrink-0 rounded overflow-hidden">
+<img alt="Discovery Set" class="w-full h-full object-cover mix-blend-multiply" data-alt="A collection of five matte black sample vials of fragrance lined up perfectly on a light grey concrete surface. The lighting is dramatic, highlighting the texture of the concrete and the smooth matte finish of the vials. The composition is highly structured, geometric, and minimalist, typical of a high-end luxury brand presentation." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjVVNJl2JKyPZVoylj_sNKDevSV9zMspPgh0JUy1R9YnGIx6pIExE0mwPiOfuR1aJNk4oDBc4SqFpjoLcndCGfUFesq1usqZSyfx0KWCt2rMl7iMddcgS7SZ3YAWlpGuV2Yt93agTt4ZvHqf3Epyrjxureg0bFn5f9FYQTg00tBqW8nklwlaaUBsHoRKMrghID8VeSDiNsWhnH9J8CBqbi8zflnbeaOfLBFaXM-UV9GyjW5m_2Uvp47A"/>
+</div>
+<div class="flex flex-col flex-1 py-1 justify-between">
+<div>
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-body-md text-body-md text-primary leading-tight">Discovery Set - Core Collection</h3>
+<button aria-label="Remove item" class="text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20; font-size: 20px;">delete</span>
+</button>
+</div>
+<p class="font-caption text-caption text-secondary mb-2">Variant: 5x 2ml</p>
+</div>
+<div class="flex items-center justify-between mt-auto">
+<!-- Quantity Control -->
+<div class="flex items-center border border-outline-variant rounded h-8">
+<button aria-label="Decrease quantity" class="qty-btn px-3 h-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-size: 16px;">remove</span>
+</button>
+<span class="font-label-caps text-label-caps w-8 text-center text-primary">1</span>
+<button aria-label="Increase quantity" class="qty-btn px-3 h-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-size: 16px;">add</span>
+</button>
+</div>
+<!-- Price -->
+<span class="font-body-md text-body-md text-primary font-medium">$45.00</span>
+</div>
+</div>
+</article>
+<hr class="border-t border-outline-variant"/>
+<!-- Item 3 -->
+<article class="flex gap-stack-md group">
+<div class="w-24 h-32 bg-surface-container shrink-0 rounded overflow-hidden">
+<img alt="Neroli Body Cream" class="w-full h-full object-cover mix-blend-multiply" data-alt="A heavy, frosted glass jar of luxurious body cream with a polished silver lid, sitting alone on a pristine white marble slab. The lighting is diffused and bright, creating a soft, clinical yet opulent atmosphere. The focus is entirely on the texture of the frosted glass and the reflective metal top." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBusL7Pedh54HT3Ndzxr0d6kl4ACYUMIjr1q-blHl0hxnmr-tWNn1VkKqiKikz4ijwQOtYxgJvBPTpW3q8Tnj7Uc6De98zK1q02cVK95cO_0VdFcpnAYLl-jVmJ0eHlf5-0U0UFHzeWUJvnkg8HAlfPYjg8JwIM1VWwy47EnAsZ3LXk4IBOYXEESF8jUDcolfkjW2MiP8eY39HZDERtbhKfxjsjFB194YJy29v1X3Yr2yLL6gYBazcmPw"/>
+</div>
+<div class="flex flex-col flex-1 py-1 justify-between">
+<div>
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-body-md text-body-md text-primary leading-tight">Neroli Body Cream</h3>
+<button aria-label="Remove item" class="text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20; font-size: 20px;">delete</span>
+</button>
+</div>
+<p class="font-caption text-caption text-secondary mb-2">Variant: 200ml Jar</p>
+</div>
+<div class="flex items-center justify-between mt-auto">
+<!-- Quantity Control -->
+<div class="flex items-center border border-outline-variant rounded h-8">
+<button aria-label="Decrease quantity" class="qty-btn px-3 h-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-size: 16px;">remove</span>
+</button>
+<span class="font-label-caps text-label-caps w-8 text-center text-primary">1</span>
+<button aria-label="Increase quantity" class="qty-btn px-3 h-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-size: 16px;">add</span>
+</button>
+</div>
+<!-- Price -->
+<span class="font-body-md text-body-md text-primary font-medium">$85.00</span>
+</div>
+</div>
+</article>
+</div>
+<!-- Fixed Footer -->
+<div class="p-stack-lg bg-surface border-t border-outline-variant mt-auto">
+<div class="flex justify-between items-center mb-stack-sm">
+<span class="font-body-md text-body-md text-primary">Subtotal</span>
+<span class="font-headline-md text-headline-md text-primary">$510.00</span>
+</div>
+<p class="font-caption text-caption text-secondary mb-stack-lg text-center">Shipping &amp; taxes calculated at checkout.</p>
+<div class="flex flex-col gap-stack-sm">
+<button class="w-full bg-primary text-on-primary py-4 px-6 font-label-caps text-label-caps hover:bg-[#2A2927] transition-colors flex items-center justify-center gap-2">
+                        CHECKOUT
+                        <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
+</button>
+<a class="w-full text-center py-3 font-label-caps text-label-caps text-primary border border-transparent hover:border-primary transition-colors" href="#">
+                        VIEW CART
+                    </a>
+</div>
+</div>
+</div>
+</div>
+</body></html>

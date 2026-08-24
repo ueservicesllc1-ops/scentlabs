@@ -190,7 +190,7 @@ export default function ProductPreviewModal({
                         <tr key={i} className="hover:bg-lab-900/40">
                           <td className="py-2 px-3 text-white">{tier.minQuantity || (tier as any).quantity}+ units</td>
                           <td className="py-2 px-3 text-amber-400 font-bold">${tier.unitPrice.toFixed(2)}</td>
-                          <td className="py-2 px-3 text-emerald-400">{tier.discountPercent ? `${tier.discountPercent}% OFF` : "-"}</td>
+                          <td className="py-2 px-3 text-emerald-400">{tier.discountPercentage ? `${tier.discountPercentage}% OFF` : "-"}</td>
                         </tr>
                       ))}
                     </tbody>

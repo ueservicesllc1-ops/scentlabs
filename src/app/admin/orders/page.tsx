@@ -16,7 +16,9 @@ import {
   Clock, 
   Truck, 
   XCircle,
-  ArrowLeft
+  ArrowLeft,
+  ShoppingCart,
+  X
 } from "lucide-react";
 
 export default function AdminOrdersPage() {
@@ -41,10 +43,12 @@ export default function AdminOrdersPage() {
 
   const filteredOrders = orders.filter((o) => {
     const fullNameStr = o.shippingAddress?.fullName || o.shippingAddress?.name || "";
+    const q = searchQuery.toLowerCase().trim();
     const matchesSearch =
-      o.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      o.customerEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      fullNameStr.toLowerCase().includes(searchQuery.toLowerCase());
+      !q ||
+      o.orderNumber.toLowerCase().includes(q) ||
+      o.customerEmail.toLowerCase().includes(q) ||
+      fullNameStr.toLowerCase().includes(q);
     const matchesStatus = statusFilter === "all" || o.orderStatus === statusFilter;
     const matchesPayment = paymentFilter === "all" || o.paymentStatus === paymentFilter;
     return matchesSearch && matchesStatus && matchesPayment;
@@ -60,39 +64,33 @@ export default function AdminOrdersPage() {
 
   return (
     <AdminGuard>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 font-mono">
-        {/* Header */}
-        <div className="border-b border-lab-800 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+      <div className="space-y-8 font-sans">
+        
+        {/* ━━━━ HEADER ━━━━ */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 pb-6 border-b border-gray-200">
           <div>
-            <div className="flex items-center gap-2 text-amber-400 text-xs uppercase tracking-widest font-bold mb-1">
-              <Package className="w-3.5 h-3.5" /> FULFILLMENT & PAYMENT OPERATIONS
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-800 border border-gray-300 mb-2">
+              <ShoppingCart className="w-3 h-3 text-gray-600" /> Fulfillment & Payment Operations
             </div>
-            <h1 className="text-3xl font-black text-white uppercase">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-950 tracking-tight">
               Customer Orders ({orders.length})
             </h1>
-            <p className="text-xs text-lab-400 mt-1">
-              Stripe verified payments, order fulfillment tracking, and buyer snapshots.
+            <p className="text-xs text-gray-600 mt-1 max-w-2xl leading-relaxed">
+              Stripe verified commercial transactions, order fulfillment tracking, and buyer address snapshots.
             </p>
           </div>
-
-          <Link
-            href="/admin"
-            className="px-4 py-2 rounded-lg bg-lab-900 border border-lab-800 text-lab-300 hover:text-white text-xs flex items-center gap-1.5"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" /> Back to Products
-          </Link>
         </div>
 
-        {/* Filters and Search Bar */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 text-xs">
+        {/* ━━━━ FILTERS AND SEARCH BAR ━━━━ */}
+        <div className="p-4 rounded-xl border border-gray-200 bg-white shadow-xs grid grid-cols-1 md:grid-cols-12 gap-3 text-xs">
           <div className="md:col-span-6 relative">
-            <Search className="w-4 h-4 text-lab-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by order number, customer email, or recipient..."
-              className="w-full bg-lab-950 border border-lab-800 rounded-lg pl-9 pr-3 py-2 text-white placeholder-lab-600 focus:outline-none focus:border-amber-500"
+              className="w-full bg-white border border-gray-300 rounded-lg pl-9 pr-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#2B5F4A] focus:ring-1 focus:ring-[#2B5F4A]"
             />
           </div>
 
@@ -100,12 +98,12 @@ export default function AdminOrdersPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full bg-lab-950 border border-lab-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+              aria-label="Filter by order status"
+              className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:border-[#2B5F4A]"
             >
               <option value="all">All Fulfillment Statuses</option>
               <option value="pending">Pending</option>
-              <option value="paid">Paid</option>
-              <option value="processing">Processing</option>
+              <option value="processing">Processing / Compounding</option>
               <option value="shipped">Shipped</option>
               <option value="delivered">Delivered</option>
               <option value="cancelled">Cancelled</option>
@@ -116,10 +114,11 @@ export default function AdminOrdersPage() {
             <select
               value={paymentFilter}
               onChange={(e) => setPaymentFilter(e.target.value)}
-              className="w-full bg-lab-950 border border-lab-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+              aria-label="Filter by payment status"
+              className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:border-[#2B5F4A]"
             >
               <option value="all">All Payment Statuses</option>
-              <option value="paid">Paid</option>
+              <option value="paid">Paid (Stripe Confirmed)</option>
               <option value="pending">Pending</option>
               <option value="failed">Failed</option>
               <option value="refunded">Refunded</option>
@@ -127,163 +126,203 @@ export default function AdminOrdersPage() {
           </div>
         </div>
 
-        {/* Orders Table */}
-        <div className="overflow-x-auto rounded-xl border border-lab-800 bg-lab-900/40">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-lab-950 border-b border-lab-800 text-lab-400 uppercase text-[10px]">
-              <tr>
-                <th className="p-3">Order Number</th>
-                <th className="p-3">Customer</th>
-                <th className="p-3">Items</th>
-                <th className="p-3">Total Billed</th>
-                <th className="p-3">Payment (Stripe)</th>
-                <th className="p-3">Fulfillment</th>
-                <th className="p-3">Date</th>
-                <th className="p-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-lab-800/60">
-              {filteredOrders.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="p-8 text-center text-lab-500">
-                    No matching orders found.
-                  </td>
+        {/* ━━━━ ORDERS TABLE ━━━━ */}
+        <div className="rounded-xl border border-gray-200 bg-white shadow-xs overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="bg-gray-50 text-[10px] text-gray-600 uppercase font-bold border-b border-gray-200">
+                  <th className="py-3.5 px-4">Order #</th>
+                  <th className="py-3.5 px-4">Customer</th>
+                  <th className="py-3.5 px-4">Recipient & City</th>
+                  <th className="py-3.5 px-4 text-right">Items</th>
+                  <th className="py-3.5 px-4 text-right">Total</th>
+                  <th className="py-3.5 px-4 text-center">Payment</th>
+                  <th className="py-3.5 px-4 text-center">Fulfillment</th>
+                  <th className="py-3.5 px-4 text-right">Action</th>
                 </tr>
-              ) : (
-                filteredOrders.map((order) => {
-                  const isPaid = order.paymentStatus === "paid";
-                  return (
-                    <tr key={order.id} className="hover:bg-lab-800/30 transition">
-                      <td className="p-3 font-bold text-white">
-                        {order.orderNumber}
-                      </td>
-                      <td className="p-3">
-                        <div className="text-white">{order.shippingAddress?.fullName || order.shippingAddress?.name || "Customer"}</div>
-                        <div className="text-[10px] text-lab-500">{order.customerEmail}</div>
-                      </td>
-                      <td className="p-3 text-lab-300">
-                        {order.items.length} line(s) • {order.items.reduce((s, i) => s + i.quantity, 0)}u
-                      </td>
-                      <td className="p-3 font-bold text-amber-400">
-                        {formatCurrency(order.total)}
-                      </td>
-                      <td className="p-3">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase inline-block ${
-                          isPaid ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" : "bg-amber-500/20 text-amber-300"
-                        }`}>
-                          {order.paymentStatus}
-                        </span>
-                      </td>
-                      <td className="p-3">
-                        <span className="capitalize text-white font-medium">
-                          {order.orderStatus}
-                        </span>
-                      </td>
-                      <td className="p-3 text-lab-400 text-[11px]">
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="p-3 text-right">
-                        <button
-                          onClick={() => setSelectedOrder(order)}
-                          className="px-2.5 py-1 rounded bg-lab-800 hover:bg-lab-700 text-white transition text-[11px] inline-flex items-center gap-1 border border-lab-700"
-                        >
-                          <Eye className="w-3 h-3" /> View
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filteredOrders.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="p-8 text-center text-gray-500">
+                      No customer orders found matching filters.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredOrders.map((o) => {
+                    const recipient = o.shippingAddress?.fullName || o.shippingAddress?.name || "Customer";
+                    const cityState = o.shippingAddress?.city
+                      ? `${o.shippingAddress.city}, ${o.shippingAddress.state || ""}`
+                      : "US";
+
+                    return (
+                      <tr key={o.id} className="hover:bg-gray-50/80 transition">
+                        <td className="py-3.5 px-4 font-mono font-bold text-gray-950">
+                          {o.orderNumber}
+                        </td>
+
+                        <td className="py-3.5 px-4 text-gray-800">
+                          <div className="font-medium text-gray-900">{o.customerEmail}</div>
+                          <div className="text-[10px] text-gray-500 font-mono">
+                            {new Date(o.createdAt).toLocaleDateString()}
+                          </div>
+                        </td>
+
+                        <td className="py-3.5 px-4">
+                          <div className="text-gray-900 font-medium">{recipient}</div>
+                          <div className="text-[10px] text-gray-500">{cityState}</div>
+                        </td>
+
+                        <td className="py-3.5 px-4 text-right font-mono text-gray-700">
+                          {o.items?.length || 0} line items
+                        </td>
+
+                        <td className="py-3.5 px-4 text-right font-mono font-bold text-gray-950">
+                          ${(o.total || 0).toFixed(2)}
+                        </td>
+
+                        <td className="py-3.5 px-4 text-center">
+                          <span
+                            className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                              o.paymentStatus === "paid"
+                                ? "bg-[#F0FDF4] border-[#BBF7D0] text-[#166534]"
+                                : o.paymentStatus === "refunded"
+                                ? "bg-purple-50 border-purple-200 text-purple-800"
+                                : "bg-amber-50 border-amber-200 text-amber-800"
+                            }`}
+                          >
+                            {o.paymentStatus}
+                          </span>
+                        </td>
+
+                        <td className="py-3.5 px-4 text-center">
+                          <span
+                            className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                              o.orderStatus === "delivered" || o.orderStatus === "shipped"
+                                ? "bg-[#F0FDF4] border-[#BBF7D0] text-[#166534]"
+                                : o.orderStatus === "processing"
+                                ? "bg-blue-50 border-blue-200 text-blue-800"
+                                : "bg-gray-100 border-gray-200 text-gray-700"
+                            }`}
+                          >
+                            {o.orderStatus}
+                          </span>
+                        </td>
+
+                        <td className="py-3.5 px-4 text-right">
+                          <button
+                            onClick={() => setSelectedOrder(o)}
+                            className="px-2.5 py-1 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 text-gray-800 text-[11px] font-semibold inline-flex items-center gap-1 shadow-xs transition"
+                          >
+                            <Eye className="w-3 h-3 text-gray-500" /> Details
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        {/* Order Detail Modal */}
+        {/* ━━━━ ORDER DETAILS MODAL ━━━━ */}
         {selectedOrder && (
-          <div className="p-6 rounded-2xl border border-lab-700 bg-lab-950 space-y-6 shadow-2xl">
-            <div className="flex justify-between items-start border-b border-lab-800 pb-4">
-              <div>
-                <span className="text-[10px] text-amber-400 uppercase tracking-widest font-bold">
-                  ORDER SPECIFICATION
-                </span>
-                <h2 className="text-xl font-bold text-white mt-0.5">
-                  {selectedOrder.orderNumber}
-                </h2>
-                <p className="text-xs text-lab-400">
-                  Customer Email: <strong className="text-white">{selectedOrder.customerEmail}</strong> • ID: {selectedOrder.id}
-                </p>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-xs">
+            <div className="bg-white rounded-xl border border-gray-200 p-6 max-w-2xl w-full space-y-4 shadow-xl text-xs max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center border-b border-gray-200 pb-3">
+                <div>
+                  <span className="font-bold text-gray-950 text-base">
+                    Order {selectedOrder.orderNumber}
+                  </span>
+                  <p className="text-[11px] text-gray-500">
+                    Placed on {new Date(selectedOrder.createdAt).toLocaleString()}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedOrder(null)}
+                  className="p-1 rounded-lg text-gray-500 hover:text-gray-950 hover:bg-gray-100"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
 
-              <div className="flex items-center gap-2">
-                <select
-                  value={selectedOrder.orderStatus}
-                  onChange={(e) => handleUpdateStatus(selectedOrder.id, e.target.value as OrderStatus)}
-                  className="bg-lab-900 border border-lab-700 rounded-lg px-3 py-1.5 text-xs text-white"
-                >
-                  <option value="pending">Pending</option>
-                  <option value="paid">Paid</option>
-                  <option value="processing">Processing</option>
-                  <option value="shipped">Shipped</option>
-                  <option value="delivered">Delivered</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
+              {/* Items List */}
+              <div className="space-y-2">
+                <span className="text-[11px] font-bold text-gray-700 uppercase tracking-wider block">
+                  Purchased Items:
+                </span>
+                <div className="border border-gray-200 rounded-lg divide-y divide-gray-100">
+                  {(selectedOrder.items || []).map((item, idx) => (
+                    <div key={idx} className="p-3 flex justify-between items-center">
+                      <div>
+                        <div className="font-semibold text-gray-900">{item.productName}</div>
+                        <div className="text-[10px] text-gray-500 font-mono">
+                          SKU: {item.sku} • Qty: {item.quantity} units
+                        </div>
+                      </div>
+                      <div className="font-mono font-bold text-gray-950">
+                        ${(item.totalPrice || 0).toFixed(2)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
+              {/* Shipping Address */}
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-1">
+                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">
+                  Shipping Destination:
+                </span>
+                <div className="text-gray-900 font-semibold">
+                  {selectedOrder.shippingAddress?.fullName || selectedOrder.shippingAddress?.name}
+                </div>
+                <div className="text-gray-600">
+                  {selectedOrder.shippingAddress?.street1} {selectedOrder.shippingAddress?.street2 || ""}
+                </div>
+                <div className="text-gray-600">
+                  {selectedOrder.shippingAddress?.city}, {selectedOrder.shippingAddress?.state} {selectedOrder.shippingAddress?.postalCode}
+                </div>
+              </div>
+
+              {/* Fulfillment Status Controls */}
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-2">
+                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">
+                  Update Fulfillment Status:
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {(["pending", "processing", "shipped", "delivered", "cancelled"] as OrderStatus[]).map((st) => (
+                    <button
+                      key={st}
+                      type="button"
+                      onClick={() => handleUpdateStatus(selectedOrder.id, st)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition ${
+                        selectedOrder.orderStatus === st
+                          ? "bg-[#2B5F4A] text-white shadow-xs"
+                          : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      {st}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-3 border-t border-gray-200">
                 <button
+                  type="button"
                   onClick={() => setSelectedOrder(null)}
-                  className="px-3 py-1.5 rounded-lg bg-lab-900 border border-lab-800 text-lab-400 hover:text-white text-xs"
+                  className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold"
                 >
                   Close
                 </button>
               </div>
             </div>
-
-            {/* Line Items */}
-            <div className="space-y-2">
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider">
-                Purchased Supplies Snapshot
-              </h3>
-              <div className="divide-y divide-lab-800/60 border border-lab-800 rounded-xl bg-lab-900/30 p-4 text-xs">
-                {selectedOrder.items.map((item) => (
-                  <div key={item.id} className="py-2 flex justify-between items-center">
-                    <div>
-                      <div className="font-bold text-white">{item.productName}</div>
-                      <div className="text-[10px] text-lab-400">
-                        SKU: {item.sku} • {item.quantity} units @ {formatUnitPrice(item.unitPrice)}/u
-                      </div>
-                    </div>
-                    <div className="font-bold text-white">{formatCurrency(item.totalPrice)}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Totals & Delivery Address */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-              <div className="p-4 rounded-xl border border-lab-800 bg-lab-900/20 space-y-1">
-                <span className="text-[10px] text-lab-500 uppercase block">Shipping Logistics Address</span>
-                <div className="text-white font-bold">{selectedOrder.shippingAddress?.fullName || selectedOrder.shippingAddress?.name || "Customer"}</div>
-                <div className="text-lab-300">
-                  {selectedOrder.shippingAddress?.streetAddress || selectedOrder.shippingAddress?.street1 || ""}, {selectedOrder.shippingAddress?.city}, {selectedOrder.shippingAddress?.state} {selectedOrder.shippingAddress?.postalCode}
-                </div>
-              </div>
-
-              <div className="p-4 rounded-xl border border-lab-800 bg-lab-900/20 space-y-1.5">
-                <div className="flex justify-between text-lab-400">
-                  <span>Subtotal:</span>
-                  <span className="text-white">{formatCurrency(selectedOrder.subtotal)}</span>
-                </div>
-                <div className="flex justify-between text-lab-400">
-                  <span>Shipping:</span>
-                  <span className="text-white">{formatCurrency(selectedOrder.shipping)}</span>
-                </div>
-                <div className="flex justify-between text-sm font-bold text-white pt-1 border-t border-lab-800">
-                  <span>Grand Total:</span>
-                  <span className="text-amber-400">{formatCurrency(selectedOrder.total)}</span>
-                </div>
-              </div>
-            </div>
           </div>
         )}
+
       </div>
     </AdminGuard>
   );

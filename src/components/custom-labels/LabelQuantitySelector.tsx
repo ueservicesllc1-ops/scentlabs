@@ -1,15 +1,14 @@
 "use client";
 
 import React from "react";
-import { LabelMaterial, LabelSize } from "@/types/custom-label";
-import { STANDARD_LABEL_QUANTITIES } from "@/config/custom-labels";
+import { LabelSize, LabelMaterial } from "@/types/custom-label";
 import { calculateLabelPricing } from "@/lib/custom-labels/pricing";
-import { formatCurrency, formatUnitPrice } from "@/lib/utils";
-import { Sparkles } from "lucide-react";
+import { STANDARD_LABEL_QUANTITIES } from "@/config/custom-labels";
+import { Check } from "lucide-react";
 
 interface LabelQuantitySelectorProps {
   selectedQuantity: number;
-  onSelectQuantity: (qty: number) => void;
+  onSelectQuantity: (quantity: number) => void;
   size: LabelSize;
   material: LabelMaterial;
 }
@@ -21,13 +20,17 @@ export function LabelQuantitySelector({
   material,
 }: LabelQuantitySelectorProps) {
   return (
-    <div className="space-y-3 font-mono">
+    <div className="space-y-4">
       <div className="flex justify-between items-center text-xs">
-        <span className="font-bold text-white uppercase">3. Choose Production Volume</span>
-        <span className="text-[11px] text-emerald-400 font-bold">Buy More, Save More</span>
+        <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-gray-900">
+          3. Select Production Batch
+        </span>
+        <span className="text-[10px] text-emerald-800 font-medium">
+          Volume Discount Applied
+        </span>
       </div>
 
-      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
         {STANDARD_LABEL_QUANTITIES.map((qty) => {
           const pricing = calculateLabelPricing(size.width, size.height, qty, material.id);
           const isSelected = selectedQuantity === qty;
@@ -37,24 +40,26 @@ export function LabelQuantitySelector({
               key={qty}
               type="button"
               onClick={() => onSelectQuantity(qty)}
-              className={`p-2.5 rounded-xl border text-center transition relative flex flex-col justify-between ${
+              className={`p-3 text-left transition flex flex-col justify-between border ${
                 isSelected
-                  ? "border-amber-500 bg-amber-500/10 text-white shadow-md shadow-amber-500/10"
-                  : "border-lab-800 bg-lab-950 text-lab-400 hover:border-lab-700 hover:text-white"
+                  ? "border-[#2B5F4A] bg-[#F6FAF8] text-gray-950 shadow-xs"
+                  : "border-gray-200 bg-white text-gray-800 hover:border-gray-400"
               }`}
             >
-              {pricing.volumeTierSavingsPercent > 0 && (
-                <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/60 px-1 rounded-full mb-1">
-                  -{pricing.volumeTierSavingsPercent}%
-                </span>
-              )}
-
-              <div className="text-xs font-black text-white">{qty} units</div>
-              <div className="text-[10px] text-amber-400 font-bold mt-1">
-                {formatCurrency(pricing.totalPrice)}
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-semibold uppercase tracking-wider">{qty} Labels</span>
+                {isSelected && <Check className="w-3.5 h-3.5 text-[#2B5F4A]" />}
               </div>
-              <div className="text-[9px] text-lab-500">
-                {formatUnitPrice(pricing.unitPrice)}/ea
+
+              <div className={`mt-2 pt-2 border-t flex flex-col font-mono text-[11px] ${
+                isSelected ? "border-[#2B5F4A]/20" : "border-gray-100"
+              }`}>
+                <span className={`font-semibold ${isSelected ? "text-[#2B5F4A]" : "text-gray-900"}`}>
+                  ${pricing.totalPrice.toFixed(2)}
+                </span>
+                <span className={`text-[10px] mt-0.5 ${isSelected ? "text-[#2B5F4A]/80" : "text-gray-400"}`}>
+                  ${pricing.unitPrice.toFixed(2)} / label
+                </span>
               </div>
             </button>
           );

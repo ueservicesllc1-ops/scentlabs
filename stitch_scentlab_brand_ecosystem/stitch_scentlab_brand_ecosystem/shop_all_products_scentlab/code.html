@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SCENTLAB - Shop Products</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Bodoni+Moda:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#f2f1ee",
+                        "on-secondary-fixed": "#1c1b1a",
+                        "on-tertiary-fixed-variant": "#594313",
+                        "surface-container-low": "#f4f3f1",
+                        "primary-fixed": "#e5e2e1",
+                        "on-surface-variant": "#444748",
+                        "on-background": "#1a1c1a",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#c8c6c5",
+                        "on-tertiary-fixed": "#261900",
+                        "surface-dim": "#dbdad7",
+                        "surface-variant": "#e3e2e0",
+                        "secondary-fixed": "#e6e2de",
+                        "tertiary": "#000000",
+                        "surface-bright": "#faf9f6",
+                        "on-surface": "#1a1c1a",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#2f312f",
+                        "error-container": "#ffdad6",
+                        "primary": "#000000",
+                        "on-primary-container": "#858383",
+                        "primary-container": "#1c1b1b",
+                        "surface-container-highest": "#e3e2e0",
+                        "surface-container": "#efeeeb",
+                        "surface-container-high": "#e9e8e5",
+                        "tertiary-fixed-dim": "#e2c286",
+                        "secondary-container": "#e6e2de",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#c4c7c7",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#484644",
+                        "on-primary-fixed-variant": "#474646",
+                        "on-tertiary-container": "#9b804a",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#ffdea1",
+                        "tertiary-container": "#261900",
+                        "secondary": "#605e5c",
+                        "on-primary-fixed": "#1c1b1b",
+                        "on-secondary-container": "#666461",
+                        "inverse-primary": "#c8c6c5",
+                        "background": "#faf9f6",
+                        "surface": "#faf9f6",
+                        "secondary-fixed-dim": "#c9c6c3",
+                        "on-primary": "#ffffff",
+                        "surface-tint": "#5f5e5e",
+                        "on-tertiary": "#ffffff",
+                        "outline": "#747878"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "container-max": "1440px",
+                        "gutter": "24px",
+                        "stack-md": "16px",
+                        "stack-sm": "8px",
+                        "section-gap": "120px",
+                        "margin-mobile": "20px",
+                        "stack-lg": "32px",
+                        "margin-desktop": "64px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "caption": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "display-hero": ["Bodoni Moda"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+                        "caption": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+                        "display-hero": ["80px", { "lineHeight": "96px", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "0em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface font-body-md antialiased selection:bg-primary selection:text-on-primary min-h-screen flex flex-col">
+<!-- TopNavBar (Semantic Shell) -->
+<header class="bg-surface/80 dark:bg-surface/80 backdrop-blur-md sticky top-0 z-50 border-b border-outline-variant w-full">
+<div class="flex justify-between items-center w-full px-margin-desktop py-4 max-w-container-max mx-auto">
+<a class="font-headline-md text-headline-md tracking-tighter text-primary" href="/">SCENTLAB</a>
+<nav class="hidden md:flex gap-gutter items-center">
+<a class="font-label-caps text-label-caps text-secondary p-2 hover:text-primary transition-colors duration-200" href="/shop?category=fragrances">Fragrances</a>
+<a class="font-label-caps text-label-caps text-secondary p-2 hover:text-primary transition-colors duration-200" href="/shop?category=packaging">Packaging</a>
+<a class="font-label-caps text-label-caps text-secondary p-2 hover:text-primary transition-colors duration-200" href="/shop?category=bottles">Bottles</a>
+<a class="font-label-caps text-label-caps text-secondary p-2 hover:text-primary transition-colors duration-200" href="/shop?category=custom-labels">Custom Labels</a>
+<a class="font-label-caps text-label-caps text-secondary p-2 hover:text-primary transition-colors duration-200" href="/shop?category=supplies">Supplies</a>
+<a class="font-label-caps text-label-caps text-primary border-b border-primary pb-1" href="/shop">Wholesale</a>
+</nav>
+<div class="flex items-center gap-4 text-primary">
+<button aria-label="Search" class="hover:opacity-80 transition-opacity"><span class="material-symbols-outlined" data-icon="search">search</span></button>
+<button aria-label="Account" class="hover:opacity-80 transition-opacity"><span class="material-symbols-outlined" data-icon="person">person</span></button>
+<button aria-label="Cart" class="hover:opacity-80 transition-opacity"><span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span></button>
+</div>
+</div>
+</header>
+<main class="flex-grow">
+<!-- Shop Header -->
+<section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-section-gap flex flex-col items-center text-center">
+<h1 class="font-display-hero text-display-hero text-primary mb-stack-lg uppercase tracking-tighter">SHOP PRODUCTS</h1>
+<p class="font-body-lg text-body-lg text-secondary max-w-2xl">
+                Curated essentials for the modern atelier. Explore our premium selection of raw materials, clinical-grade packaging, and wholesale supplies sourced for uncompromising quality and precision.
+            </p>
+</section>
+<!-- Shop Layout -->
+<section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pb-section-gap grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Sidebar Filters -->
+<aside class="md:col-span-3 hidden md:flex flex-col gap-stack-lg border-r border-outline-variant pr-gutter">
+<div class="flex items-center justify-between border-b border-outline-variant pb-stack-sm mb-stack-sm">
+<span class="font-label-caps text-label-caps text-primary">FILTERS</span>
+<button class="text-secondary hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">tune</span></button>
+</div>
+<div class="flex flex-col gap-stack-sm">
+<h3 class="font-label-caps text-label-caps text-primary mb-2">CATEGORY</h3>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="form-checkbox h-4 w-4 text-primary border-outline rounded-sm focus:ring-primary focus:ring-offset-surface" type="checkbox"/>
+<span class="font-body-md text-body-md text-secondary group-hover:text-primary transition-colors">Fragrances (24)</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="form-checkbox h-4 w-4 text-primary border-outline rounded-sm focus:ring-primary focus:ring-offset-surface" type="checkbox"/>
+<span class="font-body-md text-body-md text-secondary group-hover:text-primary transition-colors">Bottles (18)</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="form-checkbox h-4 w-4 text-primary border-outline rounded-sm focus:ring-primary focus:ring-offset-surface" type="checkbox"/>
+<span class="font-body-md text-body-md text-secondary group-hover:text-primary transition-colors">Packaging (12)</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="form-checkbox h-4 w-4 text-primary border-outline rounded-sm focus:ring-primary focus:ring-offset-surface" type="checkbox"/>
+<span class="font-body-md text-body-md text-secondary group-hover:text-primary transition-colors">Supplies (45)</span>
+</label>
+</div>
+</aside>
+<!-- Product Grid Area -->
+<div class="md:col-span-9 flex flex-col gap-stack-lg">
+<!-- Sort & Controls -->
+<div class="flex justify-between items-center border-b border-outline-variant pb-stack-sm">
+<span class="font-body-md text-body-md text-secondary">Showing 1-12 of 156 Products</span>
+<div class="relative inline-block text-left">
+<select class="form-select block w-full pl-3 pr-10 py-2 text-base border-outline-variant focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-none bg-surface text-primary font-body-md cursor-pointer appearance-none">
+<option>Recommended</option>
+<option>Newest Arrivals</option>
+<option>Price: Low to High</option>
+<option>Price: High to Low</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-primary">
+<span class="material-symbols-outlined text-[20px]">expand_more</span>
+</div>
+</div>
+</div>
+<!-- 4 Column Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-gutter gap-y-stack-lg">
+<!-- Product Card 1 -->
+<article class="group flex flex-col gap-stack-sm cursor-pointer">
+<div class="relative w-full aspect-[4/5] bg-surface-container-low overflow-hidden rounded max-w-full">
+<img alt="Amber Dropper Bottle" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="A pristine, minimalist studio shot of a sleek amber glass apothecary bottle with a matte black dropper cap. The bottle is empty and clean, resting on a stark white clinical background with soft, diffused lighting. The image embodies a modern, luxury laboratory aesthetic, focusing on the high-quality materials and simple geometric form." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdbVz7-VeObBSlcydMcpdE656J2y5FeyLxouS4H2t0N4DQN1VpxfQZnqQLJ9q1CMUCmL8YGyugO749pXHfpTW3ppe5CrCETGpJp0XcCXk5FEdS0BoBVJcVUwSMAeuyL6b0DJTeDdBMGKv6i4e4v7zrXwgVoXnKBppeDMrflGEhy5ROJ-bwBe3Q7O8T0gBHlTSkKtbHIRg0PIzGrMrX-lRY2t7Y5qVOGCDF158MJ7G-QXamqO-n45BnTA"/>
+<div class="absolute top-2 left-2 bg-primary text-on-primary px-2 py-1 font-label-caps text-[10px] tracking-wider uppercase">New</div>
+</div>
+<div class="flex flex-col">
+<h3 class="font-body-md text-body-md text-primary truncate">Amber Dropper Bottle - 30ml</h3>
+<span class="font-body-md text-body-md text-secondary">$1.20 / unit</span>
+</div>
+</article>
+<!-- Product Card 2 -->
+<article class="group flex flex-col gap-stack-sm cursor-pointer">
+<div class="relative w-full aspect-[4/5] bg-surface-container-low overflow-hidden rounded max-w-full">
+<img alt="White Cylinder Packaging" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="A minimalist flat lay photograph featuring pristine white cylindrical cardboard packaging tubes on a soft off-white surface. The tubes are unbranded, highlighting their clean lines and matte texture. The lighting is bright and even, casting subtle shadows that emphasize depth while maintaining a stark, modern, and clinical aesthetic suitable for luxury goods." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxekq7DsvJCU7D611_FOCBWQYgYWQoXY6TNqTy6VGaU3BD6ykSgvZzejR7scM7vJ1iYZR2JTotSa6pLTq_qkvmd_Z6T9Kpm3_RznkabQ-6ietCqPIdFFQLcPaYfhieo8_a70F-zEakeBGntYb6K9NBXQVqU-_9vU_4EgkS0UVExgCqCqV-bXS0rgQWUmnv8hUrkkVV2OJy72JLjY72PZu5NvgbYay_oe1wjB-Es4Ee4tSol3BeklggwA"/>
+</div>
+<div class="flex flex-col">
+<h3 class="font-body-md text-body-md text-primary truncate">Matte White Cylinder Tube</h3>
+<span class="font-body-md text-body-md text-secondary">$2.50 / unit</span>
+</div>
+</article>
+<!-- Product Card 3 -->
+<article class="group flex flex-col gap-stack-sm cursor-pointer">
+<div class="relative w-full aspect-[4/5] bg-surface-container-low overflow-hidden rounded max-w-full">
+<img alt="Textured Custom Labels" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="A close-up, high-end editorial shot of thick, textured white custom labels resting on a brushed stainless steel table. The image focuses on the tactile quality of the paper stock. The lighting is crisp and cool, reflecting an industrial yet refined laboratory environment. The composition is highly structured and minimalist." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFe5-vyPwUNcFdPkW-7CkQC6A98d-mfzlp9iQc1zMoJguSoPFSzAny1SnHGtN0vYgSOzFBvfvZXDCLTjxR-b0irTC8wo6-OO9rH7XOp7ky5PsUxw_axBF5wQX2ftr6THZ9Px9QSQGwdJn3Hnez4riw2_aZ3Tc_u44mY6uy_h-B4a9h2o6_tArLNfPcvmP773LTbmg3zRysHHNEePGrwxSI_yhzyDfBCE7wUzXSwx-2wD71OdkBEzyRLA"/>
+</div>
+<div class="flex flex-col">
+<h3 class="font-body-md text-body-md text-primary truncate">Textured Archival Labels</h3>
+<span class="font-body-md text-body-md text-secondary">$0.15 / unit</span>
+</div>
+</article>
+<!-- Product Card 4 -->
+<article class="group flex flex-col gap-stack-sm cursor-pointer">
+<div class="relative w-full aspect-[4/5] bg-surface-container-low overflow-hidden rounded max-w-full">
+<img alt="Clear Glass Perfume Bottle" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="A sophisticated still life featuring a heavy-bottomed, clear glass perfume bottle with a minimalist silver atomizer. The bottle is partially filled with a pale golden liquid, catching bright, clean light against a stark white background. The aesthetic is extremely polished, evoking high-end cosmetics and clinical precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuABTuFl3OU1wZxwKmx8ERJWx8DGuq_qZmshIXkByvHSQ4BLcxHpx65PEKCACdtOUnwnGKsJb1yuw841qelUQqJgBQLneLJ_W_hJnXRu1n6Z-w9LjnUTaVmWdTSokLBdN1ioaOQwGobaJEOau25S6MI5-aBABtHrQrmwi2BmJpZUCjSYCnJN8wu0PAnxND_--JpzZNL32xA0elFEXQHsoYi4KLQ4UpTbpK7qd7RIlW8miAWwgJi1TI3TpQ"/>
+</div>
+<div class="flex flex-col">
+<h3 class="font-body-md text-body-md text-primary truncate">Heavy Base Atomizer - 50ml</h3>
+<span class="font-body-md text-body-md text-secondary">$3.80 / unit</span>
+</div>
+</article>
+<!-- Product Card 5 -->
+<article class="group flex flex-col gap-stack-sm cursor-pointer">
+<div class="relative w-full aspect-[4/5] bg-surface-container-low overflow-hidden rounded max-w-full">
+<div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500 ease-out rounded" data-alt="A sleek, modern aluminum essential oil canister standing upright on a minimalist concrete plinth. The metallic surface reflects soft, diffused light, highlighting its industrial yet premium finish. The background is a stark, clean white, emphasizing the 'Modern Atelier' and clinical aesthetic of the fragrance supply brand." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDgIxYXqLHRrt-PRmdZ1UoO_z10Mb4XSGj4bJASN20jwjWwkGUiBXbjGoGHwHA5CPQuNXa2rN6q0NNXnuKCQNhXYUR2LCT6IOSYLW89K35Q1V9fT3l60NHh-NGYaNJXg7cRboNCZ0urqqctdYyCuwvrbkP9PHwD-91v45Q6VAyanllztSCtnXFFBYNESRbH49Jxbmvx-6bipaRfJGrTpGYDyvDYjI6_HeVLbsh-Vb5JQa-2XjWK6m5XjA')"></div>
+</div>
+<div class="flex flex-col">
+<h3 class="font-body-md text-body-md text-primary truncate">Aluminum Storage Canister</h3>
+<span class="font-body-md text-body-md text-secondary">$5.00 / unit</span>
+</div>
+</article>
+</div>
+<!-- Pagination (Simple Load More for modern feel) -->
+<div class="flex justify-center mt-stack-lg border-t border-outline-variant pt-stack-lg">
+<button class="bg-primary text-on-primary px-8 py-3 font-label-caps text-label-caps uppercase tracking-widest hover:bg-surface-tint transition-colors rounded-none">Load More</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer (Semantic Shell) -->
+<footer class="bg-surface-container text-on-surface w-full mt-auto">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-stack-lg px-margin-mobile md:px-margin-desktop py-section-gap max-w-container-max mx-auto">
+<div class="col-span-1 md:col-span-1 flex flex-col gap-stack-sm">
+<span class="font-headline-md text-headline-md text-primary mb-stack-sm">SCENTLAB</span>
+<p class="font-body-md text-body-md text-secondary max-w-xs">Elevating the standards of fragrance formulation and supply.</p>
+</div>
+<div class="col-span-1 flex flex-col gap-stack-sm">
+<span class="font-label-caps text-label-caps text-primary mb-stack-sm">Explore</span>
+<a class="font-body-md text-body-md text-secondary hover:underline underline-offset-4 transition-opacity duration-300" href="/shop">Shop</a>
+<a class="font-body-md text-body-md text-secondary hover:underline underline-offset-4 transition-opacity duration-300" href="/company">Company</a>
+</div>
+<div class="col-span-1 flex flex-col gap-stack-sm">
+<span class="font-label-caps text-label-caps text-primary mb-stack-sm">Support</span>
+<a class="font-body-md text-body-md text-secondary hover:underline underline-offset-4 transition-opacity duration-300" href="/account">Account</a>
+<a class="font-body-md text-body-md text-secondary hover:underline underline-offset-4 transition-opacity duration-300" href="/help">Help</a>
+</div>
+<div class="col-span-1 flex flex-col gap-stack-sm">
+<span class="font-label-caps text-label-caps text-primary mb-stack-sm">Legal</span>
+<a class="font-body-md text-body-md text-secondary hover:underline underline-offset-4 transition-opacity duration-300" href="/privacy-policy">Privacy Policy</a>
+<a class="font-body-md text-body-md text-secondary hover:underline underline-offset-4 transition-opacity duration-300" href="/terms-of-service">Terms of Service</a>
+</div>
+<div class="col-span-1 md:col-span-4 border-t border-outline-variant pt-stack-lg mt-stack-md flex justify-between items-center">
+<span class="font-caption text-caption text-secondary">© 2024 SCENTLAB WHOLESALE. ALL RIGHTS RESERVED.</span>
+</div>
+</div>
+</footer>
+</body></html>

@@ -67,12 +67,23 @@ export interface CartItem {
     name: string;
     sku: string;
   };
-  customLabelConfigurationId?: string;
   customLabelSpecs?: {
-    bottleName: string;
+    bottleName?: string;
+    dimensions?: string;
+    material?: string;
+    customText?: string;
+    product?: string;
+    size?: string;
+    finish?: string;
+    quantity?: number;
+    unitPrice?: number;
+    total?: number;
+    designFile?: string;
+  };
+  customBoxSpecs?: {
     dimensions: string;
     material: string;
-    customText?: string;
+    quantity: number;
   };
 }
 

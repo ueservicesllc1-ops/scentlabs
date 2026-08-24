@@ -1,0 +1,454 @@
+{
+  "run": {
+    "runId": "run_1787529782522",
+    "startedAt": "2026-08-24T00:03:02.522Z",
+    "status": "completed",
+    "productsDiscovered": 15,
+    "productsCreated": 15,
+    "productsUpdated": 0,
+    "duplicates": 0,
+    "errors": 0,
+    "imagesFound": 15,
+    "imagesUploaded": 15,
+    "imagesFailed": 0,
+    "priceChanges": 0,
+    "lastProcessedPage": 1
+  },
+  "products": [
+    {
+      "id": "ref_133919",
+      "source": "FragranceNet",
+      "sourceProductId": "133919",
+      "sourceUrl": "https://www.fragrancenet.com/cologne/dolce-and-gabbana/light-blue",
+      "brand": "Dolce & Gabbana",
+      "name": "Light Blue Eau de Toilette",
+      "fullName": "Dolce & Gabbana Light Blue",
+      "productType": "finished_perfume",
+      "category": "finished_perfumes",
+      "gender": "Women",
+      "concentration": "EDT",
+      "images": [
+        {
+          "type": "reference",
+          "sourceImageUrl": "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=600&auto=format&fit=crop&q=80",
+          "b2Path": "",
+          "b2Url": "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=600&auto=format&fit=crop&q=80",
+          "uploadedToB2": true,
+          "uploadedAt": "2026-08-24T00:03:02.561Z"
+        }
+      ],
+      "variants": [{ "id": "var_133919", "size": "3.4 oz", "sourcePrice": 62.99, "sourceAvailability": true }],
+      "sourceAvailable": true,
+      "lastCheckedAt": "2026-08-24T00:03:02.561Z",
+      "importedAt": "2026-08-24T00:03:02.561Z",
+      "updatedAt": "2026-08-24T00:03:02.561Z",
+      "addedToCatalog": false
+    },
+    {
+      "id": "ref_118335",
+      "source": "FragranceNet",
+      "sourceProductId": "118335",
+      "sourceUrl": "https://www.fragrancenet.com/cologne/versace/bright-crystal",
+      "brand": "Versace",
+      "name": "Bright Crystal",
+      "fullName": "Versace Bright Crystal",
+      "productType": "finished_perfume",
+      "category": "finished_perfumes",
+      "gender": "Women",
+      "concentration": "EDT",
+      "images": [
+        {
+          "type": "reference",
+          "sourceImageUrl": "https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?w=600&auto=format&fit=crop&q=80",
+          "b2Path": "",
+          "b2Url": "https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?w=600&auto=format&fit=crop&q=80",
+          "uploadedToB2": true,
+          "uploadedAt": "2026-08-24T00:03:02.562Z"
+        }
+      ],
+      "variants": [{ "id": "var_118335", "size": "3.0 oz", "sourcePrice": 54.99, "sourceAvailability": true }],
+      "sourceAvailable": true,
+      "lastCheckedAt": "2026-08-24T00:03:02.562Z",
+      "importedAt": "2026-08-24T00:03:02.562Z",
+      "updatedAt": "2026-08-24T00:03:02.562Z",
+      "addedToCatalog": false
+    },
+    {
+      "id": "ref_286701",
+      "source": "FragranceNet",
+      "sourceProductId": "286701",
+      "sourceUrl": "https://www.fragrancenet.com/cologne/creed/aventus",
+      "brand": "Creed",
+      "name": "Aventus Millesime",
+      "fullName": "Creed Aventus",
+      "productType": "finished_perfume",
+      "category": "finished_perfumes",
+      "gender": "Men",
+      "concentration": "EDP",
+      "images": [
+        {
+          "type": "reference",
+          "sourceImageUrl": "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=600&auto=format&fit=crop&q=80",
+          "b2Path": "",
+          "b2Url": "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=600&auto=format&fit=crop&q=80",
+          "uploadedToB2": true,
+          "uploadedAt": "2026-08-24T00:03:02.563Z"
+        }
+      ],
+      "variants": [{ "id": "var_286701", "size": "3.3 oz", "sourcePrice": 329.99, "sourceAvailability": true }],
+      "sourceAvailable": true,
+      "lastCheckedAt": "2026-08-24T00:03:02.563Z",
+      "importedAt": "2026-08-24T00:03:02.563Z",
+      "updatedAt": "2026-08-24T00:03:02.563Z",
+      "addedToCatalog": false
+    },
+    {
+      "id": "ref_235282",
+      "source": "FragranceNet",
+      "sourceProductId": "235282",
+      "sourceUrl": "https://www.fragrancenet.com/cologne/yves-saint-laurent/black-opium",
+      "brand": "Yves Saint Laurent",
+      "name": "Black Opium",
+      "fullName": "Yves Saint Laurent Black Opium",
+      "productType": "finished_perfume",
+      "category": "finished_perfumes",
+      "gender": "Women",
+      "concentration": "EDP",
+      "images": [
+        {
+          "type": "reference",
+          "sourceImageUrl": "https://images.unsplash.com/photo-1541643600914-78b084683601?w=600&auto=format&fit=crop&q=80",
+          "b2Path": "",
+          "b2Url": "https://images.unsplash.com/photo-1541643600914-78b084683601?w=600&auto=format&fit=crop&q=80",
+          "uploadedToB2": true,
+          "uploadedAt": "2026-08-24T00:03:02.564Z"
+        }
+      ],
+      "variants": [{ "id": "var_235282", "size": "3.0 oz", "sourcePrice": 99.99, "sourceAvailability": true }],
+      "sourceAvailable": true,
+      "lastCheckedAt": "2026-08-24T00:03:02.564Z",
+      "importedAt": "2026-08-24T00:03:02.564Z",
+      "updatedAt": "2026-08-24T00:03:02.564Z",
+      "addedToCatalog": false
+    },
+    {
+      "id": "ref_124614",
+      "source": "FragranceNet",
+      "sourceProductId": "124614",
+      "sourceUrl": "https://www.fragrancenet.com/cologne/giorgio-armani/acqua-di-gio",
+      "brand": "Giorgio Armani",
+      "name": "Acqua Di Gio",
+      "fullName": "Giorgio Armani Acqua Di Gio",
+      "productType": "finished_perfume",
+      "category": "finished_perfumes",
+      "gender": "Men",
+      "concentration": "EDT",
+      "images": [
+        {
+          "type": "reference",
+          "sourceImageUrl": "https://images.unsplash.com/photo-1615397349754-cfa2066a298e?w=600&auto=format&fit=crop&q=80",
+          "b2Path": "",
+          "b2Url": "https://images.unsplash.com/photo-1615397349754-cfa2066a298e?w=600&auto=format&fit=crop&q=80",
+          "uploadedToB2": true,
+          "uploadedAt": "2026-08-24T00:03:02.565Z"
+        }
+      ],
+      "variants": [{ "id": "var_124614", "size": "3.4 oz", "sourcePrice": 74.99, "sourceAvailability": true }],
+      "sourceAvailable": true,
+      "lastCheckedAt": "2026-08-24T00:03:02.565Z",
+      "importedAt": "2026-08-24T00:03:02.565Z",
+      "updatedAt": "2026-08-24T00:03:02.565Z",
+      "addedToCatalog": false
+    },
+    {
+      "id": "ref_302484",
+      "source": "FragranceNet",
+      "sourceProductId": "302484",
+      "sourceUrl": "https://www.fragrancenet.com/cologne/baccarat/rouge-540",
+      "brand": "Maison Francis Kurkdjian",
+      "name": "Baccarat Rouge 540",
+      "fullName": "Baccarat Rouge 540",
+      "productType": "finished_perfume",
+      "category": "finished_perfumes",
+      "gender": "Unisex",
+      "concentration": "Extrait",
+      "images": [
+        {
+          "type": "reference",
+          "sourceImageUrl": "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&auto=format&fit=crop&q=80",
+          "b2Path": "",
+          "b2Url": "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&auto=format&fit=crop&q=80",
+          "uploadedToB2": true,
+          "uploadedAt": "2026-08-24T00:03:02.566Z"
+        }
+      ],
+      "variants": [{ "id": "var_302484", "size": "2.4 oz", "sourcePrice": 295.99, "sourceAvailability": true }],
+      "sourceAvailable": true,
+      "lastCheckedAt": "2026-08-24T00:03:02.566Z",
+      "importedAt": "2026-08-24T00:03:02.566Z",
+      "updatedAt": "2026-08-24T00:03:02.566Z",
+      "addedToCatalog": false
+    },
+    {
+      "id": "ref_289354",
+      "source": "FragranceNet",
+      "sourceProductId": "289354",
+      "sourceUrl": "https://www.fragrancenet.com/cologne/carolina-herrera/good-girl",
+      "brand": "Carolina Herrera",
+      "name": "Good Girl",
+      "fullName": "Carolina Herrera Good Girl",
+      "productType": "finished_perfume",
+      "category": "finished_perfumes",
+      "gender": "Women",
+      "concentration": "EDP",
+      "images": [
+        {
+          "type": "reference",
+          "sourceImageUrl": "https://images.unsplash.com/photo-1547887537-6158d64c35b3?w=600&auto=format&fit=crop&q=80",
+          "b2Path": "",
+          "b2Url": "https://images.unsplash.com/photo-1547887537-6158d64c35b3?w=600&auto=format&fit=crop&q=80",
+          "uploadedToB2": true,
+          "uploadedAt": "2026-08-24T00:03:02.567Z"
+        }
+      ],
+      "variants": [{ "id": "var_289354", "size": "2.7 oz", "sourcePrice": 110.99, "sourceAvailability": true }],
+      "sourceAvailable": true,
+      "lastCheckedAt": "2026-08-24T00:03:02.567Z",
+      "importedAt": "2026-08-24T00:03:02.567Z",
+      "updatedAt": "2026-08-24T00:03:02.567Z",
+      "addedToCatalog": false
+    },
+    {
+      "id": "ref_253147",
+      "source": "FragranceNet",
+      "sourceProductId": "253147",
+      "sourceUrl": "https://www.fragrancenet.com/cologne/tom-ford/tobacco-vanille",
+      "brand": "Tom Ford",
+      "name": "Tobacco Vanille Private Blend",
+      "fullName": "Tom Ford Tobacco Vanille",
+      "productType": "finished_perfume",
+      "category": "finished_perfumes",
+      "gender": "Unisex",
+      "concentration": "EDP",
+      "images": [
+        {
+          "type": "reference",
+          "sourceImageUrl": "https://images.unsplash.com/photo-1583445013765-46c20c4a6772?w=600&auto=format&fit=crop&q=80",
+          "b2Path": "",
+          "b2Url": "https://images.unsplash.com/photo-1583445013765-46c20c4a6772?w=600&auto=format&fit=crop&q=80",
+          "uploadedToB2": true,
+          "uploadedAt": "2026-08-24T00:03:02.568Z"
+        }
+      ],
+      "variants": [{ "id": "var_253147", "size": "3.4 oz", "sourcePrice": 245.99, "sourceAvailability": true }],
+      "sourceAvailable": true,
+      "lastCheckedAt": "2026-08-24T00:03:02.568Z",
+      "importedAt": "2026-08-24T00:03:02.568Z",
+      "updatedAt": "2026-08-24T00:03:02.568Z",
+      "addedToCatalog": false
+    },
+    {
+      "id": "ref_158588",
+      "source": "FragranceNet",
+      "sourceProductId": "158588",
+      "sourceUrl": "https://www.fragrancenet.com/cologne/chanel/bleu-de-chanel",
+      "brand": "Chanel",
+      "name": "Bleu de Chanel",
+      "fullName": "Chanel Bleu de Chanel",
+      "productType": "finished_perfume",
+      "category": "finished_perfumes",
+      "gender": "Men",
+      "concentration": "Parfum",
+      "images": [
+        {
+          "type": "reference",
+          "sourceImageUrl": "https://images.unsplash.com/photo-1528740561666-dc2479dc08ab?w=600&auto=format&fit=crop&q=80",
+          "b2Path": "",
+          "b2Url": "https://images.unsplash.com/photo-1528740561666-dc2479dc08ab?w=600&auto=format&fit=crop&q=80",
+          "uploadedToB2": true,
+          "uploadedAt": "2026-08-24T00:03:02.569Z"
+        }
+      ],
+      "variants": [{ "id": "var_158588", "size": "3.4 oz", "sourcePrice": 145.00, "sourceAvailability": true }],
+      "sourceAvailable": true,
+      "lastCheckedAt": "2026-08-24T00:03:02.569Z",
+      "importedAt": "2026-08-24T00:03:02.569Z",
+      "updatedAt": "2026-08-24T00:03:02.569Z",
+      "addedToCatalog": false
+    },
+    {
+      "id": "ref_115206",
+      "source": "FragranceNet",
+      "sourceProductId": "115206",
+      "sourceUrl": "https://www.fragrancenet.com/cologne/dior/sauvage",
+      "brand": "Dior",
+      "name": "Sauvage Eau de Parfum",
+      "fullName": "Dior Sauvage",
+      "productType": "finished_perfume",
+      "category": "finished_perfumes",
+      "gender": "Men",
+      "concentration": "EDP",
+      "images": [
+        {
+          "type": "reference",
+          "sourceImageUrl": "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=600&auto=format&fit=crop&q=80",
+          "b2Path": "",
+          "b2Url": "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=600&auto=format&fit=crop&q=80",
+          "uploadedToB2": true,
+          "uploadedAt": "2026-08-24T00:03:02.570Z"
+        }
+      ],
+      "variants": [{ "id": "var_115206", "size": "3.4 oz", "sourcePrice": 115.99, "sourceAvailability": true }],
+      "sourceAvailable": true,
+      "lastCheckedAt": "2026-08-24T00:03:02.570Z",
+      "importedAt": "2026-08-24T00:03:02.570Z",
+      "updatedAt": "2026-08-24T00:03:02.570Z",
+      "addedToCatalog": false
+    },
+    {
+      "id": "ref_243302",
+      "source": "FragranceNet",
+      "sourceProductId": "243302",
+      "sourceUrl": "https://www.fragrancenet.com/cologne/maison-margiela/jazz-club",
+      "brand": "Maison Margiela",
+      "name": "Replica Jazz Club",
+      "fullName": "Maison Margiela Jazz Club",
+      "productType": "finished_perfume",
+      "category": "finished_perfumes",
+      "gender": "Unisex",
+      "concentration": "EDT",
+      "images": [
+        {
+          "type": "reference",
+          "sourceImageUrl": "https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?w=600&auto=format&fit=crop&q=80",
+          "b2Path": "",
+          "b2Url": "https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?w=600&auto=format&fit=crop&q=80",
+          "uploadedToB2": true,
+          "uploadedAt": "2026-08-24T00:03:02.571Z"
+        }
+      ],
+      "variants": [{ "id": "var_243302", "size": "3.4 oz", "sourcePrice": 135.00, "sourceAvailability": true }],
+      "sourceAvailable": true,
+      "lastCheckedAt": "2026-08-24T00:03:02.571Z",
+      "importedAt": "2026-08-24T00:03:02.571Z",
+      "updatedAt": "2026-08-24T00:03:02.571Z",
+      "addedToCatalog": false
+    },
+    {
+      "id": "ref_210515",
+      "source": "FragranceNet",
+      "sourceProductId": "210515",
+      "sourceUrl": "https://www.fragrancenet.com/cologne/viktor-and-rolf/flowerbomb",
+      "brand": "Viktor & Rolf",
+      "name": "Flowerbomb",
+      "fullName": "Viktor & Rolf Flowerbomb",
+      "productType": "finished_perfume",
+      "category": "finished_perfumes",
+      "gender": "Women",
+      "concentration": "EDP",
+      "images": [
+        {
+          "type": "reference",
+          "sourceImageUrl": "https://images.unsplash.com/photo-1541643600914-78b084683601?w=600&auto=format&fit=crop&q=80",
+          "b2Path": "",
+          "b2Url": "https://images.unsplash.com/photo-1541643600914-78b084683601?w=600&auto=format&fit=crop&q=80",
+          "uploadedToB2": true,
+          "uploadedAt": "2026-08-24T00:03:02.572Z"
+        }
+      ],
+      "variants": [{ "id": "var_210515", "size": "3.4 oz", "sourcePrice": 95.99, "sourceAvailability": true }],
+      "sourceAvailable": true,
+      "lastCheckedAt": "2026-08-24T00:03:02.572Z",
+      "importedAt": "2026-08-24T00:03:02.572Z",
+      "updatedAt": "2026-08-24T00:03:02.572Z",
+      "addedToCatalog": false
+    },
+    {
+      "id": "ref_202353",
+      "source": "FragranceNet",
+      "sourceProductId": "202353",
+      "sourceUrl": "https://www.fragrancenet.com/cologne/prada/prada-candy",
+      "brand": "Prada",
+      "name": "Prada Candy",
+      "fullName": "Prada Prada Candy",
+      "productType": "finished_perfume",
+      "category": "finished_perfumes",
+      "gender": "Women",
+      "concentration": "EDP",
+      "images": [
+        {
+          "type": "reference",
+          "sourceImageUrl": "https://images.unsplash.com/photo-1547887537-6158d64c35b3?w=600&auto=format&fit=crop&q=80",
+          "b2Path": "",
+          "b2Url": "https://images.unsplash.com/photo-1547887537-6158d64c35b3?w=600&auto=format&fit=crop&q=80",
+          "uploadedToB2": true,
+          "uploadedAt": "2026-08-24T00:03:02.573Z"
+        }
+      ],
+      "variants": [{ "id": "var_202353", "size": "2.7 oz", "sourcePrice": 75.99, "sourceAvailability": true }],
+      "sourceAvailable": true,
+      "lastCheckedAt": "2026-08-24T00:03:02.573Z",
+      "importedAt": "2026-08-24T00:03:02.573Z",
+      "updatedAt": "2026-08-24T00:03:02.573Z",
+      "addedToCatalog": false
+    },
+    {
+      "id": "ref_313174",
+      "source": "FragranceNet",
+      "sourceProductId": "313174",
+      "sourceUrl": "https://www.fragrancenet.com/cologne/parfums-de-marly/delina",
+      "brand": "Parfums de Marly",
+      "name": "Delina Royal Essence",
+      "fullName": "Parfums de Marly Delina",
+      "productType": "finished_perfume",
+      "category": "finished_perfumes",
+      "gender": "Women",
+      "concentration": "EDP",
+      "images": [
+        {
+          "type": "reference",
+          "sourceImageUrl": "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&auto=format&fit=crop&q=80",
+          "b2Path": "",
+          "b2Url": "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&auto=format&fit=crop&q=80",
+          "uploadedToB2": true,
+          "uploadedAt": "2026-08-24T00:03:02.574Z"
+        }
+      ],
+      "variants": [{ "id": "var_313174", "size": "2.5 oz", "sourcePrice": 260.99, "sourceAvailability": true }],
+      "sourceAvailable": true,
+      "lastCheckedAt": "2026-08-24T00:03:02.574Z",
+      "importedAt": "2026-08-24T00:03:02.574Z",
+      "updatedAt": "2026-08-24T00:03:02.574Z",
+      "addedToCatalog": false
+    },
+    {
+      "id": "ref_298711",
+      "source": "FragranceNet",
+      "sourceProductId": "298711",
+      "sourceUrl": "https://www.fragrancenet.com/cologne/le-labo/santal-33",
+      "brand": "Le Labo",
+      "name": "Santal 33",
+      "fullName": "Le Labo Santal 33",
+      "productType": "finished_perfume",
+      "category": "finished_perfumes",
+      "gender": "Unisex",
+      "concentration": "EDP",
+      "images": [
+        {
+          "type": "reference",
+          "sourceImageUrl": "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=600&auto=format&fit=crop&q=80",
+          "b2Path": "",
+          "b2Url": "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=600&auto=format&fit=crop&q=80",
+          "uploadedToB2": true,
+          "uploadedAt": "2026-08-24T00:03:02.575Z"
+        }
+      ],
+      "variants": [{ "id": "var_298711", "size": "3.4 oz", "sourcePrice": 195.00, "sourceAvailability": true }],
+      "sourceAvailable": true,
+      "lastCheckedAt": "2026-08-24T00:03:02.575Z",
+      "importedAt": "2026-08-24T00:03:02.575Z",
+      "updatedAt": "2026-08-24T00:03:02.575Z",
+      "addedToCatalog": false
+    }
+  ]
+}

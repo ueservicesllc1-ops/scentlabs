@@ -61,7 +61,7 @@ export const STANDARD_LABEL_SIZES: LabelSize[] = [
   },
   {
     id: "size_1_5x2_25",
-    name: "1.5 x 2.25 in (10ml Roll-On)",
+    name: "1.5 x 2.25 in",
     width: 1.5,
     height: 2.25,
     unit: "in",
@@ -72,7 +72,7 @@ export const STANDARD_LABEL_SIZES: LabelSize[] = [
   },
   {
     id: "size_1_5x2_5",
-    name: "1.5 x 2.5 in",
+    name: "1.5 x 2.5 in (10ml Roll-On)",
     width: 1.5,
     height: 2.5,
     unit: "in",
@@ -174,4 +174,20 @@ export const STANDARD_LABEL_MATERIALS: LabelMaterial[] = [
   },
 ];
 
-export const STANDARD_LABEL_QUANTITIES = [25, 50, 100, 250, 500, 1000];
+// Single source of truth: 25 labels removed. Minimum order quantity is 50.
+export const STANDARD_LABEL_QUANTITIES = [50, 100, 250, 500, 1000];
+
+export interface CustomLabelPricingTier {
+  quantity: number;
+  totalPrice: number;
+  unitPrice: number;
+  active: boolean;
+}
+
+export const OFFICIAL_LABEL_PRICING_TIERS: CustomLabelPricingTier[] = [
+  { quantity: 50, totalPrice: 12.50, unitPrice: 0.25, active: true },
+  { quantity: 100, totalPrice: 22.00, unitPrice: 0.22, active: true },
+  { quantity: 250, totalPrice: 50.00, unitPrice: 0.20, active: true },
+  { quantity: 500, totalPrice: 90.00, unitPrice: 0.18, active: true },
+  { quantity: 1000, totalPrice: 160.00, unitPrice: 0.16, active: true },
+];

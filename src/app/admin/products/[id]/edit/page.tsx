@@ -16,6 +16,7 @@ import {
   Image as ImageIcon,
   DollarSign,
   Boxes,
+  Package,
   Truck,
   Building2,
   Sparkles,
@@ -225,7 +226,7 @@ export default function ProductEditorPage() {
       tiers.push({
         minQuantity: nextMinQty,
         unitPrice: parseFloat((lastPrice * 0.9).toFixed(2)),
-        discountPercent: 10,
+        discountPercentage: 10,
         active: true,
       } as VolumePriceTier);
       return { ...p, volumePricing: tiers };
@@ -523,6 +524,7 @@ export default function ProductEditorPage() {
                     <option value="packaging">Packaging Material</option>
                     <option value="component">Component / Raw Material</option>
                     <option value="service">Service</option>
+                    <option value="finished_perfume">Finished Perfume</option>
                   </select>
                 </div>
               </div>
@@ -676,6 +678,21 @@ export default function ProductEditorPage() {
                     onChange={(e) => updateProduct((p) => ({ ...p, basePrice: parseFloat(e.target.value) || 0 }))}
                     className="w-full text-base font-mono px-4 py-2.5 bg-lab-950 border border-lab-800 rounded-xl text-amber-400 font-bold focus:border-amber-500 focus:outline-none"
                   />
+                  {product.sourcePrice ? (
+                    <div className="mt-3 p-3 bg-blue-900/20 border border-blue-900/40 rounded-xl flex items-center justify-between">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-blue-400 block">Market Reference</span>
+                        <span className="text-sm font-mono text-white">${product.sourcePrice.toFixed(2)}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => updateProduct((p) => ({ ...p, basePrice: p.sourcePrice || 0 }))}
+                        className="text-[10px] font-bold uppercase px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                      >
+                        Use Market Price
+                      </button>
+                    </div>
+                  ) : null}
                 </div>
 
                 <div>
@@ -766,9 +783,9 @@ export default function ProductEditorPage() {
                               type="number"
                               min="0"
                               max="100"
-                              value={tier.discountPercent || ""}
+                              value={tier.discountPercentage || ""}
                               onChange={(e) =>
-                                handleUpdateVolumeTier(idx, "discountPercent", parseFloat(e.target.value) || 0)
+                                handleUpdateVolumeTier(idx, "discountPercentage", parseFloat(e.target.value) || 0)
                               }
                               className="w-20 px-2 py-1 bg-lab-950 border border-lab-800 rounded text-emerald-400"
                             />

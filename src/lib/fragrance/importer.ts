@@ -1,7 +1,11 @@
-import { FragranceOil, VolumeUnit } from "@/types/fragrance";
+import { FragranceOil, VolumeUnit, RepackagingVariant } from "@/types/fragrance";
+import { Product, ProductPackage } from "@/types";
 import { calculateCostPerOz } from "./conversions";
 import { calculateRepackagingCost } from "./pricing";
 import { fragranceRepository } from "../firestore/fragrance";
+import { productRepository } from "../firestore/products";
+import { inventoryRepository } from "../firestore/inventory";
+import { RawAfricaFragrance } from "./africa-imports-scraper";
 
 export interface CsvFragranceRow {
   name: string;
@@ -36,7 +40,6 @@ export function parseCsvContent(csvText: string): CsvFragranceRow[] {
   const rows: CsvFragranceRow[] = [];
 
   for (let i = 1; i < lines.length; i++) {
-    // Regex for CSV columns handling quoted commas
     const cols = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || lines[i].split(",");
     const rowObj: any = {};
 
@@ -62,6 +65,81 @@ export function parseCsvContent(csvText: string): CsvFragranceRow[] {
   }
 
   return rows;
+}
+
+/**
+ * Normalizes SKU for SCENTLAB formatting: SC-FR-{sourceSku}
+ */
+export function generateScentlabSku(sourceSku: string): string {
+  const clean = (sourceSku || "UNK")
+    .toUpperCase()
+    .replace(/[^A-Z0-9_-]/g, "");
+  return `SC-FR-${clean}`;
+}
+
+/**
+ * Calculates SCENTLAB repackaging variants using established 25% target margin formula:
+ * Selling Price = Total Cost / 0.75
+ */
+export function buildScentlabVariants(
+  fragranceId: string,
+  slug: string,
+  sourceSku: string,
+  costPerOz: number
+): RepackagingVariant[] {
+  // Standard APPROVED SCENTLAB customer packaging sizes (1 oz, 2 oz, 4 oz, 8 oz, 16 oz)
+  const sizes = [
+    { size: 1, unit: "oz" as const, label: "1 oz (30 ml)", containerCost: 0.55, labelCost: 0.15 },
+    { size: 2, unit: "oz" as const, label: "2 oz (60 ml)", containerCost: 0.65, labelCost: 0.18 },
+    { size: 4, unit: "oz" as const, label: "4 oz (120 ml)", containerCost: 0.85, labelCost: 0.20 },
+    { size: 8, unit: "oz" as const, label: "8 oz (240 ml)", containerCost: 1.10, labelCost: 0.22 },
+    { size: 16, unit: "oz" as const, label: "16 oz (1 lb)", containerCost: 1.50, labelCost: 0.25 },
+  ];
+
+  return sizes.map((s, idx) => {
+    const rawOilCost = Math.round(costPerOz * s.size * 100) / 100;
+    const laborCost = 0.15;
+    const totalUnitCost = Math.round((rawOilCost + s.containerCost + s.labelCost + laborCost) * 100) / 100;
+
+    // Selling Price = Total Cost ÷ 0.75 (25% margin target)
+    const retailPrice = Math.round((totalUnitCost / 0.75) * 100) / 100;
+    const grossProfit = Math.round((retailPrice - totalUnitCost) * 100) / 100;
+    const marginPercent = Math.round((grossProfit / retailPrice) * 1000) / 10;
+
+    const variantSku = `${generateScentlabSku(sourceSku)}-${s.size >= 1 ? `${s.size}OZ` : "10ML"}`;
+
+    return {
+      id: `var_${fragranceId}_${s.size >= 1 ? `${s.size}oz` : "10ml"}`,
+      fragranceOilId: fragranceId,
+      sellingSize: s.size,
+      sellingUnit: s.unit,
+      sku: variantSku,
+      costBreakdown: {
+        fragranceCost: rawOilCost,
+        bottleCost: s.containerCost,
+        capCost: 0.10,
+        labelCost: s.labelCost,
+        packagingCost: 0.10,
+        laborCost,
+        wasteCost: 0.05,
+        allocatedShippingCost: 0.20,
+        totalCost: totalUnitCost,
+      },
+      unitCost: totalUnitCost,
+      retailPrice,
+      suggestedRetailPrice: retailPrice,
+      grossProfit,
+      marginPercent,
+      volumePricing: [
+        { quantity: 1, price: retailPrice, unitPrice: retailPrice },
+        { quantity: 10, price: Math.round(retailPrice * 0.95 * 10 * 100) / 100, unitPrice: Math.round(retailPrice * 0.95 * 100) / 100 },
+        { quantity: 50, price: Math.round(retailPrice * 0.90 * 50 * 100) / 100, unitPrice: Math.round(retailPrice * 0.90 * 100) / 100 },
+        { quantity: 100, price: Math.round(retailPrice * 0.85 * 100 * 100) / 100, unitPrice: Math.round(retailPrice * 0.85 * 100) / 100 },
+      ],
+      inventoryQuantity: 20, // INITIAL INVENTORY = 20 UNITS PER VARIANT
+      active: true,
+    };
+  });
 }
 
 /**
@@ -98,10 +176,12 @@ export async function validateImportRows(
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
 
-    // Duplicate detection: check by supplierProductId, supplierUrl, or slug
+    const sourceSku = r.supplierProductId || `AI-${i + 1}`;
+
+    // Duplicate detection: check by sourceSku, supplierUrl, or slug
     const duplicate = existingCatalog.find(
       (f) =>
-        (r.supplierProductId && f.supplierProductId === r.supplierProductId) ||
+        (sourceSku && f.supplierProductId === sourceSku) ||
         (r.supplierUrl && f.supplierUrl === r.supplierUrl) ||
         f.slug === slug
     );
@@ -110,10 +190,10 @@ export async function validateImportRows(
       id: duplicate ? duplicate.id : `frag_${Date.now()}_${i}`,
       name: r.name,
       slug,
-      description: r.description || `Pure uncut ${r.name} fragrance oil. Grade-A quality.`,
+      description: r.description || `Grade-A pure concentrated ${r.name} fragrance oil. 100% uncut laboratory formulation.`,
       supplierId,
       supplierName,
-      supplierProductId: r.supplierProductId,
+      supplierProductId: sourceSku,
       supplierUrl: r.supplierUrl,
       category: r.category || "fragrance_oils",
       scentFamily: r.scentFamily || "Woody",
@@ -124,9 +204,9 @@ export async function validateImportRows(
       costPerOz: costCalc.costPerOz,
       costPerMl: costCalc.costPerMl,
       inventoryVolumeOz: sourceSize,
-      status: "active",
-      images: ["/images/products/fragrance-santal.jpg"],
-      primaryImage: "/images/products/fragrance-santal.jpg",
+      status: "draft", // Imported products start in Draft for Admin photo upload & review
+      images: [],
+      primaryImage: "",
     };
 
     previewItems.push({
@@ -140,6 +220,120 @@ export async function validateImportRows(
   }
 
   return previewItems;
+}
+
+/**
+ * Converts RawAfricaFragrance into full SCENTLAB FragranceOil and Product records.
+ */
+export function transformAfricaFragrance(
+  raw: RawAfricaFragrance,
+  index: number
+): { fragrance: FragranceOil; product: Product } {
+  const sourceSku = raw.sku || `AI-${raw.entityId}`;
+  const fragranceId = `frag_${raw.entityId}`;
+  const scentlabSku = generateScentlabSku(sourceSku);
+
+  const slug = raw.name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+
+  // Cost per oz computation
+  const sourceSizeOz = raw.sourceUnit === "lb" ? raw.sourceSize * 16 : raw.sourceSize;
+  const costPerOz = sourceSizeOz > 0 ? Math.round((raw.sourcePrice / sourceSizeOz) * 100) / 100 : 2.5;
+  const costPerMl = Math.round((costPerOz / 29.5735) * 1000) / 1000;
+
+  // Repackaging variants (SCENTLAB 25% target margin)
+  const repackagingVariants = buildScentlabVariants(fragranceId, slug, sourceSku, costPerOz);
+  const baseVariant = repackagingVariants[1] || repackagingVariants[0]; // 1 oz default
+
+  const now = new Date().toISOString();
+
+  const fragrance: FragranceOil = {
+    id: fragranceId,
+    name: raw.name,
+    slug,
+    description: raw.plainTextDescription || `Grade-A pure concentrated ${raw.name} fragrance oil. 100% uncut formulation.`,
+    supplierId: "sup_africa_imports",
+    supplierName: "Africa Imports",
+    supplierProductId: sourceSku,
+    supplierUrl: `https://africaimports.com${raw.path}`,
+    fragranceReference: raw.fragranceReference,
+    category: "fragrance_oils",
+    scentFamily: "Woody",
+    gender: raw.gender.toLowerCase() as any,
+    sourceSize: raw.sourceSize,
+    sourceUnit: raw.sourceUnit as VolumeUnit,
+    sourceCost: raw.sourcePrice,
+    costPerOz,
+    costPerMl,
+    inventoryVolumeOz: sourceSizeOz,
+    status: "draft", // Draft until Admin uploads photos
+    images: [],
+    primaryImage: "",
+    repackagingVariants,
+    targetGrossMargin: 0.25, // 25% Target Margin
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  // Dual Product model for unified storefront catalog
+  const packageOptions: ProductPackage[] = repackagingVariants.map((v) => ({
+    id: `pkg_${v.id}`,
+    name: `${v.sellingSize} ${v.sellingUnit || "oz"} Bottle`,
+    quantity: v.sellingSize,
+    price: v.retailPrice,
+    unitPrice: v.unitCost,
+    isDefault: v.sellingSize === 1,
+  }));
+
+  const product: Product = {
+    id: fragranceId,
+    name: raw.name,
+    slug,
+    sku: scentlabSku,
+    category: "fragrance",
+    subcategory: raw.gender.toLowerCase(),
+    description: fragrance.description,
+    shortDescription: `Pure concentrated ${raw.name} fragrance oil.`,
+    tags: ["fragrance", raw.gender.toLowerCase(), raw.isDesigner ? "designer" : "traditional"],
+    attributes: { gender: raw.gender, fragranceReference: raw.fragranceReference || "" },
+    currency: "USD",
+    hasVariants: true,
+    basePrice: baseVariant.retailPrice,
+    costData: {
+      supplierCost: raw.sourcePrice,
+      supplierQuantity: sourceSizeOz,
+      unitCost: costPerOz,
+      totalUnitCost: baseVariant.unitCost,
+    },
+    packageOptions,
+    volumePricing: [
+      { minQuantity: 1, unitPrice: baseVariant.retailPrice },
+      { minQuantity: 10, unitPrice: Math.round(baseVariant.retailPrice * 0.95 * 100) / 100, discountPercentage: 5 },
+      { minQuantity: 50, unitPrice: Math.round(baseVariant.retailPrice * 0.90 * 100) / 100, discountPercentage: 10 },
+      { minQuantity: 100, unitPrice: Math.round(baseVariant.retailPrice * 0.85 * 100) / 100, discountPercentage: 15 },
+    ],
+    inventory: {
+      quantityInStock: 20 * repackagingVariants.length,
+      reservedQuantity: 0,
+      availableQuantity: 20 * repackagingVariants.length,
+      lowStockThreshold: 10,
+      reorderPoint: 15,
+      status: "in_stock",
+    },
+    supplierId: "sup_africa_imports",
+    supplierName: "Africa Imports",
+    status: "draft", // Initial status Draft
+    featured: false,
+    media: [],
+    discountEligible: true,
+    minimumDiscountMargin: 0.25,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  return { fragrance, product };
 }
 
 /**
@@ -157,39 +351,20 @@ export async function commitImportBatch(
     try {
       const d = item.data;
       const costPerOz = d.costPerOz || 2.0;
+      const sourceSku = d.supplierProductId || "AI-SKU";
+      const fragranceId = d.id as string;
+      const slug = d.slug as string;
 
-      // Build standard selling repackaging variants (1 oz, 2 oz, 4 oz, 8 oz)
-      const variants = [1, 2, 4, 8].map((sizeOz) => {
-        const costBreakdown = calculateRepackagingCost({ costPerOz, sellingSizeOz: sizeOz });
-        const retailPrice = Math.round(costBreakdown.totalCost * 2.1 * 100) / 100;
-        const grossProfit = Math.round((retailPrice - costBreakdown.totalCost) * 100) / 100;
-        const marginPercent = Math.round((grossProfit / retailPrice) * 1000) / 10;
-
-        return {
-          id: `var_${d.id}_${sizeOz}oz`,
-          fragranceOilId: d.id as string,
-          sellingSize: sizeOz,
-          sellingUnit: "oz" as const,
-          sku: `FRAG-${d.slug?.toUpperCase().slice(0, 8)}-${sizeOz}OZ`,
-          costBreakdown,
-          unitCost: costBreakdown.totalCost,
-          retailPrice,
-          suggestedRetailPrice: retailPrice,
-          grossProfit,
-          marginPercent,
-          inventoryQuantity: 20,
-          active: true,
-        };
-      });
+      const variants = buildScentlabVariants(fragranceId, slug, sourceSku, costPerOz);
 
       const fullFragrance: FragranceOil = {
-        id: d.id as string,
+        id: fragranceId,
         name: d.name as string,
-        slug: d.slug as string,
+        slug,
         description: d.description as string,
         supplierId: d.supplierId as string,
         supplierName: d.supplierName,
-        supplierProductId: d.supplierProductId,
+        supplierProductId: sourceSku,
         supplierUrl: d.supplierUrl,
         category: d.category || "fragrance_oils",
         scentFamily: d.scentFamily || "Woody",
@@ -200,16 +375,36 @@ export async function commitImportBatch(
         costPerOz: d.costPerOz as number,
         costPerMl: d.costPerMl as number,
         inventoryVolumeOz: d.inventoryVolumeOz as number,
-        status: "active",
-        images: d.images || ["/images/products/fragrance-santal.jpg"],
-        primaryImage: d.primaryImage || "/images/products/fragrance-santal.jpg",
+        status: "draft",
+        images: d.images || [],
+        primaryImage: d.primaryImage || "",
         repackagingVariants: variants,
-        targetGrossMargin: 0.50,
+        targetGrossMargin: 0.25,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
 
       await fragranceRepository.saveFragrance(fullFragrance);
+
+      // Record initial inventory for each variant
+      for (const v of variants) {
+        await inventoryRepository.recordTransaction({
+          id: `tx_init_${v.id}`,
+          inventoryItemId: v.id,
+          productId: fullFragrance.id,
+          productName: `${fullFragrance.name} (${v.sellingSize} ${v.sellingUnit || "oz"})`,
+          type: "initial_stock",
+          quantity: 20,
+          previousQuantity: 0,
+          newQuantity: 20,
+          referenceType: "manual",
+          reason: "Initial SCENTLAB catalog inventory",
+          createdBy: "System/Admin",
+          createdAt: new Date().toISOString(),
+          notes: "Initial inventory setup per catalog ingestion.",
+        });
+      }
+
       successful++;
     } catch {
       failed++;

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SCENTLAB - Checkout</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Bodoni+Moda:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#f2f1ee",
+                        "on-secondary-fixed": "#1c1b1a",
+                        "on-tertiary-fixed-variant": "#594313",
+                        "surface-container-low": "#f4f3f1",
+                        "primary-fixed": "#e5e2e1",
+                        "on-surface-variant": "#444748",
+                        "on-background": "#1a1c1a",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#c8c6c5",
+                        "on-tertiary-fixed": "#261900",
+                        "surface-dim": "#dbdad7",
+                        "surface-variant": "#e3e2e0",
+                        "secondary-fixed": "#e6e2de",
+                        "tertiary": "#000000",
+                        "surface-bright": "#faf9f6",
+                        "on-surface": "#1a1c1a",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#2f312f",
+                        "error-container": "#ffdad6",
+                        "primary": "#000000",
+                        "on-primary-container": "#858383",
+                        "primary-container": "#1c1b1b",
+                        "surface-container-highest": "#e3e2e0",
+                        "surface-container": "#efeeeb",
+                        "surface-container-high": "#e9e8e5",
+                        "tertiary-fixed-dim": "#e2c286",
+                        "secondary-container": "#e6e2de",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#c4c7c7",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#484644",
+                        "on-primary-fixed-variant": "#474646",
+                        "on-tertiary-container": "#9b804a",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#ffdea1",
+                        "tertiary-container": "#261900",
+                        "secondary": "#605e5c",
+                        "on-primary-fixed": "#1c1b1b",
+                        "on-secondary-container": "#666461",
+                        "inverse-primary": "#c8c6c5",
+                        "background": "#faf9f6",
+                        "surface": "#faf9f6",
+                        "secondary-fixed-dim": "#c9c6c3",
+                        "on-primary": "#ffffff",
+                        "surface-tint": "#5f5e5e",
+                        "on-tertiary": "#ffffff",
+                        "outline": "#747878"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "container-max": "1440px",
+                        "gutter": "24px",
+                        "stack-md": "16px",
+                        "stack-sm": "8px",
+                        "section-gap": "120px",
+                        "margin-mobile": "20px",
+                        "stack-lg": "32px",
+                        "margin-desktop": "64px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "caption": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "display-hero": ["Bodoni Moda"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+                        "caption": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+                        "display-hero": ["80px", { "lineHeight": "96px", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "0em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        .input-minimal {
+            border: none;
+            border-bottom: 1px solid theme('colors.outline-variant');
+            border-radius: 0;
+            background: transparent;
+            padding: 8px 0;
+            font-family: theme('fontFamily.body-md');
+            font-size: 16px;
+        }
+        .input-minimal:focus {
+            outline: none;
+            border-bottom-color: theme('colors.primary');
+            box-shadow: none;
+        }
+        .input-border {
+            border: 1px solid theme('colors.outline-variant');
+            border-radius: theme('borderRadius.DEFAULT');
+            background: transparent;
+            padding: 12px;
+            font-family: theme('fontFamily.body-md');
+            font-size: 16px;
+        }
+        .input-border:focus {
+            outline: none;
+            border-color: theme('colors.primary');
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md antialiased min-h-screen flex flex-col">
+<!-- Minimal Header -->
+<header class="w-full border-b border-outline-variant bg-surface sticky top-0 z-50">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-4 flex justify-between items-center">
+<a class="font-headline-md text-headline-md tracking-tighter text-primary" href="#">SCENTLAB</a>
+<a class="flex items-center gap-2 text-secondary hover:text-primary transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+<span class="font-label-caps text-label-caps">Back to Cart</span>
+</a>
+</div>
+</header>
+<main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-section-gap">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-y-section-gap md:gap-x-margin-desktop">
+<!-- Left Column: Checkout Steps -->
+<div class="md:col-span-7 flex flex-col gap-section-gap">
+<!-- 1. Customer Information -->
+<section>
+<h2 class="font-headline-md text-headline-md mb-stack-lg">1. Customer Information</h2>
+<form class="flex flex-col gap-stack-md">
+<div>
+<label class="block font-label-caps text-label-caps text-secondary mb-1">Email</label>
+<input class="input-border w-full" placeholder="Enter your email address" required="" type="email"/>
+</div>
+<div class="flex items-center gap-2 mt-2">
+<input class="rounded-none border-outline-variant text-primary focus:ring-0 w-4 h-4" id="newsletter" type="checkbox"/>
+<label class="font-caption text-caption text-secondary" for="newsletter">Keep me up to date on news and exclusive offers</label>
+</div>
+</form>
+</section>
+<div class="w-full h-px bg-outline-variant"></div>
+<!-- 2. Shipping Address -->
+<section>
+<h2 class="font-headline-md text-headline-md mb-stack-lg">2. Shipping Address</h2>
+<form class="grid grid-cols-1 sm:grid-cols-2 gap-stack-md">
+<div>
+<label class="block font-label-caps text-label-caps text-secondary mb-1">First Name</label>
+<input class="input-border w-full" required="" type="text"/>
+</div>
+<div>
+<label class="block font-label-caps text-label-caps text-secondary mb-1">Last Name</label>
+<input class="input-border w-full" required="" type="text"/>
+</div>
+<div class="sm:col-span-2 relative">
+<label class="block font-label-caps text-label-caps text-secondary mb-1">Address</label>
+<input class="input-border w-full pr-10" placeholder="Start typing your address..." required="" type="text"/>
+<span class="material-symbols-outlined absolute right-3 top-[34px] text-secondary">location_on</span>
+</div>
+<div class="sm:col-span-2">
+<label class="block font-label-caps text-label-caps text-secondary mb-1">Apartment, suite, etc. (optional)</label>
+<input class="input-border w-full" type="text"/>
+</div>
+<div>
+<label class="block font-label-caps text-label-caps text-secondary mb-1">City</label>
+<input class="input-border w-full" required="" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-stack-md">
+<div>
+<label class="block font-label-caps text-label-caps text-secondary mb-1">State</label>
+<select class="input-border w-full text-secondary" required="">
+<option disabled="" selected="" value="">State</option>
+<option>NY</option>
+<option>CA</option>
+</select>
+</div>
+<div>
+<label class="block font-label-caps text-label-caps text-secondary mb-1">ZIP Code</label>
+<input class="input-border w-full" required="" type="text"/>
+</div>
+</div>
+<div class="sm:col-span-2">
+<label class="block font-label-caps text-label-caps text-secondary mb-1">Phone</label>
+<input class="input-border w-full" required="" type="tel"/>
+</div>
+</form>
+</section>
+<div class="w-full h-px bg-outline-variant"></div>
+<!-- 3. Shipping Method -->
+<section>
+<h2 class="font-headline-md text-headline-md mb-stack-lg">3. Shipping Method</h2>
+<div class="flex flex-col gap-stack-sm border border-outline-variant rounded p-stack-md">
+<label class="flex items-center justify-between cursor-pointer group">
+<div class="flex items-center gap-3">
+<input checked="" class="text-primary border-outline-variant focus:ring-0 w-4 h-4" name="shipping" type="radio"/>
+<span class="font-body-md text-body-md text-primary">USPS Ground Advantage</span>
+</div>
+<span class="font-body-md text-body-md font-medium text-primary">$8.50</span>
+</label>
+<div class="h-px w-full bg-outline-variant my-2"></div>
+<label class="flex items-center justify-between cursor-pointer group">
+<div class="flex items-center gap-3">
+<input class="text-primary border-outline-variant focus:ring-0 w-4 h-4" name="shipping" type="radio"/>
+<span class="font-body-md text-body-md text-primary">UPS 2nd Day Air</span>
+</div>
+<span class="font-body-md text-body-md font-medium text-primary">$24.00</span>
+</label>
+</div>
+</section>
+<div class="w-full h-px bg-outline-variant"></div>
+<!-- 4. Payment -->
+<section>
+<h2 class="font-headline-md text-headline-md mb-stack-lg">4. Payment</h2>
+<div class="border border-outline-variant rounded p-stack-lg bg-surface">
+<div class="flex justify-between items-center mb-stack-md">
+<span class="font-label-caps text-label-caps text-secondary">Credit Card</span>
+<div class="flex gap-2 text-secondary">
+<span class="material-symbols-outlined text-[24px]">credit_card</span>
+</div>
+</div>
+<form class="flex flex-col gap-stack-md">
+<div>
+<input class="input-border w-full" placeholder="Card number" required="" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-stack-md">
+<div>
+<input class="input-border w-full" placeholder="Expiration date (MM / YY)" required="" type="text"/>
+</div>
+<div>
+<input class="input-border w-full" placeholder="Security code" required="" type="text"/>
+</div>
+</div>
+<div>
+<input class="input-border w-full" placeholder="Name on card" required="" type="text"/>
+</div>
+<div class="mt-stack-md">
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded-none border-outline-variant text-primary focus:ring-0 w-4 h-4" type="checkbox"/>
+<span class="font-body-md text-body-md text-primary">Use shipping address as billing address</span>
+</label>
+</div>
+</form>
+</div>
+</section>
+<div class="pt-stack-lg border-t border-outline-variant">
+<button class="w-full bg-primary text-surface py-4 px-8 font-label-caps text-label-caps tracking-widest hover:bg-surface-tint transition-colors">
+                        COMPLETE ORDER
+                    </button>
+<p class="text-center font-caption text-caption text-secondary mt-stack-md flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[16px]">lock</span>
+                        Secure encrypted checkout
+                    </p>
+</div>
+</div>
+<!-- Right Column: Order Summary -->
+<div class="md:col-span-5 relative">
+<div class="sticky top-24 bg-surface-container-low p-stack-lg rounded border border-outline-variant">
+<h2 class="font-headline-md text-headline-md mb-stack-lg">Order Summary</h2>
+<div class="flex flex-col gap-stack-md mb-stack-lg max-h-[409px] overflow-y-auto pr-2">
+<!-- Item 1 -->
+<div class="flex items-start gap-stack-md">
+<div class="relative w-20 h-24 flex-shrink-0 bg-surface-variant">
+<img class="w-full h-full object-cover" data-alt="A minimalist photograph of an elegant, clear glass perfume bottle with a matte black cap, resting on a stark white clinical surface under bright, cool studio lighting, embodying a modern atelier aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQumQH2dEkjM-bZufD6awU3NA1WHPvREM7VEk4xhbLqrjrCFQE7JE5y3CmSpY1GUXACt6HIpHVWEA2QztukIK0wP2Ct6hA7gV6WwFg3mM2h_7gHg6JqvEAUB9x2a41kZDc1u_zkxlwGlyCyZc7XHzT8vOvH-M_gRHEEecFpOYM5OOcc0NY4TzETWbFlB6aTte5oEj2QSfCJl8W3NAtECN3BdAzt5QPSMrjAjZ_-C4GTfNyXVFsSF8pKw"/>
+<span class="absolute -top-2 -right-2 bg-primary text-surface font-caption text-caption w-6 h-6 flex items-center justify-center rounded-full">2</span>
+</div>
+<div class="flex-grow flex flex-col justify-between h-full">
+<div>
+<h3 class="font-body-md text-body-md text-primary">Santal Absolute</h3>
+<p class="font-caption text-caption text-secondary">50ml / Eau de Parfum</p>
+</div>
+<p class="font-body-md text-body-md text-primary font-medium mt-auto">$180.00</p>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex items-start gap-stack-md">
+<div class="relative w-20 h-24 flex-shrink-0 bg-surface-variant">
+<img class="w-full h-full object-cover" data-alt="A detailed close-up shot of a sleek, minimalist amber glass dropper bottle surrounded by negative space on a pale grey surface. The lighting is soft and diffused, highlighting the clean lines of the packaging in a modern, luxury laboratory style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxilVTed1xMTbs2_C4bbK5GuRsDJpzl2BRkHMs7IHoYEfceIzll2EgCl6v4qf0WCx0V_rCo8NjAtm-P9W2KC31hxqgDvzrXMbWz96uC05xH6OCu40JF3cHmg73gA1wPdQSt7vivvxelwbEoKh8vrA-yscndsOeSUd4MEFtO_y9IAWxVha4cDrEcYGS-TDDXSLMA17585E9HJdbH3DGhGe-nxvcP0FwPnLQfAlAmot_WH_yXGZRwC5iuA"/>
+<span class="absolute -top-2 -right-2 bg-primary text-surface font-caption text-caption w-6 h-6 flex items-center justify-center rounded-full">1</span>
+</div>
+<div class="flex-grow flex flex-col justify-between h-full">
+<div>
+<h3 class="font-body-md text-body-md text-primary">Vetiver Root Extract</h3>
+<p class="font-caption text-caption text-secondary">10ml / Pure Essential Oil</p>
+</div>
+<p class="font-body-md text-body-md text-primary font-medium mt-auto">$45.00</p>
+</div>
+</div>
+</div>
+<div class="mb-stack-lg flex gap-2">
+<input class="input-border w-full bg-surface" placeholder="Discount code" type="text"/>
+<button class="bg-primary text-surface px-4 font-label-caps text-label-caps hover:bg-surface-tint transition-colors">Apply</button>
+</div>
+<div class="flex flex-col gap-stack-sm border-t border-outline-variant pt-stack-md pb-stack-md">
+<div class="flex justify-between font-body-md text-body-md text-secondary">
+<span>Subtotal</span>
+<span>$225.00</span>
+</div>
+<div class="flex justify-between font-body-md text-body-md text-secondary">
+<span>Shipping</span>
+<span>Calculated at next step</span>
+</div>
+<div class="flex justify-between font-body-md text-body-md text-secondary">
+<span>Taxes</span>
+<span>$18.56</span>
+</div>
+</div>
+<div class="flex justify-between items-end border-t border-primary pt-stack-md mt-stack-sm">
+<span class="font-body-lg text-body-lg text-primary">Total</span>
+<div class="text-right">
+<span class="font-caption text-caption text-secondary block">USD</span>
+<span class="font-headline-md text-headline-md text-primary">$243.56</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full bg-surface-container dark:bg-surface-container-high text-on-surface dark:text-on-surface-variant font-body-md text-body-md mt-auto">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-stack-lg px-margin-mobile md:px-margin-desktop py-section-gap max-w-container-max mx-auto">
+<div>
+<a class="font-headline-md text-headline-md text-primary mb-stack-md block" href="#">SCENTLAB</a>
+<p class="font-caption text-caption text-secondary mt-stack-md max-w-[200px]">The Modern Atelier. High-end clinical precision and quiet luxury.</p>
+</div>
+<div class="flex flex-col gap-stack-sm">
+<span class="font-label-caps text-label-caps text-primary mb-2">Shop</span>
+<a class="text-secondary hover:underline underline-offset-4 transition-opacity duration-300" href="#">Fragrances</a>
+<a class="text-secondary hover:underline underline-offset-4 transition-opacity duration-300" href="#">Packaging</a>
+</div>
+<div class="flex flex-col gap-stack-sm">
+<span class="font-label-caps text-label-caps text-primary mb-2">Company</span>
+<a class="text-secondary hover:underline underline-offset-4 transition-opacity duration-300" href="#">Account</a>
+<a class="text-secondary hover:underline underline-offset-4 transition-opacity duration-300" href="#">Help</a>
+</div>
+<div class="flex flex-col gap-stack-sm">
+<span class="font-label-caps text-label-caps text-primary mb-2">Legal</span>
+<a class="text-secondary hover:underline underline-offset-4 transition-opacity duration-300" href="#">Privacy Policy</a>
+<a class="text-secondary hover:underline underline-offset-4 transition-opacity duration-300" href="#">Terms of Service</a>
+</div>
+</div>
+<div class="border-t border-outline-variant px-margin-mobile md:px-margin-desktop py-stack-md text-center">
+<span class="font-caption text-caption text-secondary">© 2024 SCENTLAB WHOLESALE. ALL RIGHTS RESERVED.</span>
+</div>
+</footer>
+</body></html>

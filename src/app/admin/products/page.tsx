@@ -23,8 +23,10 @@ import {
   ShoppingBag,
   SlidersHorizontal,
 } from "lucide-react";
-import AdminGuard from "@/components/auth/AdminGuard";
+import { AdminGuard } from "@/components/auth/AdminGuard";
 import ProductPreviewModal from "@/components/admin/ProductPreviewModal";
+import ProductQuickEditModal from "@/components/admin/ProductQuickEditModal";
+import { AddProductModal } from "@/components/admin/AddProductModal";
 import { Product, ProductStatus, ProductType } from "@/types/product";
 import { productService } from "@/lib/firestore/products";
 import { categoryService } from "@/lib/firestore/categories";
@@ -44,10 +46,14 @@ export default function AdminProductsPage() {
   const [selectedStockStatus, setSelectedStockStatus] = useState("all");
   const [filterFeatured, setFilterFeatured] = useState<boolean | undefined>(undefined);
   const [filterCustomLabel, setFilterCustomLabel] = useState<boolean | undefined>(undefined);
+  const [filterMissingImages, setFilterMissingImages] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [sortBy, setSortBy] = useState("newest");
 
   // Modals & Action feedback
   const [previewProduct, setPreviewProduct] = useState<Product | null>(null);
+  const [quickEditProduct, setQuickEditProduct] = useState<Product | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [feedbackMsg, setFeedbackMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
@@ -97,13 +103,16 @@ export default function AdminProductsPage() {
   const draftCount = products.filter((p) => p.status === "draft").length;
   const archivedCount = products.filter((p) => p.status === "archived").length;
   const missingImagesCount = products.filter(
-    (p) => !p.media || p.media.length === 0 || !p.primaryImageUrl
+    (p) => !p.primaryImageUrl && (!p.media || p.media.length === 0 || !(p.media as any)[0]?.url)
   ).length;
-  const lowStockCount = products.filter((p) => p.inventory?.status === "low_stock").length;
-  const outOfStockCount = products.filter((p) => p.inventory?.status === "out_of_stock").length;
+  const lowStockCount = products.filter(
+    (p) => p.inventory?.status === "low_stock" || ((p.inventory?.availableQuantity ?? 0) > 0 && (p.inventory?.availableQuantity ?? 0) <= (p.inventory?.lowStockThreshold ?? 10))
+  ).length;
+  const outOfStockCount = products.filter(
+    (p) => p.inventory?.status === "out_of_stock" || (p.inventory?.availableQuantity ?? 0) <= 0
+  ).length;
   const customLabelCount = products.filter((p) => p.isCustomLabelProduct || p.customizable).length;
 
-  // Actions
   const handleDuplicate = async (id: string) => {
     setActionLoadingId(id);
     setFeedbackMsg(null);
@@ -175,247 +184,264 @@ export default function AdminProductsPage() {
     }
   };
 
+  const displayProducts = filterMissingImages
+    ? products.filter((p) => !p.primaryImageUrl && (!p.media || p.media.length === 0 || !(p.media as any)[0]?.url))
+    : products;
+  const paginatedProducts = displayProducts.slice((currentPage - 1) * 50, currentPage * 50);
+
   return (
     <AdminGuard>
-      <div className="min-h-screen bg-lab-950 text-white p-6 md:p-10">
-        <div className="max-w-7xl mx-auto space-y-8">
-          
-          {/* Header & Quick Action */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-lab-800 pb-6">
-            <div>
-              <div className="flex items-center gap-2 text-amber-400 text-xs font-mono font-bold tracking-widest uppercase mb-1">
-                <Package className="w-4 h-4" /> Catalog Master Control
-              </div>
-              <h1 className="text-3xl font-extrabold text-white tracking-tight">
-                Product Management
-              </h1>
-              <p className="text-xs text-lab-400 mt-1">
-                Create, edit, duplicate, archive, and manage live Firestore catalog specifications and B2 media.
-              </p>
+      <div className="space-y-8 font-sans">
+        
+        {/* ━━━━ HEADER & QUICK ACTION ━━━━ */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 pb-6 border-b border-gray-200">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-800 border border-gray-300 mb-2">
+              <Package className="w-3 h-3 text-gray-600" /> Catalog Master Control
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-950 tracking-tight">
+              Product Management
+            </h1>
+            <p className="text-xs text-gray-600 mt-1 max-w-2xl leading-relaxed">
+              Create, edit, duplicate, archive, and manage live Firestore catalog specifications and product media.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setIsAddModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-[#2B5F4A] hover:bg-[#1E4233] text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-xs transition"
+            >
+              <Plus className="w-4 h-4" /> Add Product
+            </button>
+          </div>
+        </div>
+
+        {/* Feedback Banner */}
+        {feedbackMsg && (
+          <div
+            className={`p-3.5 rounded-lg border flex items-center justify-between text-xs font-semibold ${
+              feedbackMsg.type === "success"
+                ? "bg-[#F0FDF4] border-[#BBF7D0] text-[#166534]"
+                : "bg-red-50 border-red-200 text-red-800"
+            }`}
+          >
+            <span>{feedbackMsg.text}</span>
+            <button
+              type="button"
+              onClick={() => setFeedbackMsg(null)}
+              className="text-gray-600 hover:text-gray-900 text-[10px] uppercase font-bold"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
+        {/* ━━━━ KPI SUMMARY GRID ━━━━ */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+          <div className="p-3.5 bg-white border border-gray-200 rounded-xl shadow-xs">
+            <span className="text-[10px] uppercase font-bold text-gray-500 block">Total</span>
+            <div className="text-xl font-bold font-mono text-gray-950 mt-0.5">{totalProducts}</div>
+          </div>
+          <div className="p-3.5 bg-white border border-gray-200 rounded-xl shadow-xs">
+            <span className="text-[10px] uppercase font-bold text-emerald-700 block">Active</span>
+            <div className="text-xl font-bold font-mono text-emerald-700 mt-0.5">{activeCount}</div>
+          </div>
+          <div className="p-3.5 bg-white border border-gray-200 rounded-xl shadow-xs">
+            <span className="text-[10px] uppercase font-bold text-amber-700 block">Draft</span>
+            <div className="text-xl font-bold font-mono text-amber-700 mt-0.5">{draftCount}</div>
+          </div>
+          <div className="p-3.5 bg-white border border-gray-200 rounded-xl shadow-xs">
+            <span className="text-[10px] uppercase font-bold text-gray-500 block">Archived</span>
+            <div className="text-xl font-bold font-mono text-gray-600 mt-0.5">{archivedCount}</div>
+          </div>
+          <div className="p-3.5 bg-white border border-gray-200 rounded-xl shadow-xs">
+            <span className="text-[10px] uppercase font-bold text-orange-700 block">No Image</span>
+            <div className="text-xl font-bold font-mono text-orange-700 mt-0.5">{missingImagesCount}</div>
+          </div>
+          <div className="p-3.5 bg-white border border-gray-200 rounded-xl shadow-xs">
+            <span className="text-[10px] uppercase font-bold text-amber-700 block">Low Stock</span>
+            <div className="text-xl font-bold font-mono text-amber-700 mt-0.5">{lowStockCount}</div>
+          </div>
+          <div className="p-3.5 bg-white border border-gray-200 rounded-xl shadow-xs">
+            <span className="text-[10px] uppercase font-bold text-red-700 block">Out of Stock</span>
+            <div className="text-xl font-bold font-mono text-red-700 mt-0.5">{outOfStockCount}</div>
+          </div>
+          <div className="p-3.5 bg-white border border-gray-200 rounded-xl shadow-xs">
+            <span className="text-[10px] uppercase font-bold text-purple-700 block">Custom Label</span>
+            <div className="text-xl font-bold font-mono text-purple-700 mt-0.5">{customLabelCount}</div>
+          </div>
+        </div>
+
+        {/* ━━━━ SEARCH & FILTERS TOOLBAR ━━━━ */}
+        <div className="p-4 sm:p-5 bg-white border border-gray-200 rounded-xl shadow-xs space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            
+            {/* Search Bar */}
+            <div className="relative md:col-span-2">
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search name, SKU, slug, or supplier..."
+                className="w-full text-xs pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:border-[#2B5F4A] focus:outline-none focus:ring-1 focus:ring-[#2B5F4A]"
+              />
             </div>
 
-            <div className="flex items-center gap-3">
-              <Link
-                href="/admin/products/new"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-amber-500/20 transition-all"
+            {/* Status Filter */}
+            <div>
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value as any)}
+                aria-label="Filter by status"
+                className="w-full text-xs px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:border-[#2B5F4A] focus:outline-none"
               >
-                <Plus className="w-4 h-4 stroke-[3]" /> Add Product
-              </Link>
+                <option value="all">All Statuses</option>
+                <option value="active">Active (In Store)</option>
+                <option value="draft">Draft</option>
+                <option value="inactive">Inactive</option>
+                <option value="archived">Archived</option>
+              </select>
+            </div>
+
+            {/* Sort By */}
+            <div>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                aria-label="Sort products by"
+                className="w-full text-xs px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:border-[#2B5F4A] focus:outline-none"
+              >
+                <option value="newest">Sort: Newest First</option>
+                <option value="oldest">Sort: Oldest First</option>
+                <option value="name_asc">Sort: Name (A-Z)</option>
+                <option value="name_desc">Sort: Name (Z-A)</option>
+                <option value="price_asc">Sort: Price (Low-High)</option>
+                <option value="price_desc">Sort: Price (High-Low)</option>
+                <option value="stock_asc">Sort: Stock (Low-High)</option>
+                <option value="stock_desc">Sort: Stock (High-Low)</option>
+              </select>
             </div>
           </div>
 
-          {/* Feedback banner */}
-          {feedbackMsg && (
-            <div
-              className={`p-4 rounded-xl border flex items-center justify-between text-xs ${
-                feedbackMsg.type === "success"
-                  ? "bg-emerald-950/40 border-emerald-800 text-emerald-300"
-                  : "bg-red-950/40 border-red-800 text-red-300"
+          {/* Secondary Filter Chips */}
+          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-gray-100 text-xs">
+            <span className="text-[11px] text-gray-500 uppercase font-bold flex items-center gap-1">
+              <Filter className="w-3 h-3" /> Filters:
+            </span>
+
+            {/* Category Filter */}
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              aria-label="Filter by category"
+              className="text-[11px] px-2.5 py-1 bg-white border border-gray-300 rounded-md text-gray-800 focus:border-[#2B5F4A] focus:outline-none"
+            >
+              <option value="all">All Categories</option>
+              {categories.map((cat) => (
+                <option key={cat.id || cat.slug} value={cat.slug || cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+
+            {/* Stock Status Filter */}
+            <select
+              value={selectedStockStatus}
+              onChange={(e) => setSelectedStockStatus(e.target.value)}
+              aria-label="Filter by stock status"
+              className="text-[11px] px-2.5 py-1 bg-white border border-gray-300 rounded-md text-gray-800 focus:border-[#2B5F4A] focus:outline-none"
+            >
+              <option value="all">All Stock Levels</option>
+              <option value="in_stock">In Stock</option>
+              <option value="low_stock">Low Stock Warning</option>
+              <option value="out_of_stock">Out of Stock</option>
+            </select>
+
+            {/* Featured Toggle */}
+            <button
+              type="button"
+              onClick={() => setFilterFeatured(filterFeatured === true ? undefined : true)}
+              className={`text-[11px] px-2.5 py-1 rounded-md border font-medium transition ${
+                filterFeatured === true
+                  ? "bg-purple-50 border-purple-300 text-purple-800 font-bold"
+                  : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
             >
-              <span>{feedbackMsg.text}</span>
+              ★ Featured Only
+            </button>
+
+            {/* Custom Label Toggle */}
+            <button
+              type="button"
+              onClick={() => setFilterCustomLabel(filterCustomLabel === true ? undefined : true)}
+              className={`text-[11px] px-2.5 py-1 rounded-md border font-medium transition ${
+                filterCustomLabel === true
+                  ? "bg-[#F0FDF4] border-[#BBF7D0] text-[#166534] font-bold"
+                  : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              ✨ Custom Label Only
+            </button>
+
+            {/* Missing Image Toggle */}
+            <button
+              type="button"
+              onClick={() => setFilterMissingImages(!filterMissingImages)}
+              className={`text-[11px] px-2.5 py-1 rounded-md border font-medium transition ${
+                filterMissingImages
+                  ? "bg-orange-50 border-orange-300 text-orange-800 font-bold"
+                  : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              📷 Missing Images ({missingImagesCount})
+            </button>
+
+            {(searchQuery ||
+              selectedCategory !== "all" ||
+              selectedStatus !== "all" ||
+              selectedStockStatus !== "all" ||
+              filterFeatured !== undefined ||
+              filterCustomLabel !== undefined) && (
               <button
                 type="button"
-                onClick={() => setFeedbackMsg(null)}
-                className="text-white hover:underline text-[10px] uppercase font-bold"
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategory("all");
+                  setSelectedStatus("all");
+                  setSelectedStockStatus("all");
+                  setFilterFeatured(undefined);
+                  setFilterCustomLabel(undefined);
+                }}
+                className="text-[11px] text-[#2B5F4A] hover:underline ml-auto font-semibold"
               >
-                Dismiss
+                Reset Filters
               </button>
-            </div>
-          )}
-
-          {/* KPI Summary Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
-            <div className="p-3.5 bg-lab-900/60 border border-lab-800 rounded-xl">
-              <span className="text-[10px] uppercase font-bold text-lab-500">Total</span>
-              <div className="text-xl font-black font-mono text-white mt-0.5">{totalProducts}</div>
-            </div>
-            <div className="p-3.5 bg-lab-900/60 border border-lab-800 rounded-xl">
-              <span className="text-[10px] uppercase font-bold text-emerald-500">Active</span>
-              <div className="text-xl font-black font-mono text-emerald-400 mt-0.5">{activeCount}</div>
-            </div>
-            <div className="p-3.5 bg-lab-900/60 border border-lab-800 rounded-xl">
-              <span className="text-[10px] uppercase font-bold text-amber-500">Draft</span>
-              <div className="text-xl font-black font-mono text-amber-400 mt-0.5">{draftCount}</div>
-            </div>
-            <div className="p-3.5 bg-lab-900/60 border border-lab-800 rounded-xl">
-              <span className="text-[10px] uppercase font-bold text-lab-500">Archived</span>
-              <div className="text-xl font-black font-mono text-lab-400 mt-0.5">{archivedCount}</div>
-            </div>
-            <div className="p-3.5 bg-lab-900/60 border border-lab-800 rounded-xl">
-              <span className="text-[10px] uppercase font-bold text-orange-400">No Image</span>
-              <div className="text-xl font-black font-mono text-orange-400 mt-0.5">{missingImagesCount}</div>
-            </div>
-            <div className="p-3.5 bg-lab-900/60 border border-lab-800 rounded-xl">
-              <span className="text-[10px] uppercase font-bold text-amber-400">Low Stock</span>
-              <div className="text-xl font-black font-mono text-amber-400 mt-0.5">{lowStockCount}</div>
-            </div>
-            <div className="p-3.5 bg-lab-900/60 border border-lab-800 rounded-xl">
-              <span className="text-[10px] uppercase font-bold text-red-400">Out of Stock</span>
-              <div className="text-xl font-black font-mono text-red-400 mt-0.5">{outOfStockCount}</div>
-            </div>
-            <div className="p-3.5 bg-lab-900/60 border border-lab-800 rounded-xl">
-              <span className="text-[10px] uppercase font-bold text-purple-400">Custom Label</span>
-              <div className="text-xl font-black font-mono text-purple-400 mt-0.5">{customLabelCount}</div>
-            </div>
+            )}
           </div>
+        </div>
 
-          {/* Search & Multi-Filters Toolbar */}
-          <div className="p-5 bg-lab-900/40 border border-lab-800 rounded-2xl space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-              
-              {/* Search Bar */}
-              <div className="relative md:col-span-2">
-                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-lab-500" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search name, SKU, slug, or supplier..."
-                  className="w-full text-xs pl-10 pr-4 py-2.5 bg-lab-950 border border-lab-800 rounded-xl text-white placeholder:text-lab-600 focus:border-amber-500 focus:outline-none"
-                />
-              </div>
-
-              {/* Status Filter */}
-              <div>
-                <select
-                  value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value as any)}
-                  className="w-full text-xs px-3.5 py-2.5 bg-lab-950 border border-lab-800 rounded-xl text-white focus:border-amber-500 focus:outline-none"
-                >
-                  <option value="all">All Statuses</option>
-                  <option value="active">Active (In Store)</option>
-                  <option value="draft">Draft</option>
-                  <option value="inactive">Inactive</option>
-                  <option value="archived">Archived</option>
-                </select>
-              </div>
-
-              {/* Sort By */}
-              <div>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full text-xs px-3.5 py-2.5 bg-lab-950 border border-lab-800 rounded-xl text-white focus:border-amber-500 focus:outline-none"
-                >
-                  <option value="newest">Sort: Newest First</option>
-                  <option value="oldest">Sort: Oldest First</option>
-                  <option value="name_asc">Sort: Name (A-Z)</option>
-                  <option value="name_desc">Sort: Name (Z-A)</option>
-                  <option value="price_asc">Sort: Price (Low-High)</option>
-                  <option value="price_desc">Sort: Price (High-Low)</option>
-                  <option value="stock_asc">Sort: Stock (Low-High)</option>
-                  <option value="stock_desc">Sort: Stock (High-Low)</option>
-                </select>
-              </div>
+        {/* ━━━━ PRODUCTS MASTER TABLE ━━━━ */}
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-xs">
+          {loading ? (
+            <div className="py-20 text-center text-xs text-gray-500">
+              <div className="w-8 h-8 border-2 border-[#2B5F4A] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+              Loading Firestore catalog specifications...
             </div>
-
-            {/* Secondary Filter Chips */}
-            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-lab-800/60 text-xs">
-              <span className="text-[11px] text-lab-500 uppercase font-bold flex items-center gap-1">
-                <Filter className="w-3 h-3" /> Filters:
-              </span>
-
-              {/* Category Filter */}
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="text-[11px] px-2.5 py-1 bg-lab-950 border border-lab-800 rounded-lg text-lab-300 focus:border-amber-500 focus:outline-none"
-              >
-                <option value="all">All Categories</option>
-                {categories.map((cat) => (
-                  <option key={cat.id || cat.slug} value={cat.slug || cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-
-              {/* Stock Status Filter */}
-              <select
-                value={selectedStockStatus}
-                onChange={(e) => setSelectedStockStatus(e.target.value)}
-                className="text-[11px] px-2.5 py-1 bg-lab-950 border border-lab-800 rounded-lg text-lab-300 focus:border-amber-500 focus:outline-none"
-              >
-                <option value="all">All Stock Levels</option>
-                <option value="in_stock">In Stock</option>
-                <option value="low_stock">Low Stock Warning</option>
-                <option value="out_of_stock">Out of Stock</option>
-              </select>
-
-              {/* Featured Toggle */}
-              <button
-                type="button"
-                onClick={() => setFilterFeatured(filterFeatured === true ? undefined : true)}
-                className={`text-[11px] px-2.5 py-1 rounded-lg border font-medium transition-all ${
-                  filterFeatured === true
-                    ? "bg-purple-500/20 border-purple-500 text-purple-300"
-                    : "bg-lab-950 border-lab-800 text-lab-400 hover:text-white"
-                }`}
-              >
-                ★ Featured Only
-              </button>
-
-              {/* Custom Label Toggle */}
-              <button
-                type="button"
-                onClick={() => setFilterCustomLabel(filterCustomLabel === true ? undefined : true)}
-                className={`text-[11px] px-2.5 py-1 rounded-lg border font-medium transition-all ${
-                  filterCustomLabel === true
-                    ? "bg-amber-500/20 border-amber-500 text-amber-300"
-                    : "bg-lab-950 border-lab-800 text-lab-400 hover:text-white"
-                }`}
-              >
-                ✨ Custom Label Only
-              </button>
-
-              {(searchQuery ||
-                selectedCategory !== "all" ||
-                selectedStatus !== "all" ||
-                selectedStockStatus !== "all" ||
-                filterFeatured !== undefined ||
-                filterCustomLabel !== undefined) && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearchQuery("");
-                    setSelectedCategory("all");
-                    setSelectedStatus("all");
-                    setSelectedStockStatus("all");
-                    setFilterFeatured(undefined);
-                    setFilterCustomLabel(undefined);
-                  }}
-                  className="text-[11px] text-amber-400 hover:underline ml-auto font-semibold"
-                >
-                  Reset Filters
-                </button>
-              )}
+          ) : displayProducts.length === 0 ? (
+            <div className="py-16 text-center text-xs text-gray-500">
+              <Package className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+              <p className="text-base font-bold text-gray-900 mb-1">No Products Match Filters</p>
+              <p>Try resetting filters or adjusting search criteria.</p>
             </div>
-          </div>
-
-          {/* Products Master Table */}
-          <div className="bg-lab-900/30 border border-lab-800 rounded-2xl overflow-hidden shadow-xl">
-            {loading ? (
-              <div className="py-20 text-center text-xs text-lab-400">
-                <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                Loading Firestore catalog specifications...
-              </div>
-            ) : products.length === 0 ? (
-              <div className="py-16 text-center text-xs text-lab-400">
-                <Package className="w-10 h-10 text-lab-600 mx-auto mb-3" />
-                <p className="text-base font-bold text-white mb-1">No Products Found</p>
-                <p>Try adjusting your search criteria or add a new product to the catalog.</p>
-                <Link
-                  href="/admin/products/new"
-                  className="inline-block mt-4 px-4 py-2 bg-amber-500 text-black font-bold rounded-xl text-xs"
-                >
-                  + Add First Product
-                </Link>
-              </div>
-            ) : (
+          ) : (
+            <div>
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-lab-900/80 text-lab-400 text-[10px] uppercase tracking-wider border-b border-lab-800">
-                    <tr>
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50 text-gray-600 text-[10px] font-bold uppercase tracking-wider border-b border-gray-200">
                       <th className="py-3.5 px-4">Product</th>
                       <th className="py-3.5 px-4">SKU / Slug</th>
                       <th className="py-3.5 px-4">Category</th>
@@ -426,8 +452,8 @@ export default function AdminProductsPage() {
                       <th className="py-3.5 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-lab-800/60">
-                    {products.map((product) => {
+                  <tbody className="divide-y divide-gray-100">
+                    {paginatedProducts.map((product) => {
                       const image =
                         product.primaryImageUrl ||
                         (product.media && (product.media as any[])[0]?.url) ||
@@ -436,36 +462,38 @@ export default function AdminProductsPage() {
                       const isActionLoading = actionLoadingId === product.id;
 
                       return (
-                        <tr key={product.id} className="hover:bg-lab-900/50 transition-colors group">
+                        <tr key={product.id} className="hover:bg-gray-50/80 transition">
                           
                           {/* Image & Name */}
                           <td className="py-3 px-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-12 h-12 rounded-xl bg-black/40 border border-lab-800 overflow-hidden shrink-0 flex items-center justify-center relative">
+                              <div className="w-12 h-12 rounded-lg bg-gray-50 border border-gray-200 overflow-hidden shrink-0 flex items-center justify-center relative">
                                 {image ? (
                                   // eslint-disable-next-line @next/next/no-img-element
                                   <img src={image} alt={product.name} className="w-full h-full object-contain" />
                                 ) : (
-                                  <div className="text-[9px] text-orange-400 text-center font-bold px-1 uppercase">
+                                  <div className="text-[9px] text-gray-400 text-center font-bold px-1 uppercase">
                                     No Pic
                                   </div>
                                 )}
                               </div>
                               <div className="space-y-0.5">
-                                <div className="font-bold text-white group-hover:text-amber-400 transition-colors flex items-center gap-1.5">
-                                  <Link href={`/admin/products/${product.id}/edit`}>{product.name}</Link>
+                                <div className="font-semibold text-gray-950 flex items-center gap-1.5">
+                                  <Link href={`/admin/products/${product.id}/edit`} className="hover:underline">
+                                    {product.name}
+                                  </Link>
                                   {product.featured && (
-                                    <span className="text-[9px] bg-purple-500/20 text-purple-300 px-1.5 py-0.2 rounded border border-purple-500/30">
+                                    <span className="text-[9px] bg-purple-50 text-purple-800 px-1.5 py-0.2 rounded border border-purple-200 font-bold">
                                       ★
                                     </span>
                                   )}
                                   {product.isCustomLabelProduct && (
-                                    <span className="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.2 rounded border border-amber-500/30">
+                                    <span className="text-[9px] bg-[#F6FAF8] text-[#2B5F4A] px-1.5 py-0.2 rounded border border-[#C5DDD3] font-bold">
                                       Custom
                                     </span>
                                   )}
                                 </div>
-                                <div className="text-[11px] text-lab-500 line-clamp-1">
+                                <div className="text-[11px] text-gray-500 line-clamp-1">
                                   {product.shortDescription || "No short description provided"}
                                 </div>
                               </div>
@@ -474,25 +502,25 @@ export default function AdminProductsPage() {
 
                           {/* SKU / Slug */}
                           <td className="py-3 px-4 font-mono">
-                            <div className="text-white font-bold">{product.sku}</div>
-                            <div className="text-[10px] text-lab-500 truncate max-w-[120px]">{product.slug}</div>
+                            <div className="text-gray-950 font-semibold">{product.sku}</div>
+                            <div className="text-[10px] text-gray-500 truncate max-w-[120px]">{product.slug}</div>
                           </td>
 
                           {/* Category */}
                           <td className="py-3 px-4">
-                            <span className="text-lab-300 font-medium capitalize">
+                            <span className="text-gray-800 font-medium capitalize">
                               {product.categoryName || product.category || "General"}
                             </span>
                             {product.productType && (
-                              <div className="text-[10px] text-lab-500 uppercase">{product.productType}</div>
+                              <div className="text-[10px] text-gray-500 uppercase">{product.productType}</div>
                             )}
                           </td>
 
-                          {/* Price / Margin */}
+                          {/* Price */}
                           <td className="py-3 px-4 text-right font-mono">
-                            <div className="font-bold text-amber-400">${(product.basePrice || 0).toFixed(2)}</div>
+                            <div className="font-semibold text-gray-950">${(product.basePrice || 0).toFixed(2)}</div>
                             {product.cost !== undefined && product.cost > 0 && (
-                              <div className="text-[10px] text-lab-500">
+                              <div className="text-[10px] text-gray-500">
                                 Cost: ${product.cost.toFixed(2)}
                               </div>
                             )}
@@ -501,17 +529,17 @@ export default function AdminProductsPage() {
                           {/* Stock Status */}
                           <td className="py-3 px-4 text-right font-mono">
                             <div
-                              className={`font-bold ${
+                              className={`font-semibold ${
                                 product.inventory?.status === "out_of_stock"
-                                  ? "text-red-400"
+                                  ? "text-red-700"
                                   : product.inventory?.status === "low_stock"
-                                  ? "text-amber-400"
-                                  : "text-emerald-400"
+                                  ? "text-amber-700"
+                                  : "text-[#166534]"
                               }`}
                             >
                               {product.inventory?.quantityInStock ?? 0}
                             </div>
-                            <div className="text-[10px] text-lab-500 capitalize">
+                            <div className="text-[10px] text-gray-500 capitalize">
                               {product.inventory?.status?.replace("_", " ") || "In Stock"}
                             </div>
                           </td>
@@ -519,12 +547,12 @@ export default function AdminProductsPage() {
                           {/* Status Badge */}
                           <td className="py-3 px-4 text-center">
                             <span
-                              className={`inline-block text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+                              className={`inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
                                 product.status === "active"
-                                  ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                                  ? "bg-[#F0FDF4] border-[#BBF7D0] text-[#166534]"
                                   : product.status === "draft"
-                                  ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
-                                  : "bg-lab-800/40 border-lab-700 text-lab-400"
+                                  ? "bg-amber-50 border-amber-200 text-amber-800"
+                                  : "bg-gray-100 border-gray-200 text-gray-700"
                               }`}
                             >
                               {product.status}
@@ -534,14 +562,14 @@ export default function AdminProductsPage() {
                           {/* Completeness Bar */}
                           <td className="py-3 px-4 text-center">
                             <div className="inline-flex flex-col items-center">
-                              <div className="flex items-center gap-1 text-[11px] font-mono font-bold text-lab-300">
+                              <div className="text-[11px] font-mono font-bold text-gray-700">
                                 {completeness.score}%
                               </div>
-                              <div className="w-14 h-1.5 bg-lab-800 rounded-full overflow-hidden mt-1">
+                              <div className="w-14 h-1.5 bg-gray-200 rounded-full overflow-hidden mt-1">
                                 <div
                                   className={`h-full ${
                                     completeness.score >= 85
-                                      ? "bg-emerald-500"
+                                      ? "bg-emerald-600"
                                       : completeness.score >= 50
                                       ? "bg-amber-500"
                                       : "bg-red-500"
@@ -551,7 +579,7 @@ export default function AdminProductsPage() {
                               </div>
                               {completeness.missingFields.length > 0 && (
                                 <span
-                                  className="text-[9px] text-orange-400 hover:underline mt-0.5 cursor-help"
+                                  className="text-[9px] text-amber-700 hover:underline mt-0.5 cursor-help"
                                   title={`Missing: ${completeness.missingFields.join(", ")}`}
                                 >
                                   {completeness.missingFields.length} missing
@@ -567,27 +595,28 @@ export default function AdminProductsPage() {
                               <button
                                 type="button"
                                 onClick={() => setPreviewProduct(product)}
-                                className="p-1.5 rounded-lg bg-lab-900 border border-lab-800 text-lab-400 hover:text-white hover:border-lab-700"
+                                className="p-1.5 rounded-lg bg-white border border-gray-300 text-gray-600 hover:text-gray-950 hover:bg-gray-50"
                                 title="Customer Store Preview"
                               >
                                 <Eye className="w-3.5 h-3.5" />
                               </button>
 
                               {/* Edit */}
-                              <Link
-                                href={`/admin/products/${product.id}/edit`}
-                                className="p-1.5 rounded-lg bg-lab-900 border border-lab-800 text-lab-400 hover:text-amber-400 hover:border-amber-500/40"
-                                title="Edit Product"
+                              <button
+                                type="button"
+                                onClick={() => setQuickEditProduct(product)}
+                                className="p-1.5 rounded-lg bg-white border border-gray-300 text-gray-600 hover:text-[#2B5F4A] hover:bg-gray-50"
+                                title="Quick Edit Product"
                               >
                                 <Edit className="w-3.5 h-3.5" />
-                              </Link>
+                              </button>
 
                               {/* Duplicate */}
                               <button
                                 type="button"
                                 disabled={isActionLoading}
                                 onClick={() => handleDuplicate(product.id)}
-                                className="p-1.5 rounded-lg bg-lab-900 border border-lab-800 text-lab-400 hover:text-blue-400 hover:border-blue-500/40 disabled:opacity-30"
+                                className="p-1.5 rounded-lg bg-white border border-gray-300 text-gray-600 hover:text-blue-700 hover:bg-gray-50 disabled:opacity-30"
                                 title="Duplicate Product Specification"
                               >
                                 <Copy className="w-3.5 h-3.5" />
@@ -599,7 +628,7 @@ export default function AdminProductsPage() {
                                   type="button"
                                   disabled={isActionLoading}
                                   onClick={() => handleArchive(product.id)}
-                                  className="p-1.5 rounded-lg bg-lab-900 border border-lab-800 text-lab-400 hover:text-amber-400 hover:border-amber-500/40 disabled:opacity-30"
+                                  className="p-1.5 rounded-lg bg-white border border-gray-300 text-gray-600 hover:text-amber-700 hover:bg-gray-50 disabled:opacity-30"
                                   title="Archive Product"
                                 >
                                   <Archive className="w-3.5 h-3.5" />
@@ -611,8 +640,8 @@ export default function AdminProductsPage() {
                                 type="button"
                                 disabled={isActionLoading}
                                 onClick={() => handleDelete(product.id, product.name)}
-                                className="p-1.5 rounded-lg bg-lab-900 border border-lab-800 text-lab-400 hover:text-red-400 hover:border-red-500/40 disabled:opacity-30"
-                                title="Delete (If no orders attached)"
+                                className="p-1.5 rounded-lg bg-white border border-gray-300 text-gray-600 hover:text-red-700 hover:bg-gray-50 disabled:opacity-30"
+                                title="Delete Product"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
@@ -625,10 +654,40 @@ export default function AdminProductsPage() {
                   </tbody>
                 </table>
               </div>
-            )}
-          </div>
 
+              {/* Pagination Controls */}
+              {displayProducts.length > 50 && (
+                <div className="p-4 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-600 font-sans">
+                  <div>
+                    Showing {(currentPage - 1) * 50 + 1} - {Math.min(currentPage * 50, displayProducts.length)} of {displayProducts.length} products
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      className="px-3 py-1.5 rounded-lg bg-white border border-gray-300 text-gray-800 disabled:opacity-40 hover:bg-gray-50"
+                    >
+                      ← Previous
+                    </button>
+                    <span className="px-3 py-1.5 bg-white border border-gray-300 rounded-lg text-gray-900 font-semibold">
+                      Page {currentPage} of {Math.ceil(displayProducts.length / 50)}
+                    </span>
+                    <button
+                      type="button"
+                      disabled={currentPage >= Math.ceil(displayProducts.length / 50)}
+                      onClick={() => setCurrentPage((p) => p + 1)}
+                      className="px-3 py-1.5 rounded-lg bg-white border border-gray-300 text-gray-800 disabled:opacity-40 hover:bg-gray-50"
+                    >
+                      Next →
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
+
       </div>
 
       {/* Storefront Preview Modal */}
@@ -639,6 +698,26 @@ export default function AdminProductsPage() {
           onClose={() => setPreviewProduct(null)}
         />
       )}
+
+      {/* Quick Edit Modal */}
+      <ProductQuickEditModal
+        isOpen={Boolean(quickEditProduct)}
+        onClose={() => setQuickEditProduct(null)}
+        product={quickEditProduct}
+        onSaved={() => {
+          fetchProducts();
+        }}
+      />
+
+      {/* Add Product Modal with Category Routing */}
+      <AddProductModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSaved={(newProd) => {
+          setFeedbackMsg({ type: "success", text: `Producto '${newProd.name}' creado exitosamente en ${newProd.categoryName || newProd.category}.` });
+          fetchProducts();
+        }}
+      />
     </AdminGuard>
   );
 }

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SCENTLAB - Custom Label Personalization</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "inverse-on-surface": "#f2f1ee",
+                      "on-secondary-fixed": "#1c1b1a",
+                      "on-tertiary-fixed-variant": "#594313",
+                      "surface-container-low": "#f4f3f1",
+                      "primary-fixed": "#e5e2e1",
+                      "on-surface-variant": "#444748",
+                      "on-background": "#1a1c1a",
+                      "error": "#ba1a1a",
+                      "primary-fixed-dim": "#c8c6c5",
+                      "on-tertiary-fixed": "#261900",
+                      "surface-dim": "#dbdad7",
+                      "surface-variant": "#e3e2e0",
+                      "secondary-fixed": "#e6e2de",
+                      "tertiary": "#000000",
+                      "surface-bright": "#faf9f6",
+                      "on-surface": "#1a1c1a",
+                      "surface-container-lowest": "#ffffff",
+                      "inverse-surface": "#2f312f",
+                      "error-container": "#ffdad6",
+                      "primary": "#000000",
+                      "on-primary-container": "#858383",
+                      "primary-container": "#1c1b1b",
+                      "surface-container-highest": "#e3e2e0",
+                      "surface-container": "#efeeeb",
+                      "surface-container-high": "#e9e8e5",
+                      "tertiary-fixed-dim": "#e2c286",
+                      "secondary-container": "#e6e2de",
+                      "on-secondary": "#ffffff",
+                      "outline-variant": "#c4c7c7",
+                      "on-error-container": "#93000a",
+                      "on-secondary-fixed-variant": "#484644",
+                      "on-primary-fixed-variant": "#474646",
+                      "on-tertiary-container": "#9b804a",
+                      "on-error": "#ffffff",
+                      "tertiary-fixed": "#ffdea1",
+                      "tertiary-container": "#261900",
+                      "secondary": "#605e5c",
+                      "on-primary-fixed": "#1c1b1b",
+                      "on-secondary-container": "#666461",
+                      "inverse-primary": "#c8c6c5",
+                      "background": "#faf9f6",
+                      "surface": "#faf9f6",
+                      "secondary-fixed-dim": "#c9c6c3",
+                      "on-primary": "#ffffff",
+                      "surface-tint": "#5f5e5e",
+                      "on-tertiary": "#ffffff",
+                      "outline": "#747878"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "container-max": "1440px",
+                      "gutter": "24px",
+                      "stack-md": "16px",
+                      "stack-sm": "8px",
+                      "section-gap": "120px",
+                      "margin-mobile": "20px",
+                      "stack-lg": "32px",
+                      "margin-desktop": "64px"
+              },
+              "fontFamily": {
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "caption": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-caps": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Inter"
+                      ],
+                      "display-hero": [
+                              "Bodoni Moda"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg": [
+                              "40px",
+                              {
+                                      "lineHeight": "48px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "caption": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.1em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "display-hero": [
+                              "80px",
+                              {
+                                      "lineHeight": "96px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "0em",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+      </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar -->
+<header class="bg-surface/80 backdrop-blur-md sticky top-0 z-50 border-b border-outline-variant w-full">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto">
+<div class="flex items-center gap-8">
+<a class="font-headline-md text-headline-md tracking-tighter text-primary" href="#">SCENTLAB</a>
+<nav class="hidden md:flex gap-6 items-center">
+<a class="font-label-caps text-label-caps text-secondary p-2 hover:text-primary transition-colors duration-200" href="#">Fragrances</a>
+<a class="font-label-caps text-label-caps text-secondary p-2 hover:text-primary transition-colors duration-200" href="#">Packaging</a>
+<a class="font-label-caps text-label-caps text-secondary p-2 hover:text-primary transition-colors duration-200" href="#">Bottles</a>
+<a class="font-label-caps text-label-caps text-primary border-b border-primary pb-1 p-2 hover:text-primary transition-colors duration-200" href="#">Custom Labels</a>
+<a class="font-label-caps text-label-caps text-secondary p-2 hover:text-primary transition-colors duration-200" href="#">Supplies</a>
+<a class="font-label-caps text-label-caps text-secondary p-2 hover:text-primary transition-colors duration-200" href="#">Wholesale</a>
+</nav>
+</div>
+<div class="flex items-center gap-4 text-primary">
+<button class="p-2 hover:opacity-80 transition-opacity"><span class="material-symbols-outlined">search</span></button>
+<button class="p-2 hover:opacity-80 transition-opacity"><span class="material-symbols-outlined">person</span></button>
+<button class="p-2 hover:opacity-80 transition-opacity relative">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-margin-desktop grid grid-cols-1 lg:grid-cols-12 gap-gutter relative">
+<!-- Main Content Area -->
+<div class="lg:col-span-8 flex flex-col gap-stack-lg">
+<!-- Step Indicator -->
+<div class="flex items-center justify-between w-full border-b border-outline-variant pb-6 mb-8">
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center font-label-caps text-label-caps text-on-surface-variant"><span class="material-symbols-outlined text-[16px]">check</span></div>
+<span class="font-label-caps text-label-caps text-secondary">Material</span>
+</div>
+<div class="h-[1px] bg-outline-variant flex-grow mx-4"></div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center font-label-caps text-label-caps text-on-surface-variant"><span class="material-symbols-outlined text-[16px]">check</span></div>
+<span class="font-label-caps text-label-caps text-secondary">Size</span>
+</div>
+<div class="h-[1px] bg-outline-variant flex-grow mx-4"></div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center font-label-caps text-label-caps text-on-surface-variant"><span class="material-symbols-outlined text-[16px]">check</span></div>
+<span class="font-label-caps text-label-caps text-secondary">Quantity</span>
+</div>
+<div class="h-[1px] bg-outline-variant flex-grow mx-4"></div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center font-label-caps text-label-caps text-on-primary">4</div>
+<span class="font-label-caps text-label-caps text-primary">Upload</span>
+</div>
+<div class="h-[1px] bg-surface-container flex-grow mx-4"></div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface flex items-center justify-center font-label-caps text-label-caps text-secondary border border-outline-variant">5</div>
+<span class="font-label-caps text-label-caps text-secondary">Review</span>
+</div>
+</div>
+<!-- Header -->
+<div class="mb-4">
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-2">Upload Your Design</h1>
+<p class="font-body-md text-body-md text-secondary">Upload your print-ready artwork to generate a professional proof.</p>
+</div>
+<!-- Upload Area & Preview -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-lg">
+<!-- Upload Box -->
+<div class="border border-outline-variant border-dashed p-8 flex flex-col items-center justify-center gap-4 text-center bg-surface hover:bg-surface-container-low transition-colors cursor-pointer min-h-[400px]">
+<span class="material-symbols-outlined text-[48px] text-secondary">cloud_upload</span>
+<h3 class="font-headline-md text-headline-md text-primary">Drag &amp; Drop Artwork</h3>
+<p class="font-body-md text-body-md text-secondary">or click to browse files</p>
+<p class="font-caption text-caption text-secondary mt-4">Supported formats: PNG, JPG, PDF, SVG (Max 50MB)</p>
+<button class="mt-6 px-6 py-3 bg-primary text-on-primary font-label-caps text-label-caps hover:bg-primary-container transition-colors">Select File</button>
+</div>
+<!-- Proof Preview -->
+<div class="border border-outline-variant p-4 flex flex-col gap-4 bg-surface-container-lowest h-[400px]">
+<div class="flex justify-between items-center border-b border-outline-variant pb-2">
+<span class="font-label-caps text-label-caps text-secondary">Live Proof</span>
+<button class="text-primary hover:text-secondary"><span class="material-symbols-outlined text-[20px]">zoom_in</span></button>
+</div>
+<div class="flex-grow flex items-center justify-center bg-surface-container-low overflow-hidden relative">
+<!-- Placeholder for user's design preview -->
+<div class="w-48 h-64 bg-surface border border-outline-variant shadow-sm flex items-center justify-center">
+<span class="font-caption text-caption text-secondary text-center px-4">Artwork Preview<br/>Will Appear Here</span>
+</div>
+</div>
+<div class="flex items-center gap-2 text-secondary">
+<span class="material-symbols-outlined text-[16px]">info</span>
+<p class="font-caption text-caption">Please ensure your design stays within the safe zone (dotted line visible on hover).</p>
+</div>
+</div>
+</div>
+<!-- Configuration Summary (Edit mode) -->
+<div class="mt-8 border border-outline-variant p-6">
+<h3 class="font-label-caps text-label-caps text-primary mb-6 border-b border-outline-variant pb-2">Current Configuration</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Material -->
+<div>
+<label class="font-label-caps text-label-caps text-secondary block mb-3">Material</label>
+<div class="flex flex-col gap-2">
+<label class="flex items-center justify-between p-3 border border-primary bg-surface-container-low cursor-pointer">
+<span class="font-body-md text-body-md text-primary">Matte Vinyl</span>
+<input checked="" class="form-radio text-primary focus:ring-primary h-4 w-4" name="material" type="radio"/>
+</label>
+<label class="flex items-center justify-between p-3 border border-outline-variant hover:border-outline cursor-pointer transition-colors">
+<span class="font-body-md text-body-md text-secondary">Glossy Vinyl</span>
+<input class="form-radio text-primary focus:ring-primary h-4 w-4 border-outline-variant" name="material" type="radio"/>
+</label>
+<label class="flex items-center justify-between p-3 border border-outline-variant hover:border-outline cursor-pointer transition-colors">
+<span class="font-body-md text-body-md text-secondary">Clear BOPP</span>
+<input class="form-radio text-primary focus:ring-primary h-4 w-4 border-outline-variant" name="material" type="radio"/>
+</label>
+</div>
+</div>
+<!-- Size -->
+<div>
+<label class="font-label-caps text-label-caps text-secondary block mb-3">Size</label>
+<select class="w-full border-b border-outline-variant border-t-0 border-l-0 border-r-0 bg-transparent py-2 font-body-md text-body-md text-primary focus:ring-0 focus:border-primary px-0">
+<option>1.5 x 2.25 in (Rectangular)</option>
+<option>2 x 2 in (Square)</option>
+<option>3 x 4 in (Rectangular)</option>
+<option>Custom Size...</option>
+</select>
+</div>
+<!-- Quantity -->
+<div>
+<label class="font-label-caps text-label-caps text-secondary block mb-3">Quantity</label>
+<select class="w-full border-b border-outline-variant border-t-0 border-l-0 border-r-0 bg-transparent py-2 font-body-md text-body-md text-primary focus:ring-0 focus:border-primary px-0">
+<option>100 units</option>
+<option>500 units</option>
+<option selected="">1,000 units (Wholesale Tier 1)</option>
+<option>5,000 units (Wholesale Tier 2)</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<!-- Sticky Sidebar / Price Summary -->
+<div class="lg:col-span-4 relative">
+<div class="sticky top-24 bg-surface-container p-6 flex flex-col gap-6">
+<h2 class="font-headline-md text-headline-md text-primary border-b border-outline-variant pb-4">Order Summary</h2>
+<div class="flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-body-md text-body-md text-primary font-bold">Custom Labels</p>
+<p class="font-caption text-caption text-secondary">Matte Vinyl, 1.5 x 2.25 in</p>
+<p class="font-caption text-caption text-secondary">Qty: 1,000</p>
+</div>
+<span class="font-body-md text-body-md text-primary">$150.00</span>
+</div>
+<div class="flex justify-between items-center py-2 border-y border-outline-variant border-dashed">
+<span class="font-caption text-caption text-secondary">Setup Fee</span>
+<span class="font-caption text-caption text-secondary">Waived</span>
+</div>
+<div class="flex justify-between items-center pt-2">
+<span class="font-body-lg text-body-lg text-primary">Estimated Total</span>
+<span class="font-headline-md text-headline-md text-primary">$150.00</span>
+</div>
+<p class="font-caption text-caption text-secondary text-right text-[11px] mt-[-8px]">*Excludes shipping &amp; taxes</p>
+</div>
+<div class="flex flex-col gap-3 mt-4">
+<button class="w-full py-4 bg-primary text-on-primary font-label-caps text-label-caps hover:bg-primary-container transition-colors flex justify-center items-center gap-2">
+                        Proceed to Review <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+<button class="w-full py-3 bg-transparent border border-primary text-primary font-label-caps text-label-caps hover:bg-surface-container-low transition-colors">
+                        Save for Later
+                    </button>
+</div>
+<div class="mt-4 flex items-start gap-3 p-4 bg-surface border border-outline-variant">
+<span class="material-symbols-outlined text-secondary text-[20px]">local_shipping</span>
+<div>
+<p class="font-label-caps text-label-caps text-primary">Estimated Delivery</p>
+<p class="font-caption text-caption text-secondary">Oct 24 - Oct 28</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container w-full mt-auto">
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-stack-lg px-margin-mobile md:px-margin-desktop py-section-gap max-w-container-max mx-auto">
+<div class="flex flex-col gap-4">
+<span class="font-headline-md text-headline-md text-primary">SCENTLAB</span>
+<p class="font-caption text-caption text-secondary mt-4">© 2024 SCENTLAB WHOLESALE. ALL RIGHTS RESERVED.</p>
+</div>
+<div class="flex flex-col gap-4">
+<span class="font-label-caps text-label-caps text-primary">Shop</span>
+<a class="font-body-md text-body-md text-secondary hover:underline underline-offset-4 transition-opacity duration-300" href="#">Fragrances</a>
+<a class="font-body-md text-body-md text-secondary hover:underline underline-offset-4 transition-opacity duration-300" href="#">Packaging</a>
+<a class="font-body-md text-body-md text-secondary hover:underline underline-offset-4 transition-opacity duration-300" href="#">Custom Labels</a>
+</div>
+<div class="flex flex-col gap-4">
+<span class="font-label-caps text-label-caps text-primary">Company</span>
+<a class="font-body-md text-body-md text-secondary hover:underline underline-offset-4 transition-opacity duration-300" href="#">About Us</a>
+<a class="font-body-md text-body-md text-secondary hover:underline underline-offset-4 transition-opacity duration-300" href="#">Contact</a>
+<a class="font-body-md text-body-md text-secondary hover:underline underline-offset-4 transition-opacity duration-300" href="#">Wholesale</a>
+</div>
+<div class="flex flex-col gap-4">
+<span class="font-label-caps text-label-caps text-primary">Help</span>
+<a class="font-body-md text-body-md text-secondary hover:underline underline-offset-4 transition-opacity duration-300" href="#">Account</a>
+<a class="font-body-md text-body-md text-secondary hover:underline underline-offset-4 transition-opacity duration-300" href="#">Privacy Policy</a>
+<a class="font-body-md text-body-md text-secondary hover:underline underline-offset-4 transition-opacity duration-300" href="#">Terms of Service</a>
+</div>
+</div>
+</footer>
+</body></html>
