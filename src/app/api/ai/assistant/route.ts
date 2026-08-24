@@ -161,10 +161,10 @@ function getSmartOlfactoryResponse(userQuery: string): string {
         .join("\n");
 
       if (isDirect) {
-        return `✨ **${p.name} (${p.house})**\n\n¡Sí, contamos con esta formulación en nuestro catálogo Grado A puro sin cortar!\n\n${recList}\n\n📦 *Disponible en presentaciones de 1 oz, 2 oz, 4 oz, 8 oz y 16 oz en frascos de vidrio oscuro con tapa hermética.*`;
+        return `✨ **${p.name} (${p.house})**\n\n¡Sí, contamos con esta formulación en nuestro catálogo Grado A puro sin cortar!\n\n${recList}\n\n📦 *Disponible en presentaciones de 1 oz, 2 oz, 4 oz, 8 oz y 16 oz en botellas de plástico transparente con tapa hermética.*`;
       }
 
-      return `✨ **Perfil de ${p.name} (${p.house})**\n\nActualmente no contamos con la referencia exacta de ${p.name}, pero su pirámide olfativa se destaca por:\n*${p.notes}*.\n\nPara recrear o disfrutar de ese mismo acorde vibrante, te recomiendo estas opciones disponibles con enlace directo:\n\n${recList}\n\n💡 *Tip de formulación:* Mezclando nuestras esencias frutales con una base de [Amber White](/fragrance/amber-white) obtienes la misma fijación y estela cálida.`;
+      return `✨ **Perfil de ${p.name} (${p.house})**\n\nActualmente no contamos con la referencia exacta de ${p.name}, pero su pirámide olfativa se destaca por:\n*${p.notes}*.\n\nPara recrear o disfrutar de ese mismo acorde vibrante, te recomiendo estas opciones disponibles con enlace directo:\n\n${recList}\n\n💡 *Tip de formulación:* Mezclando nuestras esencias frutales con una base de [Amber White](/fragrance/amber-white) obtienes la misma fijación y estela cálida. Disponibles en botellas de plástico transparente desde 1 oz hasta 16 oz.`;
     }
   }
 
