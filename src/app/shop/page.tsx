@@ -50,28 +50,18 @@ export default async function ShopMainPage() {
           </div>
 
           {/* Master Category Cards Grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 1, background: "var(--sl-gray-light)" }}>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
             {categoryTiles.map((cat) => (
               <Link
                 key={cat.href}
                 href={cat.href}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  padding: "20px 16px",
-                  background: "white",
-                  textDecoration: "none",
-                  transition: "background 0.15s",
-                  minHeight: 110
-                }}
-                className="hover:bg-emerald-50/50"
+                className="flex flex-col justify-between p-4 sm:p-5 bg-white border border-gray-200 rounded-xl hover:border-emerald-600 hover:shadow-sm transition group no-underline min-h-[110px]"
               >
                 <div>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: "var(--sl-ink)", margin: "0 0 4px" }}>{cat.label}</p>
-                  <p style={{ fontSize: 10, color: "var(--sl-gray-mid)", margin: 0, fontWeight: 300 }}>{cat.desc}</p>
+                  <p className="text-xs font-semibold text-gray-900 group-hover:text-emerald-800 mb-1">{cat.label}</p>
+                  <p className="text-[10px] text-gray-500 font-light leading-relaxed">{cat.desc}</p>
                 </div>
-                <ArrowRight style={{ width: 12, height: 12, color: "#2B5F4A", marginTop: 12 }} />
+                <ArrowRight className="w-3.5 h-3.5 text-emerald-700 mt-3 group-hover:translate-x-0.5 transition-transform" />
               </Link>
             ))}
           </div>

@@ -189,11 +189,9 @@ export function CategoryPage({
               </p>
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 1, background: "var(--sl-gray-light)" }}>
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
               {paginatedProducts.map((p) => (
-                <div key={p.id} style={{ background: "white" }}>
-                  <ProductCard product={p} />
-                </div>
+                <ProductCard key={p.id} product={p} />
               ))}
             </div>
           )}

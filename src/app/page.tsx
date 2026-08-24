@@ -230,22 +230,23 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 1, background: "var(--sl-gray-light)" }}>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
             {categories.map((cat) => (
-              <Link key={cat.href} href={cat.href} style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "28px 24px", background: "white", textDecoration: "none", minHeight: 160, transition: "background 0.15s", position: "relative" }}
-                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "#F6FAF8")}
-                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "white")}
+              <Link
+                key={cat.href}
+                href={cat.href}
+                className="flex flex-col justify-between p-5 bg-white border border-gray-200 rounded-xl hover:border-emerald-600 hover:shadow-md transition-all group no-underline min-h-[150px] relative"
               >
                 {cat.badge && (
-                  <span style={{ position: "absolute", top: 12, right: 12, fontSize: 8, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", padding: "2px 7px", background: "#E8F0EC", color: "#2B5F4A", border: "1px solid #C5DDD3" }}>
+                  <span className="absolute top-3 right-3 text-[8px] font-bold tracking-wider uppercase px-2 py-0.5 bg-[#E8F0EC] text-[#2B5F4A] border border-[#C5DDD3] rounded">
                     {cat.badge}
                   </span>
                 )}
                 <div>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: "var(--sl-ink)", margin: "0 0 6px", lineHeight: 1.3 }}>{cat.label}</p>
-                  <p style={{ fontSize: 11, color: "var(--sl-gray-mid)", margin: 0, fontWeight: 300 }}>{cat.desc}</p>
+                  <p className="text-xs font-semibold text-gray-900 group-hover:text-emerald-800 mb-1.5 leading-snug">{cat.label}</p>
+                  <p className="text-[10px] text-gray-500 font-light leading-relaxed">{cat.desc}</p>
                 </div>
-                <ArrowRight style={{ width: 14, height: 14, color: "#2B5F4A", marginTop: 16 }} />
+                <ArrowRight className="w-3.5 h-3.5 text-emerald-700 mt-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             ))}
           </div>

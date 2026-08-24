@@ -50,16 +50,19 @@
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .sl-card {
   background: var(--sl-white);
-  border: 1px solid var(--sl-gray-light);
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
   overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .sl-card:hover {
-  border-color: #BFBFBF;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+  border-color: #CBD5E1;
+  box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
+  transform: translateY(-2px);
 }
 
 /* Image zone */
@@ -67,8 +70,9 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
-  background: var(--sl-gray-bg);
+  background: #F9FAFB;
   overflow: hidden;
+  border-bottom: 1px solid #F3F4F6;
 }
 
 .sl-card-image img {
@@ -86,7 +90,7 @@
 .sl-card-placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #F0EDE8 0%, #E8E3DC 100%);
+  background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -97,13 +101,13 @@
 .sl-card-placeholder-line {
   width: 1px;
   height: 28px;
-  background: #B0A898;
+  background: #D1D5DB;
 }
 
 .sl-card-placeholder-label {
   font-size: 9px;
   letter-spacing: 0.28em;
-  color: #9A907F;
+  color: #9CA3AF;
   text-transform: uppercase;
   font-weight: 500;
 }
@@ -121,6 +125,7 @@
   background: white;
   color: var(--sl-ink);
   border: 1px solid var(--sl-gray-light);
+  border-radius: 4px;
   z-index: 10;
 }
 
@@ -142,14 +147,14 @@
 .sl-card-eyebrow {
   font-size: 9px;
   font-weight: 600;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--sl-gray-mid);
 }
 
 .sl-card-name {
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--sl-ink);
   line-height: 1.35;
   display: -webkit-box;
@@ -183,12 +188,13 @@
 .sl-pill {
   font-size: 9px;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 3px 7px;
-  border: 1px solid var(--sl-gray-light);
+  padding: 3px 8px;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
   color: var(--sl-gray-dark);
-  background: transparent;
+  background: #F9FAFB;
   cursor: pointer;
   transition: all 0.15s ease;
   line-height: 1;
@@ -210,7 +216,7 @@
 .sl-card-footer {
   margin-top: auto;
   padding-top: 10px;
-  border-top: 1px solid var(--sl-gray-bg);
+  border-top: 1px solid #F3F4F6;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -219,7 +225,7 @@
 
 .sl-price {
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--sl-ink);
   font-variant-numeric: tabular-nums;
 }
@@ -236,14 +242,15 @@
 .sl-add-btn {
   font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  padding: 6px 12px;
+  padding: 6px 14px;
+  border-radius: 6px;
   background: var(--sl-ink);
   color: white;
   border: none;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: all 0.15s ease;
   white-space: nowrap;
 }
 

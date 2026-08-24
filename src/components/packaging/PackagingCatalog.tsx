@@ -367,11 +367,9 @@ export function PackagingCatalog() {
               </p>
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1, background: "var(--sl-gray-light)" }}>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5">
               {filteredProducts.map((item) => (
-                <div key={item.id} style={{ background: "white" }}>
-                  <PackagingProductCard item={item} />
-                </div>
+                <PackagingProductCard key={item.id} item={item} />
               ))}
             </div>
           )}
