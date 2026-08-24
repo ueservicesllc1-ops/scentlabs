@@ -1,6 +1,6 @@
 export const siteConfig = {
-  name: "SCENTLAB",
-  tagline: "Professional Fragrance Supplies & Packaging",
+  name: "ScentLabs Supply",
+  tagline: "Wholesale Fragrance Compounding & Supplies",
   description: "Everything you need to create, package and sell your own fragrances.",
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://scentlab.pro",
   ogImage: "https://scentlab.pro/og.jpg",

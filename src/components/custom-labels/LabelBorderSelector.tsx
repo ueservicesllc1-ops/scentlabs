@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
-import { Check, ChevronDown, Square } from "lucide-react";
+import React from "react";
+import { ChevronDown, Square } from "lucide-react";
 
-export type LabelBorderStyle = "none" | "full_edge" | "inset_margin";
+export type LabelBorderStyle = "none" | "outer_edge" | "inner_edge" | "inset_margin";
 
 export interface LabelBorderOption {
   id: LabelBorderStyle;
@@ -15,17 +15,22 @@ export const LABEL_BORDER_OPTIONS: LabelBorderOption[] = [
   {
     id: "none",
     name: "Sin Marco (Clean Cut)",
-    description: "Diseño limpio sin líneas de marco alrededor de la etiqueta.",
+    description: "Diseño limpio sin líneas de marco.",
   },
   {
-    id: "full_edge",
-    name: "Marco en el Borde Exterior",
-    description: "Línea de marco ajustada al borde exterior de la etiqueta.",
+    id: "outer_edge",
+    name: "Marco en el Borde Exterior Exacto",
+    description: "Totalmente al límite exterior de corte (sin espacio).",
+  },
+  {
+    id: "inner_edge",
+    name: "Marco Interior",
+    description: "Ajustado con un ligero espacio / margen interior.",
   },
   {
     id: "inset_margin",
-    name: "Marco Inset con Margen Interior",
-    description: "Línea de marco elegante dejando un espacio / margen desde el borde.",
+    name: "Marco Inset Margen Amplio",
+    description: "Marco flotante dejando un espacio interior más amplio.",
   },
 ];
 
@@ -38,82 +43,30 @@ export function LabelBorderSelector({
   selectedBorderStyle,
   onSelectBorderStyle,
 }: LabelBorderSelectorProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const activeOption =
-    LABEL_BORDER_OPTIONS.find((b) => b.id === selectedBorderStyle) || LABEL_BORDER_OPTIONS[0];
-
   return (
-    <div className="space-y-2 relative">
-      <div className="flex justify-between items-center text-xs">
-        <label className="text-[10px] font-semibold tracking-[0.2em] uppercase text-gray-900 flex items-center gap-1.5">
-          <Square className="w-3.5 h-3.5 text-[#2B5F4A]" /> Marco del Diseño (Desplegable)
+    <div className="space-y-2 flex flex-col justify-end">
+      <div className="flex justify-between items-end text-xs min-h-[32px] pb-0.5">
+        <label htmlFor="label-border-select" className="text-[10px] font-semibold tracking-[0.15em] uppercase text-gray-900 flex items-center gap-1.5 cursor-pointer leading-tight">
+          <Square className="w-3.5 h-3.5 text-[#2B5F4A] shrink-0" />
+          <span>Marco del Diseño</span>
         </label>
-        <span className="text-[10px] text-gray-400 font-mono">3 Estilos de Marco</span>
+        <span className="text-[10px] text-gray-400 shrink-0 font-mono">4 Estilos</span>
       </div>
 
-      {/* Custom Dropdown Trigger Button */}
       <div className="relative">
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-full p-3 bg-gray-50 hover:bg-white border border-gray-200 focus:border-[#2B5F4A] transition flex items-center justify-between text-left shadow-xs"
+        <select
+          id="label-border-select"
+          value={selectedBorderStyle}
+          onChange={(e) => onSelectBorderStyle(e.target.value as LabelBorderStyle)}
+          className="w-full h-11 px-3 bg-gray-50 hover:bg-white border border-gray-200 focus:border-[#2B5F4A] focus:outline-none transition text-xs font-bold text-gray-900 appearance-none cursor-pointer pr-8 shadow-xs truncate"
         >
-          <div className="flex items-center gap-3">
-            <span className="text-[10px] font-bold uppercase text-gray-500 bg-gray-200 px-1.5 py-0.5 rounded">
-              {activeOption.id === "none" ? "Limpio" : activeOption.id === "full_edge" ? "Borde" : "Inset"}
-            </span>
-            <div>
-              <span className="text-xs font-bold text-gray-900 block">{activeOption.name}</span>
-              <span className="text-[10px] text-gray-500 font-light block">
-                {activeOption.description}
-              </span>
-            </div>
-          </div>
-          <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
-        </button>
-
-        {/* Dropdown Options List */}
-        {isOpen && (
-          <>
-            {/* Backdrop to close on outside click */}
-            <div className="fixed inset-0 z-20" onClick={() => setIsOpen(false)} />
-
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 shadow-xl z-30 max-h-72 overflow-y-auto divide-y divide-gray-100 font-sans">
-              {LABEL_BORDER_OPTIONS.map((opt) => {
-                const isSelected = selectedBorderStyle === opt.id;
-
-                return (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => {
-                      onSelectBorderStyle(opt.id);
-                      setIsOpen(false);
-                    }}
-                    className={`w-full p-3 text-left transition flex items-center justify-between hover:bg-[#F6FAF8] ${
-                      isSelected ? "bg-[#F6FAF8]" : "bg-white"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-[9px] uppercase font-bold text-gray-400 w-12">
-                        {opt.id === "none" ? "SIN" : opt.id === "full_edge" ? "BORDE" : "INSET"}
-                      </span>
-                      <div>
-                        <span className="text-xs font-bold text-gray-900 block">{opt.name}</span>
-                        <span className="text-[10px] text-gray-500 font-light block">
-                          {opt.description}
-                        </span>
-                      </div>
-                    </div>
-
-                    {isSelected && <Check className="w-4 h-4 text-[#2B5F4A] shrink-0 ml-2" />}
-                  </button>
-                );
-              })}
-            </div>
-          </>
-        )}
+          {LABEL_BORDER_OPTIONS.map((opt) => (
+            <option key={opt.id} value={opt.id} className="p-2 text-xs">
+              {opt.name} — {opt.description}
+            </option>
+          ))}
+        </select>
+        <ChevronDown className="w-4 h-4 text-gray-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
       </div>
     </div>
   );

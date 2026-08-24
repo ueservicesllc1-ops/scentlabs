@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { AdminGuard } from "@/components/auth/AdminGuard";
+import FragranceOilEditModal from "@/components/admin/FragranceOilEditModal";
 import { fragranceRepository } from "@/lib/firestore/fragrance";
 import { FragranceOil } from "@/types/fragrance";
 import { formatCurrency, formatUnitPrice } from "@/lib/utils";
@@ -20,7 +21,8 @@ import {
   SlidersHorizontal,
   RefreshCw,
   Building2,
-  Tag
+  Tag,
+  Trash2
 } from "lucide-react";
 
 export default function AdminFragranceDashboardPage() {
@@ -28,12 +30,29 @@ export default function AdminFragranceDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [familyFilter, setFamilyFilter] = useState("all");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [editingFragrance, setEditingFragrance] = useState<FragranceOil | null>(null);
 
   const fetchFragrances = async () => {
     setLoading(true);
     const all = await fragranceRepository.getAllFragrances();
     setFragrances(all);
     setLoading(false);
+  };
+
+  const handleDeleteFragrance = async (id: string, name: string) => {
+    if (!confirm(`¿Estás seguro de que deseas eliminar permanentemente el aceite de fragancia '${name}'?`)) {
+      return;
+    }
+    setDeletingId(id);
+    try {
+      await fragranceRepository.deleteFragrance(id);
+      await fetchFragrances();
+    } catch (err: any) {
+      alert("Error al eliminar fragancia: " + err.message);
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   useEffect(() => {
@@ -51,12 +70,26 @@ export default function AdminFragranceDashboardPage() {
 
   const filtered = fragrances.filter((f) => {
     const q = searchQuery.toLowerCase().trim();
-    const matchesSearch =
-      !q ||
-      f.name.toLowerCase().includes(q) ||
-      f.scentFamily.toLowerCase().includes(q) ||
-      (f.supplierProductId && f.supplierProductId.toLowerCase().includes(q)) ||
-      (f.fragranceReference && f.fragranceReference.toLowerCase().includes(q));
+    if (!q) return familyFilter === "all" || f.scentFamily.toLowerCase() === familyFilter.toLowerCase();
+
+    // Build a full searchable text blob for this fragrance
+    const searchable = [
+      f.name,
+      f.scentFamily,
+      f.supplierProductId,
+      f.fragranceReference,
+      f.supplierName,
+      f.slug,
+      f.description,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+
+    // All tokens must match somewhere in the searchable blob
+    const tokens = q.split(/\s+/).filter(Boolean);
+    const matchesSearch = tokens.every((token) => searchable.includes(token));
+
     const matchesFamily = familyFilter === "all" || f.scentFamily.toLowerCase() === familyFilter.toLowerCase();
     return matchesSearch && matchesFamily;
   });
@@ -280,13 +313,25 @@ export default function AdminFragranceDashboardPage() {
 
                       {/* Action Button */}
                       <td className="py-3.5 px-4 text-right">
-                        <Link
-                          href={`/admin/fragrance/${f.id}`}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white border border-gray-300 text-xs font-semibold text-gray-800 hover:bg-gray-100 hover:text-gray-950 transition shadow-xs"
-                        >
-                          <Edit3 className="w-3 h-3 text-gray-500" />
-                          <span>Edit / Fraction</span>
-                        </Link>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setEditingFragrance(f)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white border border-gray-300 text-xs font-semibold text-gray-800 hover:bg-gray-100 hover:text-gray-950 transition shadow-xs"
+                          >
+                            <Edit3 className="w-3 h-3 text-gray-500" />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            type="button"
+                            disabled={deletingId === f.id}
+                            onClick={() => handleDeleteFragrance(f.id, f.name)}
+                            className="p-1.5 rounded-lg bg-white border border-gray-300 text-gray-600 hover:text-red-700 hover:bg-red-50 transition shadow-xs disabled:opacity-40"
+                            title="Eliminar fragancia"
+                          >
+                            <Trash2 className="w-3.5 h-3.5 text-red-600" />
+                          </button>
+                        </div>
                       </td>
 
                     </tr>
@@ -307,6 +352,14 @@ export default function AdminFragranceDashboardPage() {
         </div>
 
       </div>
+
+      {/* Fragrance Oil Edit Modal */}
+      <FragranceOilEditModal
+        isOpen={Boolean(editingFragrance)}
+        fragrance={editingFragrance}
+        onClose={() => setEditingFragrance(null)}
+        onSaved={fetchFragrances}
+      />
     </AdminGuard>
   );
 }

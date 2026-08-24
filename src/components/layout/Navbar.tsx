@@ -47,17 +47,21 @@ export function Navbar() {
 
       {/* ── Main Top Navbar ── */}
       <header style={{ background: "rgba(255,255,255,0.98)", backdropFilter: "blur(8px)", position: "sticky", top: 0, zIndex: 50, borderBottom: "1px solid #EEEEEE" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", maxWidth: "1280px", margin: "0 auto", padding: "14px 24px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", maxWidth: "1280px", margin: "0 auto", padding: "8px 24px" }}>
           
           {/* Logo */}
           <Link
             href="/"
-            style={{ fontSize: "15px", fontWeight: 800, letterSpacing: "0.25em", color: "#111111", textDecoration: "none", textTransform: "uppercase" }}
+            style={{ display: "flex", alignItems: "center", textDecoration: "none" }}
+            className="shrink-0"
           >
-            SCENTLAB
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.png?v=10"
+              alt="Logo"
+              style={{ height: "40px", width: "auto", objectFit: "contain" }}
+            />
           </Link>
-
-          {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-7">
             {navLinks.map((link) => {
               const isActive = pathname === link.href || (link.href !== "/" && pathname?.startsWith(link.href));

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Type, ChevronDown, Check } from "lucide-react";
+import React from "react";
+import { ChevronDown, Type } from "lucide-react";
 
 export interface LabelFontOption {
   id: string;
@@ -33,82 +33,36 @@ export function LabelFontSelector({
   selectedFontId,
   onSelectFont,
 }: LabelFontSelectorProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
   const activeFont =
     LABEL_FONTS.find((f) => f.id === selectedFontId || f.family === selectedFontId) || LABEL_FONTS[0];
 
   return (
-    <div className="space-y-2 relative">
-      <div className="flex justify-between items-center text-xs">
-        <label className="text-[10px] font-semibold tracking-[0.2em] uppercase text-gray-900 flex items-center gap-1.5">
-          <Type className="w-3.5 h-3.5 text-[#2B5F4A]" /> Tipografía / Estilo de Fuente (Desplegable)
+    <div className="space-y-2 flex flex-col justify-end">
+      <div className="flex justify-between items-end text-xs min-h-[32px] pb-0.5">
+        <label htmlFor="label-font-select" className="text-[10px] font-semibold tracking-[0.15em] uppercase text-gray-900 flex items-center gap-1.5 cursor-pointer leading-tight">
+          <Type className="w-3.5 h-3.5 text-[#2B5F4A] shrink-0" />
+          <span>Tipografía / Fuente</span>
         </label>
-        <span className="text-[10px] text-gray-400">10 Fuentes de Lujo</span>
+        <span className="text-[10px] text-gray-400 shrink-0 font-mono">10 Fuentes</span>
       </div>
 
-      {/* Custom Dropdown Trigger Button */}
       <div className="relative">
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-full p-3 bg-gray-50 hover:bg-white border border-gray-200 focus:border-[#2B5F4A] transition flex items-center justify-between text-left shadow-xs"
+        <select
+          id="label-font-select"
+          value={activeFont.id}
+          onChange={(e) => {
+            const found = LABEL_FONTS.find((f) => f.id === e.target.value);
+            if (found) onSelectFont(found);
+          }}
+          className="w-full h-11 px-3 bg-gray-50 hover:bg-white border border-gray-200 focus:border-[#2B5F4A] focus:outline-none transition text-xs font-bold text-gray-900 appearance-none cursor-pointer pr-8 shadow-xs truncate"
         >
-          <div className="flex items-center gap-3">
-            <span className="text-[10px] uppercase font-bold text-gray-400 bg-gray-200 px-1.5 py-0.5 rounded">
-              {activeFont.category}
-            </span>
-            <div>
-              <span className="text-xs font-bold text-gray-900 block">{activeFont.name}</span>
-              <span style={{ fontFamily: activeFont.family }} className="text-xs text-[#2B5F4A] block font-semibold">
-                {activeFont.previewText}
-              </span>
-            </div>
-          </div>
-          <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
-        </button>
-
-        {/* Dropdown Options List */}
-        {isOpen && (
-          <>
-            {/* Backdrop to close on outside click */}
-            <div className="fixed inset-0 z-20" onClick={() => setIsOpen(false)} />
-
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 shadow-xl z-30 max-h-72 overflow-y-auto divide-y divide-gray-100 font-sans">
-              {LABEL_FONTS.map((font) => {
-                const isSelected = activeFont.id === font.id;
-
-                return (
-                  <button
-                    key={font.id}
-                    type="button"
-                    onClick={() => {
-                      onSelectFont(font);
-                      setIsOpen(false);
-                    }}
-                    className={`w-full p-3 text-left transition flex items-center justify-between hover:bg-[#F6FAF8] ${
-                      isSelected ? "bg-[#F6FAF8]" : "bg-white"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-[9px] uppercase font-semibold text-gray-400 w-10">
-                        {font.category}
-                      </span>
-                      <div>
-                        <span className="text-xs font-semibold text-gray-900 block">{font.name}</span>
-                        <span style={{ fontFamily: font.family }} className="text-xs text-[#2B5F4A] block">
-                          {font.previewText}
-                        </span>
-                      </div>
-                    </div>
-
-                    {isSelected && <Check className="w-4 h-4 text-[#2B5F4A]" />}
-                  </button>
-                );
-              })}
-            </div>
-          </>
-        )}
+          {LABEL_FONTS.map((font) => (
+            <option key={font.id} value={font.id} className="p-2 text-xs">
+              {font.name} ({font.category}) — {font.previewText}
+            </option>
+          ))}
+        </select>
+        <ChevronDown className="w-4 h-4 text-gray-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
       </div>
     </div>
   );

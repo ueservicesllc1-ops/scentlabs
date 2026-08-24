@@ -5,18 +5,10 @@ import Link from "next/link";
 import { AdminGuard } from "@/components/auth/AdminGuard";
 import { testingRepository } from "@/lib/firestore/testing";
 import { TestingProduct, SampleKitBundleFoundation } from "@/types/testing";
-import { formatCurrency, formatUnitPrice } from "@/lib/utils";
+import TestingProductEditModal from "@/components/admin/TestingProductEditModal";
 import { 
   FlaskConical, 
   Plus, 
-  Search, 
-  Tag, 
-  SlidersHorizontal, 
-  Layers, 
-  AlertTriangle, 
-  ExternalLink, 
-  ArrowRight,
-  Package,
   Edit3 
 } from "lucide-react";
 
@@ -24,16 +16,19 @@ export default function AdminTestingDashboardPage() {
   const [products, setProducts] = useState<TestingProduct[]>([]);
   const [kits, setKits] = useState<SampleKitBundleFoundation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingProduct, setEditingProduct] = useState<TestingProduct | null>(null);
+
+  const loadData = async () => {
+    setLoading(true);
+    const prods = await testingRepository.getAllTestingProducts();
+    setProducts(prods);
+    const kt = await testingRepository.getTestingKits();
+    setKits(kt);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const load = async () => {
-      const prods = await testingRepository.getAllTestingProducts();
-      setProducts(prods);
-      const kt = await testingRepository.getTestingKits();
-      setKits(kt);
-      setLoading(false);
-    };
-    load();
+    loadData();
   }, []);
 
   const totalBlotters = products.find((p) => p.testingType === "blotter_strip")?.inventory.quantityInStock || 0;
@@ -124,7 +119,13 @@ export default function AdminTestingDashboardPage() {
                   return (
                     <tr key={p.id} className="hover:bg-gray-50/80 transition">
                       <td className="py-3 px-4">
-                        <div className="font-semibold text-gray-950">{p.name}</div>
+                        <button
+                          type="button"
+                          onClick={() => setEditingProduct(p)}
+                          className="font-semibold text-gray-950 text-left hover:underline"
+                        >
+                          {p.name}
+                        </button>
                         <div className="text-[10px] text-gray-500 font-mono">{p.sku}</div>
                       </td>
                       <td className="py-3 px-4">
@@ -148,12 +149,13 @@ export default function AdminTestingDashboardPage() {
                         {p.inventory.quantityInStock}
                       </td>
                       <td className="py-3 px-4 text-right">
-                        <Link
-                          href={`/admin/testing/${p.id}`}
+                        <button
+                          type="button"
+                          onClick={() => setEditingProduct(p)}
                           className="px-2.5 py-1 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 text-gray-800 text-[11px] font-semibold inline-flex items-center gap-1 shadow-xs transition"
                         >
                           <Edit3 className="w-3 h-3 text-gray-500" /> Edit
-                        </Link>
+                        </button>
                       </td>
                     </tr>
                   );
@@ -162,6 +164,14 @@ export default function AdminTestingDashboardPage() {
             </table>
           </div>
         </div>
+
+        {/* ━━━━ EDIT MODAL ━━━━ */}
+        <TestingProductEditModal
+          isOpen={!!editingProduct}
+          onClose={() => setEditingProduct(null)}
+          product={editingProduct}
+          onSaved={loadData}
+        />
 
       </div>
     </AdminGuard>

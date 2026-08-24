@@ -48,14 +48,15 @@ export function Footer() {
 
         {/* Brand */}
         <div>
-          <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", color: "white", display: "block", marginBottom: 16 }}>
-            SCENTLAB
-          </span>
+          <div style={{ marginBottom: 16 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png?v=10" alt="Logo" style={{ height: 50, width: "auto", objectFit: "contain" }} />
+          </div>
           <p style={{ fontSize: 12, fontWeight: 300, lineHeight: 1.7, maxWidth: 280, color: "rgba(255,255,255,0.45)", margin: "0 0 24px" }}>
             Wholesale fragrance oils, clinical-grade packaging, and custom labels for artisan perfumers and growing brands.
           </p>
           <p style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", margin: 0 }}>
-            © {new Date().getFullYear()} SCENTLAB Wholesale. All rights reserved.
+            © {new Date().getFullYear()} ScentLabs Supply. All rights reserved.
           </p>
         </div>
 

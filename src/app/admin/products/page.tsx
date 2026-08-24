@@ -159,7 +159,7 @@ export default function AdminProductsPage() {
   const handleDelete = async (id: string, name: string) => {
     if (
       !confirm(
-        `Are you sure you want to permanently delete '${name}'? This action cannot be undone if no orders/transactions are attached.`
+        `¿Estás seguro de que deseas eliminar permanentemente el producto '${name}'? Esta acción no se puede deshacer.`
       )
     ) {
       return;
@@ -167,14 +167,14 @@ export default function AdminProductsPage() {
     setActionLoadingId(id);
     setFeedbackMsg(null);
     try {
-      const result = await productService.deleteProduct(id);
+      const result = await productService.deleteProduct(id, true);
       if (result.success) {
-        setFeedbackMsg({ type: "success", text: `Product '${name}' permanently deleted.` });
+        setFeedbackMsg({ type: "success", text: `Producto '${name}' eliminado permanentemente del sistema.` });
         await fetchProducts();
       } else {
         setFeedbackMsg({
           type: "error",
-          text: result.error || "Failed to delete product.",
+          text: result.error || "No se pudo eliminar el producto.",
         });
       }
     } catch (err: any) {
@@ -479,9 +479,13 @@ export default function AdminProductsPage() {
                               </div>
                               <div className="space-y-0.5">
                                 <div className="font-semibold text-gray-950 flex items-center gap-1.5">
-                                  <Link href={`/admin/products/${product.id}/edit`} className="hover:underline">
+                                  <button
+                                    type="button"
+                                    onClick={() => setQuickEditProduct(product)}
+                                    className="hover:underline text-left font-semibold text-gray-950"
+                                  >
                                     {product.name}
-                                  </Link>
+                                  </button>
                                   {product.featured && (
                                     <span className="text-[9px] bg-purple-50 text-purple-800 px-1.5 py-0.2 rounded border border-purple-200 font-bold">
                                       ★

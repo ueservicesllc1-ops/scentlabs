@@ -1,21 +1,24 @@
 import { FragranceOil } from "@/types/fragrance";
-import { calculateRepackagingCost, calculateSuggestedRetailPrice, calculateGrossMargin } from "@/lib/fragrance/pricing";
-import africaFragrancesRaw from "./africa-imports-fragrances.json";
+import fragrancesClean from "./fragrances-clean.json";
 
-const importedMap = new Map<string, FragranceOil>();
+export function cleanFragranceName(name: string): string {
+  return name; // Already cleaned in the build-time JSON
+}
 
-(africaFragrancesRaw as unknown as FragranceOil[]).forEach((f) => {
-  // Enforce approved customer-facing sizes (1, 2, 4, 8, 16 oz)
-  const approvedVariants = (f.repackagingVariants || []).filter((v) =>
-    [1, 2, 4, 8, 16].includes(Number(v.sellingSize))
-  );
+export function inferScentFamily(name: string, description: string = "", currentFamily: string = ""): string {
+  const text = `${name} ${description}`.toLowerCase();
+  if (currentFamily && currentFamily !== "Woody" && currentFamily !== "woody") return currentFamily;
+  if (/citrus|lemon|lime|orange|bergamot|grapefruit|tangerine|mandarin|yuzu|lemongrass|clementine/.test(text)) return "Citrus";
+  if (/floral|rose|jasmine|gardenia|lavender|violet|peony|orchid|blossom|tulip|magnolia|lily|tuberose|iris|hibiscus|lilac|freesia|lotus|plumeria|daisy|ylang/.test(text)) return "Floral";
+  if (/vanilla|coconut|chocolate|cocoa|coffee|honey|sugar|caramel|sweet|cream|milk|cookie|cake|candy|almond|cinnamon|butter|mango|peach|apple|berry|cherry|strawberry|pineapple|banana|watermelon|fig|pear|plum/.test(text)) return "Gourmand";
+  if (/clean|fresh|powder|linen|breeze|rain|water|aquatic|ocean|sea|cotton|ice|bamboo|soap|pure|sky/.test(text)) return "Fresh";
+  if (/amber|musk|oud|oudh|incense|myrrh|frankincense|tonka|patchouli|saffron|cardamom|opium|oriental/.test(text)) return "Amber";
+  if (/tobacco|leather|smoke|cigar|rum|suede/.test(text)) return "Tobacco";
+  if (/cedar|sandalwood|pine|oak|wood|woody|cypress|birch|vetiver|mahogany|driftwood|teak/.test(text)) return "Woody";
+  const families = ["Amber", "Floral", "Fresh", "Citrus", "Oriental", "Gourmand", "Woody"];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) { hash = (hash << 5) - hash + name.charCodeAt(i); hash |= 0; }
+  return families[Math.abs(hash) % families.length];
+}
 
-  importedMap.set(f.id, {
-    ...f,
-    category: "fragrance_oils",
-    status: (f.status as string) === "archived" ? "discontinued" : "active",
-    repackagingVariants: approvedVariants.length > 0 ? approvedVariants : f.repackagingVariants,
-  });
-});
-
-export const INITIAL_FRAGRANCES: FragranceOil[] = Array.from(importedMap.values());
+export const INITIAL_FRAGRANCES: FragranceOil[] = (fragrancesClean as unknown as FragranceOil[]);

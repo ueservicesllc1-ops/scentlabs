@@ -148,28 +148,37 @@ export default function HomePage() {
     <main style={{ background: "white", color: "var(--sl-ink)" }}>
 
       {/* ━━━━ HERO ━━━━ */}
-      <section style={{ position: "relative", minHeight: "88vh", background: "#0E1A14", overflow: "hidden", display: "flex", alignItems: "flex-end" }}>
+      <section style={{ position: "relative", minHeight: "88vh", background: "transparent", overflow: "hidden", display: "flex", alignItems: "flex-end" }}>
         {/* Background */}
         <div style={{
           position: "absolute", inset: 0,
-          backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuDXDXBHARws9mKgORT8Phj-P4ilJYhjYYDSl_Mi7gmAfjUqAWCwXqnv_DyDaTgSUBD0plg4QWjpMthFrdNK4rAf85DeMHFgcEOKGDKfOyBPZMu-apkNe_XhNAshUgY7T3-QoLjjOUuZ1poiCmBsbZ0-J1g9RZXLpLeHo_zHBk3N-WiV_44Z-jOdRf-JOObHJ2vPDnBKQQ7LqxL0AdWXj9BKyzAJvZDUB_daAthYshQO5XCgND7DUPqGEQ')`,
+          backgroundImage: `url('/banner.png?v=1')`,
           backgroundSize: "cover", backgroundPosition: "center",
-          opacity: 0.3,
+          opacity: 1,
         }} />
         {/* Bottom gradient to white */}
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 120, background: "linear-gradient(to top, white, transparent)", zIndex: 10 }} />
 
         {/* Content */}
-        <div style={{ position: "relative", zIndex: 20, maxWidth: 1280, margin: "0 auto", padding: "0 40px 72px", width: "100%" }}>
+        <div style={{ position: "relative", zIndex: 20, maxWidth: 1280, margin: "0 auto", padding: "180px 40px 48px", width: "100%" }}>
           <div style={{ maxWidth: 640 }}>
-            <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", color: "#5EAB85", marginBottom: 16 }}>
+            <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", color: "#FFFFFF", marginBottom: 16 }}>
               Wholesale Perfume Supplies · EST. 2024
             </p>
-            <h1 style={{ fontSize: "clamp(36px, 6vw, 64px)", fontWeight: 300, color: "white", lineHeight: 1.08, letterSpacing: "-0.02em", marginBottom: 20, fontFamily: "var(--font-cormorant), Georgia, serif" }}>
+            <h1 style={{
+              fontSize: "clamp(36px, 6vw, 64px)", fontWeight: 300, color: "#FFFFFF", lineHeight: 1.08, letterSpacing: "-0.02em", marginBottom: 20, fontFamily: "var(--font-cormorant), Georgia, serif",
+              textShadow: "0 2px 8px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.5)",
+            }}>
               Everything You Need<br />
-              <em style={{ fontStyle: "normal", color: "#8FD5B0" }}>to Craft Perfumes.</em>
+              <em style={{
+                fontStyle: "normal", color: "#8FD5B0",
+                textShadow: "0 2px 8px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.5)",
+              }}>to Craft Perfumes.</em>
             </h1>
-            <p style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", fontWeight: 300, lineHeight: 1.7, maxWidth: 440, marginBottom: 36 }}>
+            <p style={{
+              fontSize: 14, color: "#FFFFFF", fontWeight: 400, lineHeight: 1.7, maxWidth: 440, marginBottom: 36,
+              textShadow: "0 1px 6px rgba(0, 0, 0, 0.55)",
+            }}>
               Fragrance oils, bottles, custom labels and packaging for perfume makers, indie brands and formulators.
             </p>
             <div style={{ display: "flex", alignItems: "center", gap: 28, flexWrap: "wrap" }}>
@@ -178,12 +187,14 @@ export default function HomePage() {
                 fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase",
                 textDecoration: "none", transition: "background 0.15s",
                 display: "inline-block",
+                boxShadow: "0 4px 14px rgba(0,0,0,0.3)",
               }}>
                 Shop Fragrances
               </Link>
               <Link href="/shop" style={{
                 fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase",
-                color: "rgba(255,255,255,0.5)", textDecoration: "none", display: "flex", alignItems: "center", gap: 8,
+                color: "white", textDecoration: "none", display: "flex", alignItems: "center", gap: 8,
+                textShadow: "0 1px 4px rgba(0, 0, 0, 0.4)",
               }}>
                 All Categories <ArrowRight style={{ width: 14, height: 14 }} />
               </Link>

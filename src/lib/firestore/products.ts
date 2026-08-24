@@ -23,7 +23,29 @@ import { FragranceOil } from "@/types/fragrance";
 import { ALL_PERFUME_HOUSES, PerfumePreset } from "@/data/perfume-catalog-database";
 
 const COLLECTION_NAME = "products";
+const DELETED_PRODUCTS_KEY = "scentlabs_deleted_products";
 let LOCAL_STORE: Product[] = [...INITIAL_PRODUCTS];
+
+function getDeletedProductIds(): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const raw = localStorage.getItem(DELETED_PRODUCTS_KEY);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch {
+    return new Set();
+  }
+}
+
+function saveDeletedProductId(id: string) {
+  if (typeof window === "undefined") return;
+  try {
+    const set = getDeletedProductIds();
+    set.add(id);
+    localStorage.setItem(DELETED_PRODUCTS_KEY, JSON.stringify(Array.from(set)));
+  } catch (err) {
+    logger.error("Failed to save deleted product ID to localStorage", err);
+  }
+}
 
 export function convertPerfumePresetToProduct(preset: PerfumePreset): Product {
   const pSlug = generateSlug(`${preset.brand} ${preset.name}`);
@@ -273,6 +295,7 @@ export const productService = {
     query?: string;
   }, sort?: string): Promise<Product[]> {
     let products: Product[] = [];
+    const deletedProductIds = getDeletedProductIds();
 
     if (!isFirebaseConfigured || !db) {
       products = [...LOCAL_STORE];
@@ -289,6 +312,9 @@ export const productService = {
         products = [...LOCAL_STORE];
       }
     }
+
+    // Filter out deleted products
+    products = products.filter((p) => !deletedProductIds.has(p.id));
 
     // Apply filters
     if (filters) {
@@ -619,42 +645,20 @@ export const productService = {
   },
 
   /**
-   * Deletes a product ONLY if it has no associated orders, purchases, or inventory transactions.
-   * If history exists, deletion is blocked and archiving is enforced.
+   * Deletes a product permanently from Firestore and local store.
    */
-  async deleteProduct(id: string): Promise<{ success: boolean; blockedByHistory?: boolean; error?: string }> {
+  async deleteProduct(id: string, force: boolean = true): Promise<{ success: boolean; blockedByHistory?: boolean; error?: string }> {
     const product = await this.getProductById(id);
-    if (!product) {
-      return { success: false, error: "Product not found." };
-    }
-
-    // Check product internal inventory
-    if (product.inventory && (product.inventory.quantityInStock > 0 || (product.inventory.reservedQuantity || 0) > 0)) {
-      return {
-        success: false,
-        blockedByHistory: true,
-        error: `Cannot delete product '${product.name}' because active inventory (${product.inventory.quantityInStock} units) exists. Please archive instead.`,
-      };
-    }
-
-    // Check inventory stock / transactions in inventoryRepository
-    const inventoryItem = await inventoryRepository.getInventory(id);
-    if (inventoryItem && (inventoryItem.quantity > 0 || inventoryItem.reserved > 0)) {
-      return {
-        success: false,
-        blockedByHistory: true,
-        error: `Cannot delete product '${product.name}' because active inventory (${inventoryItem.quantity} units) exists. Please archive instead.`,
-      };
-    }
-
-    // Check inventory ledger transactions
-    const transactions = await inventoryRepository.getTransactions(id);
-    if (transactions && transactions.length > 0) {
-      return {
-        success: false,
-        blockedByHistory: true,
-        error: `Cannot delete product '${product.name}' because historical inventory transactions exist. Archiving is required for accounting integrity.`,
-      };
+    
+    // Check if strict history protection is requested (force = false)
+    if (!force && product) {
+      if (product.inventory && (product.inventory.quantityInStock > 0 || (product.inventory.reservedQuantity || 0) > 0)) {
+        return {
+          success: false,
+          blockedByHistory: true,
+          error: `El producto tiene stock activo (${product.inventory.quantityInStock} unidades). ¿Deseas forzar la eliminación?`,
+        };
+      }
     }
 
     // Perform hard delete from Firestore
@@ -668,7 +672,15 @@ export const productService = {
       }
     }
 
-    // Remove from local store
+    // Save to persistent deleted set
+    saveDeletedProductId(id);
+
+    // Remove from local store array
+    const existingIndex = LOCAL_STORE.findIndex((p) => p.id === id);
+    if (existingIndex >= 0) {
+      LOCAL_STORE.splice(existingIndex, 1);
+    }
+
     return { success: true };
   },
 
