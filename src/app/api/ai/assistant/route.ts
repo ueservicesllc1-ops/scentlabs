@@ -228,9 +228,76 @@ function getSmartOlfactoryResponse(userQuery: string): string {
     }
   }
 
-  // 2. Shipping FAQ
-  if (q.includes("envio") || q.includes("envío") || q.includes("shipping") || q.includes("gratis") || q.includes("costo de envio")) {
-    return "🚚 En **SCENTLAB** ofrecemos **ENVÍO GRATIS** en todas las órdenes a partir de **$250 USD** para todo Estados Unidos y Puerto Rico.\n\nPuedes armar tu pedido combinando:\n• [Catálogo de Esencias Puras](/fragrance)\n• [Botellas de Vidrio y Atomizadores](/bottles)\n• [Suministros de Laboratorio y Prueba](/testing)\n• [Etiquetas Personalizadas](/custom-labels)";
+  // 2. Shipping & Returns FAQ (Tiempos, Costos, Envío Gratis $250, Devoluciones, Daños)
+  if (
+    q.includes("envio") ||
+    q.includes("envío") ||
+    q.includes("shipping") ||
+    q.includes("gratis") ||
+    q.includes("cuanto tarda") ||
+    q.includes("cuánto tarda") ||
+    q.includes("tiempo de entrega") ||
+    q.includes("donde envian") ||
+    q.includes("dónde envían") ||
+    q.includes("costo de envio") ||
+    q.includes("tracking") ||
+    q.includes("rastreo") ||
+    q.includes("devolucion") ||
+    q.includes("devolución") ||
+    q.includes("devolver") ||
+    q.includes("daño") ||
+    q.includes("derrame") ||
+    q.includes("roto")
+  ) {
+    return `🚚 **INFORMACIÓN Y POLÍTICAS DE ENVÍO (SCENTLAB)**
+
+• **ENVÍO GRATIS:** A partir de **$250.00 USD** de compra, tu orden califica automáticamente para envío estándar gratuito a todos los 50 estados de EE. UU. y Puerto Rico.
+• **Despacho Rápido (24-48h):** Procesamos, fraccionamos y embalamos los pedidos de lunes a viernes desde nuestro centro de formulación en **Miami, Florida**.
+• **Tiempos de Tránsito:** 
+  - *USPS Ground / UPS Ground:* 2 a 5 días hábiles promedio.
+  - *USPS Priority Mail:* 1 a 3 días hábiles.
+• **Empaque de Seguridad:** Esencias en botellas de plástico transparente con tapa de seguridad hermética sellada antifugas.
+• **Garantía por Daños:** Si algún frasco sufre derrame en tránsito, te enviamos un reemplazo inmediato reportándolo dentro de los primeros 5 días hábiles a *support@scentlab.com*.
+
+👉 [Ver Políticas de Envío y Devoluciones Completas](/shipping)`;
+  }
+
+  // 2.1 Terms & Trademark Disclaimers
+  if (
+    q.includes("termino") ||
+    q.includes("término") ||
+    q.includes("condicion") ||
+    q.includes("condición") ||
+    q.includes("marca registrada") ||
+    q.includes("original o copia") ||
+    q.includes("son originales") ||
+    q.includes("es original") ||
+    q.includes("son clones") ||
+    q.includes("legal")
+  ) {
+    return `⚖️ **CALIDAD GRADO A Y TÉRMINOS COMERCIALES**
+
+• **Pureza Grado A:** Todos nuestros aceites son concentrados puros sin diluir (uncut), formulados para brindar la máxima fijación y proyección en perfumería.
+• **Deslinde de Marcas (Inspiraciones / Type):** Los nombres de diseñadores (como *Tom Ford, Creed, Dior, MFK, Le Labo*, etc.) son marcas registradas de sus respectivos dueños. SCENTLAB no tiene afiliación con ellos; las menciones se realizan exclusivamente bajo la doctrina de *uso legítimo nominativo* para describir el perfil de notas aromáticas.
+
+👉 [Ver Términos y Condiciones de Servicio](/terms)`;
+  }
+
+  // 2.2 Privacy & Payment Security
+  if (
+    q.includes("privacidad") ||
+    q.includes("seguridad") ||
+    q.includes("mis datos") ||
+    q.includes("tarjeta") ||
+    q.includes("pago seguro") ||
+    q.includes("stripe")
+  ) {
+    return `🔒 **PRIVACIDAD Y PAGOS SEGUROS EN SCENTLAB**
+
+• **Pagos Cifrados:** Procesamos todas las transacciones mediante **Stripe Inc.** bajo el estándar bancario de máxima seguridad **PCI-DSS Nivel 1**. Jamás almacenamos los datos de tu tarjeta de crédito.
+• **Protección de Datos:** No vendemos ni compartimos tu información personal o comercial con terceros.
+
+👉 [Ver Política de Privacidad](/privacy)`;
   }
 
   // 3. Perfume formulation / dilution advice

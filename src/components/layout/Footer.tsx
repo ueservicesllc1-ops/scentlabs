@@ -20,6 +20,7 @@ const companyLinks = [
 
 const supportLinks = [
   { label: "Contact Us", href: "/contact" },
+  { label: "Shipping & Returns", href: "/shipping" },
   { label: "Terms of Service", href: "/terms" },
   { label: "Privacy Policy", href: "/privacy" },
 ];
