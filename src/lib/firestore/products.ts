@@ -208,11 +208,22 @@ export const productService = {
       }
     }
 
+    // Helper: a product/fragrance has a usable photo
+    const productHasPhoto = (p: Product) =>
+      !!(p.primaryImageUrl || (p.images && p.images.length > 0) || (p.media && p.media.length > 0));
+    const fragranceHasPhoto = (f: FragranceOil) =>
+      !!(f.primaryImage || (f.images && f.images.length > 0));
+
+    // Only show physical products that have at least one image on the public storefront
+    physicalProducts = physicalProducts.filter(productHasPhoto);
+
     // Fetch active Fragrance Oils from Firestore / repository
     let activeFragrances: FragranceOil[] = [];
     try {
       const allFragrances = await fragranceRepository.getAllFragrances();
-      activeFragrances = allFragrances.filter((f) => f.status === "active" || !f.status);
+      activeFragrances = allFragrances.filter(
+        (f) => (f.status === "active" || !f.status) && fragranceHasPhoto(f)
+      );
     } catch (err) {
       logger.warn("Failed to fetch fragrance oils for storefront catalog", err);
     }

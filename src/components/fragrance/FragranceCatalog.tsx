@@ -23,7 +23,11 @@ export function FragranceCatalog() {
 
   useEffect(() => {
     fragranceRepository.getAllFragrances().then((all) => {
-      setFragrances(all);
+      // Public storefront: only show fragrances that have at least one photo
+      const withPhoto = all.filter(
+        (f) => !!(f.primaryImage || (f.images && f.images.length > 0))
+      );
+      setFragrances(withPhoto);
       setLoading(false);
     });
   }, []);
