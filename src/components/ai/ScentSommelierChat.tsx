@@ -224,16 +224,42 @@ export function ScentSommelierChat() {
                   <div className="whitespace-pre-wrap space-y-1">
                     {m.content.split("\n").map((line, i) => {
                       if (!line.trim()) return <div key={i} className="h-1" />;
-                      
-                      // Simple inline markdown parsing for bold text
-                      const parts = line.split(/(\*\*.*?\*\*)/g);
+
+                      // Rich inline parser: supports both **bold** and [link text](url)
+                      // Tokenize by links first: [title](href)
+                      const linkRegex = /(\[[^\]]+\]\([^)]+\))/g;
+                      const segments = line.split(linkRegex);
+
                       return (
-                        <p key={i} className="my-0.5">
-                          {parts.map((p, j) => {
-                            if (p.startsWith("**") && p.endsWith("**")) {
-                              return <strong key={j} className="font-bold text-emerald-900">{p.slice(2, -2)}</strong>;
+                        <p key={i} className="my-0.5 leading-relaxed">
+                          {segments.map((seg, j) => {
+                            const linkMatch = seg.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+                            if (linkMatch) {
+                              const [, linkText, linkHref] = linkMatch;
+                              return (
+                                <Link
+                                  key={j}
+                                  href={linkHref}
+                                  className="inline-flex items-center gap-1 font-bold text-[#166534] bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300 transition text-[11px] my-0.5 mr-1 no-underline group"
+                                >
+                                  <span>{linkText}</span>
+                                  <ExternalLink className="w-2.5 h-2.5 text-[#2B5F4A] group-hover:translate-x-0.5 transition-transform" />
+                                </Link>
+                              );
                             }
-                            return p;
+
+                            // Bold tokens: **bold text**
+                            const boldParts = seg.split(/(\*\*.*?\*\*)/g);
+                            return boldParts.map((p, k) => {
+                              if (p.startsWith("**") && p.endsWith("**")) {
+                                return (
+                                  <strong key={`${j}-${k}`} className="font-bold text-gray-950">
+                                    {p.slice(2, -2)}
+                                  </strong>
+                                );
+                              }
+                              return p;
+                            });
                           })}
                         </p>
                       );

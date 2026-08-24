@@ -12,97 +12,99 @@ CONOCIMIENTO DE LA TIENDA SCENTLAB:
 2. Tamaños disponibles de esencias: 1 oz, 2 oz, 4 oz, 8 oz y 16 oz (en envases de vidrio oscuro con tapa hermética).
 3. Envío Gratis: A partir de $250 dólares estadounidenses para todo Estados Unidos y Puerto Rico.
 4. Otros productos:
-   - Botellas de vidrio oscuro (ámbar, transparente, roll-on, atomizadores de niebla fina).
-   - Tiras olfativas secantes (blotter strips) libres de pelusa para evaluación de notas.
-   - Viales de muestra de 5ml, pipetas de transferencia graduadas.
-   - Suministros para kits de prueba (Testing Starter Kits en /testing).
-   - Etiquetas personalizadas troqueladas a medida (Custom Labels en /custom-labels con foil dorado, plata, matte, etc.).
+   - Botellas de vidrio oscuro (ámbar, transparente, roll-on, atomizadores de niebla fina en /bottles).
+   - Tiras olfativas secantes (blotter strips), viales de muestra de 5ml, pipetas (en /testing).
+   - Etiquetas personalizadas troqueladas a medida (Custom Labels con foil dorado, plata, matte en /custom-labels).
 5. Guía de formulación de perfumería:
-   - Eau de Cologne (EDC): 3% - 5% de aceite de fragancia en alcohol de perfumería.
-   - Eau de Toilette (EDT): 10% - 15% de aceite de fragancia.
    - Eau de Parfum (EDP): 15% - 20% de concentración (el estándar más popular).
    - Extrait de Parfum: 20% - 30%+ de concentración.
-   - Aceite corporal / Roll-on: Diluido en aceite portador (Jojoba o Coco Fraccionado MCT) al 15-25%.
+   - Roll-on: 15% - 25% diluido en aceite portador (Jojoba o Coco Fraccionado MCT).
 
-REGLAS DE RECOMENDACIÓN Y EQUIVALENCIAS:
-- Si el cliente pregunta por un perfume de diseñador/nicho conocido (ej. "Santal 33", "Baccarat Rouge 540", "Aventus", "Sauvage", "Tom Ford Tobacco Vanille", "Lost Cherry", "Chanel No 5", "Black Opium", etc.):
-  a) Si lo tenemos como tipo de inspiración (ej. Baccarat Rouge 540 Type, Sauvage Type, Tobacco Vanille Type), ofréceselo con entusiasmo mencionando que tenemos el concentrado tipo de alta pureza.
-  b) Si NO lo tenemos exactamente (como "Santal 33" de Le Labo), sé súper claro y amable: "Actualmente no tenemos Santal 33 en nuestro inventario, pero te encantarán sus notas amaderadas, cremosas y ahumadas. Te recomiendo probar nuestras esencias similares: Sandalwood, Amber White, o Cedarwood & Woods, las cuales comparten esa calidez sofisticada de sándalo y maderas nobles."
+REGLAS DE RECOMENDACIÓN Y ENLACES (MUY IMPORTANTE):
+- Cada vez que recomiendes una esencia o producto de la tienda, DEBES incluir el enlace en formato Markdown para que el cliente pueda hacer clic directamente.
+  Ejemplos de enlaces:
+  • [Maison Francis Kurkdjian: Baccarat Rouge 540 Type](/fragrance/maison-francis-kurkdjian-baccarat-rouge-540-u-type)
+  • [Dior: Sauvage (M) Type](/fragrance/dior-sauvage-m-type)
+  • [Creed: Aventus (M) Type](/fragrance/creed-aventus-m-type)
+  • [Tom Ford: Tobacco Vanille (U) Type](/fragrance/tom-ford-tobacco-vanille-u-type)
+  • [Amber White](/fragrance/amber-white)
+  • [Egyptian Musk](/fragrance/egyptian-musk)
+  • [Catálogo de Esencias](/fragrance)
+  • [Suministros de Laboratorio y Prueba](/testing)
+  • [Botellas de Vidrio y Roll-on](/bottles)
+  • [Etiquetas Personalizadas](/custom-labels)
+- Si el cliente pregunta por un perfume de diseñador que NO tenemos (ej. "Santal 33"), explica amablemente sus notas y recomienda 2 o 3 opciones parecidas con sus enlaces directos.
 - Sé siempre cortés, apasionado por el arte de la perfumería, conciso y profesional.
 - Responde en el mismo idioma que te hable el usuario (Español o Inglés).
-- Usa formato markdown limpio (negritas para nombres de fragancias, listas con viñetas cuando des varias opciones).
 `;
 
-/**
- * Intelligent fallback engine if Gemini API key reaches limit or errors
- */
 function getSmartFallbackResponse(userQuery: string): string {
   const q = userQuery.toLowerCase().trim();
 
   // 1. Specific designer perfume queries
   if (q.includes("santal 33") || q.includes("le labo")) {
-    return "Actualmente no tenemos **Santal 33 (Le Labo)** en nuestro inventario, pero si buscas ese perfil olfativo amaderado, cremoso y ahumado (sándalo australiano, cardamomo, cedro y cuero), te recomiendo probar:\n\n• **Sandalwood Pure Grade-A** (nuestro sándalo más rico y cremoso)\n• **Amber White** (cálido, sofisticado y de larga fijación)\n• **Egyptian Musk** (almizclado limpio y elegante)\n\nPuedes encontrarlos en presentaciones desde 1 oz hasta 16 oz en nuestro catálogo de esencias.";
+    return "Actualmente no tenemos **Santal 33 (Le Labo)** en nuestro inventario, pero si buscas ese perfil olfativo amaderado, cremoso y ahumado (sándalo australiano, cardamomo, cedro y cuero), te recomiendo probar estas alternativas disponibles con enlace directo:\n\n• [Amber White](/fragrance/amber-white) — Cálido, sofisticado y de altísima fijación.\n• [Egyptian Musk](/fragrance/egyptian-musk) — Almizclado limpio, elegante y unisex.\n• [Explorar Catálogo Amaderado](/fragrance) — Ver todas nuestras esencias amaderadas y especiadas.\n\nDisponibles en presentaciones desde 1 oz hasta 16 oz con grado de pureza Grado A sin cortar.";
   }
 
   if (q.includes("baccarat") || q.includes("540") || q.includes("rouge")) {
-    return "¡Sí! Tenemos disponible el concentrado **Maison Francis Kurkdjian: Baccarat Rouge 540 (U) Type** en formulación Grado A puro sin cortar. Cuenta con sus características notas de azafrán, jazmín, ámbar gris y cedro. Lo tenemos en tamaños de **1 oz, 2 oz, 4 oz, 8 oz y 16 oz**.";
+    return "¡Sí! Tenemos disponible el concentrado Grado A puro:\n\n👉 [Maison Francis Kurkdjian: Baccarat Rouge 540 (U) Type](/fragrance/maison-francis-kurkdjian-baccarat-rouge-540-u-type)\n\nCuenta con sus acordes inconfundibles de azafrán, jazmín egipcio, ámbar gris y cedro recién cortado. Disponible en **1 oz, 2 oz, 4 oz, 8 oz y 16 oz**.";
   }
 
   if (q.includes("sauvage") || q.includes("dior")) {
-    return "¡Contamos con **Dior: Sauvage (M) Type**! Es una de nuestras esencias más vendidas, con notas intensas de bergamota de Calabria, pimienta de Sichuan y ambroxan. Disponible en presentaciones de 1 oz hasta 16 oz.";
+    return "¡Contamos con la inspiración tipo:\n\n👉 [Dior: Sauvage (M) Type](/fragrance/dior-sauvage-m-type)\n\nEs una de nuestras esencias masculinas más vendidas, con bergamota de Calabria, pimienta de Sichuan y fondo de ambroxan de larga duración.";
   }
 
   if (q.includes("aventus") || q.includes("creed")) {
-    return "¡Sí, tenemos la inspiración tipo **Creed: Aventus (M) Type**! Con sus vibrantes notas de piña ahumada, bergamota, abedul y musgo de roble. Ideal para formular Eau de Parfum de alta proyección.";
+    return "¡Sí! Tenemos la formulación:\n\n👉 [Creed: Aventus (M) Type](/fragrance/creed-aventus-m-type)\n\nCon sus icónicas notas de piña ahumada, bergamota italiana, abedul y musgo de roble. Perfecta para proyectar elegancia.";
   }
 
   if (q.includes("tobacco vanille") || q.includes("tom ford")) {
-    return "¡Tenemos **Tom Ford: Tobacco Vanille (U) Type**! Una esencia cálida y especiada con notas de hoja de tabaco, haba tonka, flor de tabaco, vainilla y cacao. Excelente para perfumes otoñales e invernales.";
+    return "¡Tenemos disponible:\n\n👉 [Tom Ford: Tobacco Vanille (U) Type](/fragrance/tom-ford-tobacco-vanille-u-type)\n\nUna esencia cálida y envolvente con notas de hoja de tabaco aromático, haba tonka, flor de tabaco, vainilla y cacao puro.";
   }
 
   // 2. Shipping FAQ
   if (q.includes("envio") || q.includes("envío") || q.includes("shipping") || q.includes("gratis") || q.includes("costo de envio")) {
-    return "🚚 En **SCENTLAB** ofrecemos **ENVÍO GRATIS** en todas las órdenes a partir de **$250 USD** para todo Estados Unidos y Puerto Rico. Para órdenes menores, el costo de flete se calcula en tiempo real con tarifas directas de transportista (USPS / UPS).";
+    return "🚚 En **SCENTLAB** ofrecemos **ENVÍO GRATIS** en todas las órdenes a partir de **$250 USD** para todo Estados Unidos y Puerto Rico.\n\nPuedes armar tu pedido combinando [Esencias](/fragrance), [Botellas de Vidrio](/bottles), [Suministros de Prueba](/testing) y [Etiquetas](/custom-labels).";
   }
 
   // 3. Perfume formulation / dilution advice
   if (q.includes("diluir") || q.includes("formula") || q.includes("formular") || q.includes("edp") || q.includes("edt") || q.includes("porcentaje") || q.includes("como hacer perfume") || q.includes("cómo hacer perfume")) {
-    return "🧪 **Guía rápida de concentración para perfumería con nuestras esencias Grado A:**\n\n• **Eau de Parfum (EDP) [Recomendado]:** 15% a 20% de aceite de fragancia + 80-85% alcohol de perfumería.\n• **Extrait de Parfum:** 20% a 30% de aceite de fragancia (máxima duración y fijación).\n• **Eau de Toilette (EDT):** 10% a 15% de aceite de fragancia.\n• **Roll-on / Aceite corporal:** 15% a 25% diluido en aceite portador (Jojoba o Coco Fraccionado MCT).\n\n💡 *Tip:* Deja macerar tu mezcla en botella de vidrio oscuro durante 2 a 4 semanas para que las notas se integren a la perfección.";
+    return "🧪 **Guía rápida de concentración para perfumería con nuestras esencias Grado A:**\n\n• **Eau de Parfum (EDP) [Recomendado]:** 15% a 20% de esencia + 80-85% alcohol de perfumería.\n• **Extrait de Parfum:** 20% a 30% de esencia (máxima duración y estela).\n• **Roll-on en aceite:** 15% a 25% diluido en aceite de Jojoba o MCT.\n\n💡 *Suministros útiles para tu formulación:*\n• [Tiras Olfativas Secantes (Blotters)](/testing)\n• [Frascos y Atomizadores de Vidrio](/bottles)";
   }
 
   // 4. Scent families search
   if (q.includes("floral") || q.includes("flores") || q.includes("rosa") || q.includes("jazmin") || q.includes("lavanda")) {
-    const matches = INITIAL_FRAGRANCES.filter(f => f.scentFamily === "Floral").slice(0, 4);
-    const list = matches.map(m => `• **${m.name}** (Floral)`).join("\n");
-    return `🌸 Para amantes de las fragancias **Florales**, aquí tienes algunas de nuestras mejores opciones:\n\n${list}\n\nPuedes explorar todas en la sección de Esencias filtrando por la familia *Floral*.`;
+    const matches = INITIAL_FRAGRANCES.filter(f => f.scentFamily === "Floral").slice(0, 3);
+    const list = matches.map(m => `• [${m.name}](/fragrance/${m.slug}) — *Floral*`).join("\n");
+    return `🌸 Para amantes de las fragancias **Florales**, aquí tienes excelentes opciones directas:\n\n${list}\n\n👉 [Ver todas las esencias Florales](/fragrance)`;
   }
 
   if (q.includes("fresc") || q.includes("limpi") || q.includes("verano") || q.includes("citric") || q.includes("citrico")) {
-    const matches = INITIAL_FRAGRANCES.filter(f => f.scentFamily === "Fresh" || f.scentFamily === "Citrus").slice(0, 4);
-    const list = matches.map(m => `• **${m.name}** (${m.scentFamily})`).join("\n");
-    return `🍋 Si buscas aromas **Frescos y Cítricos**, te recomiendo estas esencias súper energizantes:\n\n${list}\n\nIdeales para uso diario y climas cálidos.`;
+    const matches = INITIAL_FRAGRANCES.filter(f => f.scentFamily === "Fresh" || f.scentFamily === "Citrus").slice(0, 3);
+    const list = matches.map(m => `• [${m.name}](/fragrance/${m.slug}) — *${m.scentFamily}*`).join("\n");
+    return `🍋 Si buscas aromas **Frescos y Cítricos**, te recomiendo:\n\n${list}\n\n👉 [Explorar Catálogo Completo](/fragrance)`;
   }
 
   if (q.includes("amaderad") || q.includes("wood") || q.includes("mader") || q.includes("sandalo") || q.includes("cedro")) {
-    const matches = INITIAL_FRAGRANCES.filter(f => f.scentFamily === "Woody").slice(0, 4);
-    const list = matches.map(m => `• **${m.name}** (Woody)`).join("\n");
-    return `🌲 En nuestra familia **Woody (Amaderada)** destacan aromas sofisticados y elegantes:\n\n${list}\n\nSon excelentes fijadores de fondo para cualquier formulación.`;
+    const matches = INITIAL_FRAGRANCES.filter(f => f.scentFamily === "Woody").slice(0, 3);
+    const list = matches.map(m => `• [${m.name}](/fragrance/${m.slug}) — *Woody*`).join("\n");
+    return `🌲 En nuestra familia **Woody (Amaderada)** destacan:\n\n${list}\n\n👉 [Ver todas las esencias Amaderadas](/fragrance)`;
   }
 
   if (q.includes("dulce") || q.includes("vainilla") || q.includes("gourmand") || q.includes("chocolate") || q.includes("caramelo")) {
-    const matches = INITIAL_FRAGRANCES.filter(f => f.scentFamily === "Gourmand").slice(0, 4);
-    const list = matches.map(m => `• **${m.name}** (Gourmand)`).join("\n");
-    return `🍯 Para aromas **Gourmand y Dulces**, prueba:\n\n${list}\n\nFragancias adictivas con notas cálidas de vainilla, frutas y acordes dulces.`;
+    const matches = INITIAL_FRAGRANCES.filter(f => f.scentFamily === "Gourmand").slice(0, 3);
+    const list = matches.map(m => `• [${m.name}](/fragrance/${m.slug}) — *Gourmand*`).join("\n");
+    return `🍯 Para aromas **Gourmand y Dulces**, prueba:\n\n${list}\n\n👉 [Ver todas las esencias Dulces](/fragrance)`;
   }
 
   // 5. Search by direct keyword across catalog
   const matchingFrags = INITIAL_FRAGRANCES.filter(f => f.name.toLowerCase().includes(q)).slice(0, 3);
   if (matchingFrags.length > 0) {
-    const list = matchingFrags.map(m => `• **${m.name}** (${m.scentFamily})`).join("\n");
-    return `Encontré estas opciones en nuestro catálogo que coinciden con tu búsqueda:\n\n${list}\n\n¿Deseas saber más sobre alguna de ellas o necesitas ayuda para combinarla?`;
+    const list = matchingFrags.map(m => `• [${m.name}](/fragrance/${m.slug}) — *${m.scentFamily}*`).join("\n");
+    return `Encontré estas opciones en nuestro catálogo que coinciden con tu búsqueda:\n\n${list}\n\n¿Deseas conocer más detalles o cómo combinarlas?`;
   }
 
-  return "¡Con gusto te asesoro! En **SCENTLAB** contamos con más de 1,390 aceites de fragancia puros Grado A sin cortar, frascos de laboratorio, atomizadores, tiras de prueba y etiquetas personalizadas.\n\n¿Buscas alguna fragancia o diseñador en especial, o te gustaría que te recomiende opciones según tus acordes favoritos (amaderado, floral, fresco, cítrico, gourmand, ámbar)?";
+  return "¡Con gusto te asesoro! En **SCENTLAB** contamos con más de 1,390 aceites de fragancia puros Grado A sin cortar.\n\n• [Ver Catálogo de Esencias](/fragrance)\n• [Ver Frascos y Atomizadores](/bottles)\n• [Ver Suministros de Laboratorio](/testing)\n\n¿Buscas alguna fragancia o diseñador en especial, o te gustaría una recomendación personalizada?";
 }
 
 export async function POST(req: NextRequest) {
