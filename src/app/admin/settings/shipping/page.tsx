@@ -87,7 +87,7 @@ export default function AdminShippingSettingsPage() {
         height: Number(height),
         distanceUnit: "in",
       },
-      freeShippingThreshold: 150,
+      freeShippingThreshold: 250,
       fallbackFlatRate: 6.99,
       updatedAt: new Date().toISOString(),
     };

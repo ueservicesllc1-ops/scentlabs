@@ -32,7 +32,7 @@ export const DEFAULT_PARCEL: ParcelDimensions = {
 const DEFAULT_SETTINGS: ShippingSettings = {
   origin: DEFAULT_SHIPPING_ORIGIN,
   defaultParcel: DEFAULT_PARCEL,
-  freeShippingThreshold: 150,
+  freeShippingThreshold: 250,
   fallbackFlatRate: 6.99,
   updatedAt: new Date().toISOString(),
 };

@@ -41,7 +41,7 @@ export function Navbar() {
       {/* ── Top Announcement Bar ── */}
       <div style={{ background: "#2B5F4A", color: "rgba(255,255,255,0.95)", padding: "7px 16px", textAlign: "center" }}>
         <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase" }}>
-          Free Shipping on Orders Over $500 &nbsp;·&nbsp; Wholesale Perfume Compounding & Supplies
+          Free Shipping on Orders Over $250 &nbsp;·&nbsp; Wholesale Perfume Compounding & Supplies
         </span>
       </div>
 

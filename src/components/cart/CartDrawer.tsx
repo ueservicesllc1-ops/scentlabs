@@ -49,6 +49,33 @@ export function CartDrawer() {
             </button>
           </div>
 
+          {/* Free Shipping Progress Bar ($250 Threshold) */}
+          {items.length > 0 && (
+            <div className="px-6 py-3 bg-[#F0FDF4] border-b border-[#BBF7D0]">
+              <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
+                {summary.subtotal >= 250 ? (
+                  <span className="text-[#166534] flex items-center gap-1.5 font-bold">
+                    <Sparkles className="w-3.5 h-3.5 text-[#166534]" />
+                    ¡Calificas para Envío Gratis!
+                  </span>
+                ) : (
+                  <span className="text-gray-700">
+                    Faltan <strong className="text-[#166534]">{formatCurrency(250 - summary.subtotal)}</strong> para <strong className="text-[#166534]">Envío Gratis</strong>
+                  </span>
+                )}
+                <span className="text-[10px] text-gray-500 font-mono font-bold">
+                  {Math.min(100, Math.round((summary.subtotal / 250) * 100))}%
+                </span>
+              </div>
+              <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#2B5F4A] rounded-full transition-all duration-500"
+                  style={{ width: `${Math.min(100, (summary.subtotal / 250) * 100)}%` }}
+                />
+              </div>
+            </div>
+          )}
+
           {/* Cart Items List */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {items.length === 0 ? (
