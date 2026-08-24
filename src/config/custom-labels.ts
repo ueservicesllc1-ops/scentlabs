@@ -118,21 +118,33 @@ export const STANDARD_LABEL_SIZES: LabelSize[] = [
 
 export const STANDARD_LABEL_MATERIALS: LabelMaterial[] = [
   {
-    id: "mat_matte_vinyl",
-    name: "Matte Black / White Waterproof Vinyl",
-    description: "Ultra-crisp high-density polymer vinyl, oil-proof and scratch-resistant.",
+    id: "mat_black",
+    name: "Matte Black Vinyl",
+    description: "Fondo negro mate de alta densidad, resistente a aceites de perfumería.",
     active: true,
     materialCostPerSqIn: 0.00250,
     productionCost: 0.03,
     additionalCost: 0.0,
     hexColorPreview: "#18181B",
-    finishType: "matte_vinyl",
+    finishType: "matte_black",
     priceMultiplier: 1.00,
   },
   {
-    id: "mat_gold_foil",
-    name: "Metallic Gold Foil + Premium Vinyl",
-    description: "Reflective laboratory-grade gold foil on waterproof matte vinyl backing.",
+    id: "mat_white",
+    name: "Matte White Vinyl",
+    description: "Fondo blanco puro impermeable de grado cosmético con acabado mate suave.",
+    active: true,
+    materialCostPerSqIn: 0.00250,
+    productionCost: 0.03,
+    additionalCost: 0.0,
+    hexColorPreview: "#FFFFFF",
+    finishType: "matte_white",
+    priceMultiplier: 1.00,
+  },
+  {
+    id: "mat_gold",
+    name: "Metallic Gold Foil Substrate",
+    description: "Fondo dorado metalizado de grado laboratorio con reflejo espejo premium.",
     active: true,
     materialCostPerSqIn: 0.00460,
     productionCost: 0.05,
@@ -142,9 +154,9 @@ export const STANDARD_LABEL_MATERIALS: LabelMaterial[] = [
     priceMultiplier: 1.15,
   },
   {
-    id: "mat_silver_foil",
-    name: "Metallic Silver Chrome Foil + Vinyl",
-    description: "Sleek mirrored silver foil resistant to perfume oils and alcohol solvents.",
+    id: "mat_silver",
+    name: "Metallic Silver Chrome Substrate",
+    description: "Fondo plateado cromo metalizado resistente a solventes de alcohol.",
     active: true,
     materialCostPerSqIn: 0.00460,
     productionCost: 0.05,
@@ -153,30 +165,21 @@ export const STANDARD_LABEL_MATERIALS: LabelMaterial[] = [
     finishType: "silver_foil",
     priceMultiplier: 1.15,
   },
-  {
-    id: "mat_rosegold_foil",
-    name: "Rose Gold Foil + Satin Vinyl",
-    description: "Warm copper-pink metallic foil with luxurious artisanal luster.",
-    active: true,
-    materialCostPerSqIn: 0.00480,
-    productionCost: 0.05,
-    additionalCost: 0.05,
-    hexColorPreview: "#E09F8F",
-    finishType: "rose_gold_foil",
-    priceMultiplier: 1.15,
-  },
-  {
-    id: "mat_holo_foil",
-    name: "Prismatic Holographic Foil",
-    description: "Dynamic rainbow-shifting security foil with anti-counterfeiting sheen.",
-    active: true,
-    materialCostPerSqIn: 0.00510,
-    productionCost: 0.06,
-    additionalCost: 0.06,
-    hexColorPreview: "#818CF8",
-    finishType: "holographic",
-    priceMultiplier: 1.25,
-  },
+];
+
+export interface LabelTextColorOption {
+  id: string;
+  name: string;
+  hex: string;
+  type: "black" | "white" | "gold" | "silver";
+  multiplier: number;
+}
+
+export const LABEL_TEXT_COLORS: LabelTextColorOption[] = [
+  { id: "txt_gold", name: "Metallic Gold Foil Text", hex: "#E5A93C", type: "gold", multiplier: 1.15 },
+  { id: "txt_silver", name: "Metallic Silver Chrome Text", hex: "#D1D5DB", type: "silver", multiplier: 1.15 },
+  { id: "txt_black", name: "High-Density Black Ink Text", hex: "#18181B", type: "black", multiplier: 1.00 },
+  { id: "txt_white", name: "Pure White Ink Text", hex: "#FFFFFF", type: "white", multiplier: 1.00 },
 ];
 
 // Single source of truth: Minimum order quantity is 50. Quantities: 50, 100, 250, 500, 1000.

@@ -28,7 +28,7 @@ export interface LabelMaterial {
   productionCost: number; // printing / hot stamping
   additionalCost: number; // premium finishes
   hexColorPreview?: string;
-  finishType: 'gold_foil' | 'silver_foil' | 'rose_gold_foil' | 'holographic' | 'matte_vinyl' | 'gloss_vinyl';
+  finishType: string;
   priceMultiplier?: number;
 }
 

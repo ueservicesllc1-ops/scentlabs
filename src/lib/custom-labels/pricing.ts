@@ -1,6 +1,7 @@
 import { 
   BASE_SHEET_CONFIG, 
   STANDARD_LABEL_MATERIALS, 
+  LABEL_TEXT_COLORS,
   BASE_LABEL_PRICING_MATRIX,
   OFFICIAL_LABEL_PRICING_TIERS 
 } from "@/config/custom-labels";
@@ -74,14 +75,15 @@ export function calculateLabelCost(
 /**
  * SINGLE SOURCE OF TRUTH for Custom Label Pricing across Georgina Wholesale.
  *
- * Formula: BASE_PRICE(Size, Quantity) * MATERIAL_MULTIPLIER
+ * Formula: BASE_PRICE(Size, Quantity) * MAX(MaterialMultiplier, TextColorMultiplier)
  * Rounded to 2 decimal places.
  */
 export function calculateLabelPricing(
   width: number,
   height: number,
   quantity: number,
-  materialId: string = "mat_matte_vinyl"
+  materialId: string = "mat_black",
+  textColorId?: string
 ): {
   unitPrice: number;
   totalPrice: number;
@@ -89,12 +91,16 @@ export function calculateLabelPricing(
   materialMultiplier: number;
   volumeTierSavingsPercent: number;
 } {
-  // 1. Material lookup & Multiplier
+  // 1. Material & Text Color lookup & Multiplier
   const material = STANDARD_LABEL_MATERIALS.find((m) => m.id === materialId) ||
     STANDARD_LABEL_MATERIALS.find((m) => m.finishType === materialId) ||
     STANDARD_LABEL_MATERIALS[0];
 
-  const materialMultiplier = material.priceMultiplier ?? 1.0;
+  const textColor = LABEL_TEXT_COLORS.find((t) => t.id === textColorId || t.type === textColorId) || LABEL_TEXT_COLORS[0];
+
+  const baseMult = material.priceMultiplier ?? 1.0;
+  const textMult = textColor.multiplier ?? 1.0;
+  const materialMultiplier = Math.max(baseMult, textMult);
 
   // 2. Size Matrix lookup
   const minDim = Math.min(width, height);

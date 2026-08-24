@@ -12,6 +12,7 @@ interface LabelPreviewProps {
   logoUrl?: string;
   designUrl?: string;
   fontFamily?: string;
+  textColorHex?: string;
   size: LabelSize;
   material: LabelMaterial;
   className?: string;
@@ -25,57 +26,38 @@ export function LabelPreview({
   logoUrl,
   designUrl,
   fontFamily = "'Bodoni Moda', serif",
+  textColorHex = "#E5A93C",
   size,
   material,
   className = "",
 }: LabelPreviewProps) {
-  // Foil sheen gradients and colors
+  // Foil sheen gradients and colors for 4 Base Materials (Black, White, Gold, Silver)
   const getFinishStyles = () => {
     switch (material.finishType) {
       case "gold_foil":
         return {
-          textColor: "text-amber-300",
           borderColor: "border-amber-400/80",
-          gradient: "from-amber-400 via-yellow-200 to-amber-500",
-          bgOverlay: "bg-[#111111]",
-          accentColor: "#F59E0B",
+          bgOverlay: "bg-gradient-to-br from-[#D4AF37] via-[#F3E5AB] to-[#AA7C11]",
           sheen: "bg-gradient-to-tr from-amber-500/20 via-yellow-300/40 to-transparent",
         };
       case "silver_foil":
         return {
-          textColor: "text-slate-200",
           borderColor: "border-slate-300/80",
-          gradient: "from-slate-300 via-white to-slate-400",
-          bgOverlay: "bg-[#111111]",
-          accentColor: "#E2E8F0",
+          bgOverlay: "bg-gradient-to-br from-[#C0C0C0] via-[#FFFFFF] to-[#999999]",
           sheen: "bg-gradient-to-tr from-slate-400/20 via-white/40 to-transparent",
         };
-      case "rose_gold_foil":
+      case "matte_white":
         return {
-          textColor: "text-rose-300",
-          borderColor: "border-rose-300/80",
-          gradient: "from-rose-300 via-pink-100 to-rose-400",
-          bgOverlay: "bg-[#111111]",
-          accentColor: "#FDA4AF",
-          sheen: "bg-gradient-to-tr from-rose-400/20 via-pink-200/40 to-transparent",
+          borderColor: "border-gray-300",
+          bgOverlay: "bg-[#FFFFFF]",
+          sheen: "bg-gradient-to-b from-gray-100/30 to-transparent",
         };
-      case "holographic":
-        return {
-          textColor: "text-indigo-200",
-          borderColor: "border-indigo-400/80",
-          gradient: "from-cyan-300 via-purple-300 to-pink-400",
-          bgOverlay: "bg-[#111111]",
-          accentColor: "#818CF8",
-          sheen: "bg-gradient-to-r from-cyan-400/20 via-fuchsia-400/30 to-amber-300/20",
-        };
+      case "matte_black":
       default:
         return {
-          textColor: "text-[#111111]",
-          borderColor: "border-[#111111]/80",
-          gradient: "from-[#111111] to-[#605e5c]",
-          bgOverlay: "bg-[#faf9f6]",
-          accentColor: "#111111",
-          sheen: "bg-gradient-to-b from-[#111111]/5 to-transparent",
+          borderColor: "border-gray-800",
+          bgOverlay: "bg-[#18181B]",
+          sheen: "bg-gradient-to-tr from-white/5 to-transparent",
         };
     }
   };
@@ -141,28 +123,28 @@ export function LabelPreview({
                   />
                 ) : (
                   <div
-                    style={{ fontFamily }}
-                    className={`text-[11px] font-bold uppercase tracking-[0.25em] bg-gradient-to-r ${finish.gradient} bg-clip-text text-transparent`}
+                    style={{ fontFamily, color: textColorHex }}
+                    className="text-[11px] font-bold uppercase tracking-[0.25em]"
                   >
                     {brandName || "STUDIO BRAND"}
                   </div>
                 )}
-                <div className="w-8 h-[1px] bg-outline-variant/60 my-1" />
+                <div className="w-8 h-[1px] bg-gray-400/40 my-1" />
               </div>
 
               {/* Center: Fragrance Name & Subtext */}
               <div className="relative z-10 w-full py-2 space-y-1">
                 <h4
-                  style={{ fontFamily }}
-                  className={`text-lg font-bold uppercase tracking-widest bg-gradient-to-r ${finish.gradient} bg-clip-text text-transparent line-clamp-2`}
+                  style={{ fontFamily, color: textColorHex }}
+                  className="text-lg font-bold uppercase tracking-widest line-clamp-2"
                 >
                   {fragranceName || "FRAGRANCE NAME"}
                 </h4>
 
                 {customText && (
                   <p
-                    style={{ fontFamily }}
-                    className={`text-[10px] font-medium tracking-wide uppercase ${material.finishType.includes("vinyl") ? "text-secondary" : "text-white/80"}`}
+                    style={{ fontFamily, color: textColorHex }}
+                    className="text-[10px] font-medium tracking-wide uppercase opacity-90"
                   >
                     {customText}
                   </p>
@@ -170,10 +152,10 @@ export function LabelPreview({
               </div>
 
               {/* Bottom: Volume / Formulation Standard */}
-              <div className={`relative z-10 w-full pb-1 border-t pt-2 ${material.finishType.includes("vinyl") ? "border-outline-variant" : "border-white/10"}`}>
+              <div className="relative z-10 w-full pb-1 border-t border-gray-400/30 pt-2">
                 <div
-                  style={{ fontFamily }}
-                  className={`text-[9px] font-mono tracking-widest uppercase ${material.finishType.includes("vinyl") ? "text-secondary" : "text-white/60"}`}
+                  style={{ fontFamily, color: textColorHex }}
+                  className="text-[9px] font-mono tracking-widest uppercase opacity-80"
                 >
                   {volumeText}
                 </div>

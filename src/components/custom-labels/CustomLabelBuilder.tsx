@@ -5,7 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { 
   STANDARD_LABEL_SIZES, 
-  STANDARD_LABEL_MATERIALS 
+  STANDARD_LABEL_MATERIALS,
+  LABEL_TEXT_COLORS,
+  LabelTextColorOption
 } from "@/config/custom-labels";
 import { LabelSize, LabelMaterial, CustomLabelConfiguration } from "@/types/custom-label";
 import { calculateLabelPricing } from "@/lib/custom-labels/pricing";
@@ -19,6 +21,7 @@ import { LabelMaterialSelector } from "./LabelMaterialSelector";
 import { LabelQuantitySelector } from "./LabelQuantitySelector";
 import { LabelSheetYieldBadge } from "./LabelSheetYieldBadge";
 import { LabelFontSelector, LABEL_FONTS, LabelFontOption } from "./LabelFontSelector";
+import { LabelTextColorSelector } from "./LabelTextColorSelector";
 import { 
   Sparkles, 
   Check, 
@@ -56,6 +59,7 @@ export function CustomLabelBuilder({ initialProductId }: CustomLabelBuilderProps
   const [selectedMaterial, setSelectedMaterial] = useState<LabelMaterial>(STANDARD_LABEL_MATERIALS[0]);
   const [selectedQuantity, setSelectedQuantity] = useState<number>(50);
   const [selectedFont, setSelectedFont] = useState<LabelFontOption>(LABEL_FONTS[0]);
+  const [selectedTextColor, setSelectedTextColor] = useState<LabelTextColorOption>(LABEL_TEXT_COLORS[0]);
 
   // Customization Form State
   const [brandName, setBrandName] = useState("AURA NOIR");
@@ -83,7 +87,8 @@ export function CustomLabelBuilder({ initialProductId }: CustomLabelBuilderProps
     effectiveSize.width,
     effectiveSize.height,
     selectedQuantity,
-    selectedMaterial.id
+    selectedMaterial.id,
+    selectedTextColor.id
   );
 
   const handleDesignFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -323,6 +328,7 @@ export function CustomLabelBuilder({ initialProductId }: CustomLabelBuilderProps
                 logoUrl={logoUrl}
                 designUrl={designUrl}
                 fontFamily={selectedFont.family}
+                textColorHex={selectedTextColor.hex}
                 size={effectiveSize}
                 material={selectedMaterial}
               />
@@ -441,20 +447,26 @@ export function CustomLabelBuilder({ initialProductId }: CustomLabelBuilderProps
               </div>
             </div>
 
-            {/* Typography Customization Form & Font Selection */}
+            {/* Typography Customization Form & Font + Text Color Selection */}
             <div className="p-6 border border-gray-200 bg-white shadow-sm space-y-6">
               <div className="flex justify-between items-center text-xs border-b border-gray-100 pb-3">
                 <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-gray-900">
-                  {isRollOnLabel ? "3. Texto / Tipografía Alternativa (4. Selección de Fuente)" : "4. Texto y Selección de Tipografía (10 Fuentes)"}
+                  {isRollOnLabel ? "3. Texto, Tipografía y Color (2 Colores Máx)" : "4. Texto, Tipografía (10 Fuentes) y Color de Texto"}
                 </span>
                 <span className="text-[10px] text-gray-400">Prueba rápida en visor si no subes diseño</span>
               </div>
 
-              {/* 10 Font Selector Grid */}
-              <LabelFontSelector
-                selectedFontId={selectedFont.id}
-                onSelectFont={setSelectedFont}
-              />
+              {/* 10 Font Selector Dropdown & Text Color Selector Dropdown */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <LabelFontSelector
+                  selectedFontId={selectedFont.id}
+                  onSelectFont={setSelectedFont}
+                />
+                <LabelTextColorSelector
+                  selectedTextColor={selectedTextColor}
+                  onSelectTextColor={setSelectedTextColor}
+                />
+              </div>
 
               {/* Typography Input Fields */}
               <div className="pt-2 border-t border-gray-100 space-y-4">
