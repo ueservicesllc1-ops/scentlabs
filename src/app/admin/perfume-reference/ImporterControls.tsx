@@ -39,7 +39,7 @@ export function ImporterControls() {
         runId = data.run.runId;
         setStatus(data.run);
         // Start the background batch processing loop
-        runBatchLoop(runId, startUrl);
+        if (runId) runBatchLoop(runId, startUrl);
       } else {
         fetchStatus();
       }

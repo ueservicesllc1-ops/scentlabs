@@ -57,7 +57,8 @@ function PerfumesCatalogContent() {
     products.forEach((p) => {
       const b = p.brand || p.attributes?.brand;
       if (b) {
-        map.set(b, (map.get(b) || 0) + 1);
+        const brandStr = String(b);
+        map.set(brandStr, (map.get(brandStr) || 0) + 1);
       }
     });
     return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
@@ -67,7 +68,7 @@ function PerfumesCatalogContent() {
     return products
       .filter((p) => {
         const q = search.toLowerCase().trim();
-        const brand = (p.brand || p.attributes?.brand || "").toLowerCase();
+        const brand = String(p.brand || p.attributes?.brand || "").toLowerCase();
         const name = p.name.toLowerCase();
         const fullName = `${brand} ${name}`;
         const inspiredBy = (p.inspiredBy || "").toLowerCase();
@@ -107,7 +108,7 @@ function PerfumesCatalogContent() {
           brand === brandFilter.toLowerCase();
 
         // 4. Gender Filter
-        const gender = (p.attributes?.gender || "").toLowerCase();
+        const gender = String(p.attributes?.gender || "").toLowerCase();
         const matchGender =
           genderFilter === "all" ||
           gender === genderFilter.toLowerCase();

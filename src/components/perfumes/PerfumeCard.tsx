@@ -23,15 +23,16 @@ export function PerfumeCard({ product }: { product: Product }) {
     e.preventDefault();
     if (isOutOfStock) return;
 
-    addItem({
-      productId: product.id,
-      name: `${brand ? brand + " - " : ""}${product.name}`,
-      sku: product.sku,
-      unitPrice: price,
+    const defaultPkg = product.packageOptions?.[0] || {
+      id: "pkg_default",
+      name: "1 Unit",
       quantity: 1,
-      image: image,
-      category: "Perfumes",
-    });
+      price: price,
+      unitPrice: price,
+      isDefault: true
+    };
+
+    addItem(product, defaultPkg, 1);
 
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);

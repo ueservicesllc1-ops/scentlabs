@@ -89,10 +89,10 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
             barcode: found.barcode || enrich.barcode,
             attributes: {
               ...found.attributes,
-              concentration: found.attributes?.concentration || enrich.concentration,
-              gender: found.attributes?.gender || enrich.gender,
-              measure: found.attributes?.measure || enrich.measure,
-            }
+              ...(found.attributes?.concentration || enrich.concentration ? { concentration: found.attributes?.concentration || enrich.concentration } : {}),
+              ...(found.attributes?.gender || enrich.gender ? { gender: found.attributes?.gender || enrich.gender } : {}),
+              ...(found.attributes?.measure || enrich.measure ? { measure: found.attributes?.measure || enrich.measure } : {}),
+            } as Record<string, string | number>
           };
         }
 
@@ -100,7 +100,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
 
         const defaultPkg = (found.packageOptions && found.packageOptions[0]) || {
           id: "pkg_default",
-          name: found.attributes?.measure || "1 Unit",
+          name: (found.attributes?.measure || "1 Unit").toString(),
           quantity: 1,
           price: found.basePrice || found.price || 39.99,
           unitPrice: found.basePrice || found.price || 39.99,

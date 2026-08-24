@@ -13,7 +13,7 @@ const importedMap = new Map<string, FragranceOil>();
   importedMap.set(f.id, {
     ...f,
     category: "fragrance_oils",
-    status: f.status === "archived" ? "archived" : "active",
+    status: (f.status as string) === "archived" ? "discontinued" : "active",
     repackagingVariants: approvedVariants.length > 0 ? approvedVariants : f.repackagingVariants,
   });
 });

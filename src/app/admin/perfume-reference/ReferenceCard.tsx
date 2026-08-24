@@ -60,7 +60,7 @@ export function ReferenceCard({ product }: { product: PerfumeReference }) {
             <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">{product.brand}</p>
             <h3 className="text-sm font-semibold text-gray-900 leading-tight">{product.name}</h3>
           </div>
-          {price > 0 && (
+          {typeof price === 'number' && price > 0 && (
             <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-100 rounded-sm">
               ${price.toFixed(2)}
             </span>

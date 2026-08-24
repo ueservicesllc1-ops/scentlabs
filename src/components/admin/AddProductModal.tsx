@@ -408,6 +408,7 @@ export function AddProductModal({ isOpen, onClose, onSaved }: AddProductModalPro
       upc: autoSku.length >= 8 && /^\d+$/.test(autoSku) ? autoSku : undefined,
       barcode: autoSku.length >= 8 && /^\d+$/.test(autoSku) ? autoSku : undefined,
       status: status,
+      hasVariants: false,
       basePrice: basePrice,
       price: basePrice,
       cost: cost,
@@ -438,7 +439,7 @@ export function AddProductModal({ isOpen, onClose, onSaved }: AddProductModalPro
         status: "out_of_stock",
       },
       primaryImageUrl: imageUrl.trim() || undefined,
-      images: imageUrl.trim() ? [{ id: `img_${Date.now()}`, url: imageUrl.trim(), sortOrder: 0, isPrimary: true }] : [],
+      images: imageUrl.trim() ? [{ id: `img_${Date.now()}`, url: imageUrl.trim(), sortOrder: 0, isPrimary: true, altText: name.trim() }] : [],
       media: imageUrl.trim()
         ? [
             {
