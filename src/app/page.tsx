@@ -254,33 +254,47 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {/* Grid adapts to actual number of products (up to 4) */}
+          {/* Compact & Balanced Card Grid */}
           {trendingProducts.length > 0 ? (
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(${trendingProducts.length}, 1fr)`, gap: 1, background: "var(--sl-gray-light)" }}>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
               {trendingProducts.map((prod) => (
-                <Link key={prod.id} href={prod.href} style={{ display: "block", textDecoration: "none", background: "white" }}
-                  className="sl-card"
+                <Link
+                  key={prod.id}
+                  href={prod.href}
+                  className="group bg-white border border-gray-200 hover:border-gray-900 rounded-xl p-3 sm:p-4 transition-all duration-200 flex flex-col justify-between shadow-2xs hover:shadow-xs"
                 >
-                  <div className="sl-card-image" style={{ aspectRatio: "4/5" }}>
-                    {prod.imageUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={prod.imageUrl} alt={prod.name}
-                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "transform 0.4s ease" }} />
-                    ) : (
-                      <div className="sl-card-placeholder">
-                        <div className="sl-card-placeholder-line" />
-                        <span className="sl-card-placeholder-label">{prod.placeholderLabel || prod.category}</span>
-                        <div className="sl-card-placeholder-line" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="sl-card-body">
-                    <span className="sl-card-eyebrow">{prod.category}</span>
-                    <h3 className="sl-card-name">{prod.name}</h3>
-                    <div className="sl-card-footer">
-                      <span className="sl-price">{prod.price}</span>
-                      <span className="text-[10px] text-gray-400 font-mono">SKU: {prod.sku}</span>
+                  <div>
+                    {/* Compact Image Box */}
+                    <div className="w-full h-44 sm:h-52 bg-[#FAFAFA] rounded-lg flex items-center justify-center p-3 overflow-hidden mb-3">
+                      {prod.imageUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={prod.imageUrl}
+                          alt={prod.name}
+                          className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center text-center p-2">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                            {prod.placeholderLabel || prod.category}
+                          </span>
+                        </div>
+                      )}
                     </div>
+
+                    {/* Meta info */}
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-1">
+                      {prod.category}
+                    </span>
+                    <h3 className="text-xs sm:text-sm font-bold text-gray-900 group-hover:text-black line-clamp-1 mb-2">
+                      {prod.name}
+                    </h3>
+                  </div>
+
+                  {/* Price and SKU Footer */}
+                  <div className="pt-2.5 border-t border-gray-100 flex items-center justify-between">
+                    <span className="text-xs sm:text-sm font-extrabold text-gray-950">{prod.price}</span>
+                    <span className="text-[10px] text-gray-400 font-mono">SKU: {prod.sku}</span>
                   </div>
                 </Link>
               ))}
