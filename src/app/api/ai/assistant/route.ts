@@ -67,9 +67,66 @@ function getSmartFallbackResponse(userQuery: string): string {
     return "🚚 En **SCENTLAB** ofrecemos **ENVÍO GRATIS** en todas las órdenes a partir de **$250 USD** para todo Estados Unidos y Puerto Rico.\n\nPuedes armar tu pedido combinando [Esencias](/fragrance), [Botellas de Vidrio](/bottles), [Suministros de Prueba](/testing) y [Etiquetas](/custom-labels).";
   }
 
-  // 3. Perfume formulation / dilution advice
-  if (q.includes("diluir") || q.includes("formula") || q.includes("formular") || q.includes("edp") || q.includes("edt") || q.includes("porcentaje") || q.includes("como hacer perfume") || q.includes("cómo hacer perfume")) {
-    return "🧪 **Guía rápida de concentración para perfumería con nuestras esencias Grado A:**\n\n• **Eau de Parfum (EDP) [Recomendado]:** 15% a 20% de esencia + 80-85% alcohol de perfumería.\n• **Extrait de Parfum:** 20% a 30% de esencia (máxima duración y estela).\n• **Roll-on en aceite:** 15% a 25% diluido en aceite de Jojoba o MCT.\n\n💡 *Suministros útiles para tu formulación:*\n• [Tiras Olfativas Secantes (Blotters)](/testing)\n• [Frascos y Atomizadores de Vidrio](/bottles)";
+  // 3. Perfume formulation / dilution advice (EDP, Extrait, Elixir, EDT, EDC)
+  if (
+    q.includes("diluy") ||
+    q.includes("diluir") ||
+    q.includes("dilucion") ||
+    q.includes("dilución") ||
+    q.includes("formula") ||
+    q.includes("fórmula") ||
+    q.includes("formular") ||
+    q.includes("receta") ||
+    q.includes("preparar") ||
+    q.includes("proporcion") ||
+    q.includes("proporción") ||
+    q.includes("porcentaje") ||
+    q.includes("elixir") ||
+    q.includes("extrait") ||
+    q.includes("edp") ||
+    q.includes("edt") ||
+    q.includes("edc") ||
+    q.includes("alcohol") ||
+    q.includes("como hacer perfume") ||
+    q.includes("cómo hacer perfume")
+  ) {
+    return `🧪 **GUÍA MAESTRA DE FORMULACIÓN Y DILUCIÓN (SCENTLAB)**
+
+Nuestras esencias son **100% puras Grado A sin cortar**, por lo que rinden al máximo. Aquí tienes las fórmulas exactas por categoría:
+
+1. **Eau de Cologne (EDC):** 
+   • **3% a 5%** de esencia + 95% a 97% alcohol de perfumería.
+   • *Duración:* 2 a 3 horas (frescura ligera).
+
+2. **Eau de Toilette (EDT):**
+   • **10% a 15%** de esencia + 85% a 90% alcohol.
+   • *Duración:* 4 a 6 horas (ideal para uso diario).
+
+3. **Eau de Parfum (EDP) ⭐ [El más popular y comercial]:**
+   • **18% a 22%** de esencia + 78% a 82% alcohol.
+   • *Duración:* 8 a 10 horas con excelente proyección y estela.
+
+4. **Parfum / Extrait de Parfum (Lujo Extremo):**
+   • **25% a 30%** de esencia + 70% a 75% alcohol.
+   • *Duración:* 12 a 16+ horas (fijación profunda y concentrada).
+
+5. **Elixir / Ultra Concentrado:**
+   • **30% a 35%** de esencia + 65% a 70% alcohol.
+   • *Duración:* Potencia pesada y máxima densidad aromática.
+
+6. **Roll-on en Aceite (Sin alcohol):**
+   • **20% a 25%** de esencia + 75% a 80% aceite portador (Jojoba o Coco MCT).
+
+---
+⚗️ **EJEMPLO PRÁCTICO PARA UN FRASCO DE 50 ML (Eau de Parfum al 20%):**
+• **10 ml (0.34 oz)** de Aceite de Fragancia SCENTLAB.
+• **40 ml (1.35 oz)** de Alcohol de Perfumería (Etanol 96° / SDA 40-B).
+• *Tip Pro:* Agita bien y deja macerar en un lugar oscuro y fresco de **2 a 3 semanas** para que las notas maduren y se fundan.
+
+📦 **Materiales recomendados:**
+• [Ver Frascos y Atomizadores](/bottles)
+• [Ver Tiras de Prueba y Pipetas](/testing)
+• [Explorar Catálogo de Esencias](/fragrance)`;
   }
 
   // 4. Scent families search
