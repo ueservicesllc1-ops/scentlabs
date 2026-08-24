@@ -256,10 +256,18 @@ export default function AdminProductsPage() {
             <span className="text-[10px] uppercase font-bold text-gray-500 block">Archived</span>
             <div className="text-xl font-bold font-mono text-gray-600 mt-0.5">{archivedCount}</div>
           </div>
-          <div className="p-3.5 bg-white border border-gray-200 rounded-xl shadow-xs">
-            <span className="text-[10px] uppercase font-bold text-orange-700 block">No Image</span>
+          <button
+            type="button"
+            onClick={() => setFilterMissingImages(!filterMissingImages)}
+            className={`p-3.5 rounded-xl border shadow-xs text-left w-full transition-all ${
+              filterMissingImages
+                ? "bg-orange-50 border-orange-400 ring-2 ring-orange-300"
+                : "bg-white border-gray-200 hover:border-orange-300 hover:bg-orange-50/40"
+            }`}
+          >
+            <span className="text-[10px] uppercase font-bold text-orange-700 block">Sin Foto</span>
             <div className="text-xl font-bold font-mono text-orange-700 mt-0.5">{missingImagesCount}</div>
-          </div>
+          </button>
           <div className="p-3.5 bg-white border border-gray-200 rounded-xl shadow-xs">
             <span className="text-[10px] uppercase font-bold text-amber-700 block">Low Stock</span>
             <div className="text-xl font-bold font-mono text-amber-700 mt-0.5">{lowStockCount}</div>
@@ -421,6 +429,41 @@ export default function AdminProductsPage() {
               </button>
             )}
           </div>
+        </div>
+
+        {/* ━━━━ VIEW TABS ━━━━ */}
+        <div className="flex items-center gap-1 border-b border-gray-200 -mb-2">
+          <button
+            type="button"
+            onClick={() => setFilterMissingImages(false)}
+            className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-colors ${
+              !filterMissingImages
+                ? "border-[#2B5F4A] text-[#2B5F4A]"
+                : "border-transparent text-gray-500 hover:text-gray-800"
+            }`}
+          >
+            Todos los Productos
+            <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-600 text-[10px] font-mono">
+              {products.length}
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilterMissingImages(true)}
+            className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-colors flex items-center gap-1.5 ${
+              filterMissingImages
+                ? "border-orange-500 text-orange-700"
+                : "border-transparent text-gray-500 hover:text-orange-600"
+            }`}
+          >
+            <ImageIcon className="w-3.5 h-3.5" />
+            Sin Foto
+            {missingImagesCount > 0 && (
+              <span className="px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-700 text-[10px] font-mono font-bold">
+                {missingImagesCount}
+              </span>
+            )}
+          </button>
         </div>
 
         {/* ━━━━ PRODUCTS MASTER TABLE ━━━━ */}

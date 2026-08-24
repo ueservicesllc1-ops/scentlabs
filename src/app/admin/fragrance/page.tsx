@@ -22,7 +22,8 @@ import {
   RefreshCw,
   Building2,
   Tag,
-  Trash2
+  Trash2,
+  Image as ImageIcon
 } from "lucide-react";
 
 export default function AdminFragranceDashboardPage() {
@@ -30,6 +31,7 @@ export default function AdminFragranceDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [familyFilter, setFamilyFilter] = useState("all");
+  const [photoFilter, setPhotoFilter] = useState<"all" | "missing" | "has_photo">("all");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [editingFragrance, setEditingFragrance] = useState<FragranceOil | null>(null);
 
@@ -65,12 +67,26 @@ export default function AdminFragranceDashboardPage() {
     0
   );
   const lowStockCount = fragrances.filter((f) => (f.inventoryVolumeOz || 0) < 32).length;
+  const missingPhotosCount = fragrances.filter(
+    (f) => !f.primaryImage && (!f.images || f.images.length === 0)
+  ).length;
+  const withPhotosCount = fragrances.length - missingPhotosCount;
 
   const ALLOWED_SIZES = [1, 2, 4, 8, 16];
 
   const filtered = fragrances.filter((f) => {
+    // 1. Photo Filter
+    const hasPhoto = !!(f.primaryImage || (f.images && f.images.length > 0));
+    if (photoFilter === "missing" && hasPhoto) return false;
+    if (photoFilter === "has_photo" && !hasPhoto) return false;
+
+    // 2. Family Filter
+    const matchesFamily = familyFilter === "all" || f.scentFamily.toLowerCase() === familyFilter.toLowerCase();
+    if (!matchesFamily) return false;
+
+    // 3. Search Query
     const q = searchQuery.toLowerCase().trim();
-    if (!q) return familyFilter === "all" || f.scentFamily.toLowerCase() === familyFilter.toLowerCase();
+    if (!q) return true;
 
     // Build a full searchable text blob for this fragrance
     const searchable = [
@@ -88,10 +104,7 @@ export default function AdminFragranceDashboardPage() {
 
     // All tokens must match somewhere in the searchable blob
     const tokens = q.split(/\s+/).filter(Boolean);
-    const matchesSearch = tokens.every((token) => searchable.includes(token));
-
-    const matchesFamily = familyFilter === "all" || f.scentFamily.toLowerCase() === familyFilter.toLowerCase();
-    return matchesSearch && matchesFamily;
+    return tokens.every((token) => searchable.includes(token));
   });
 
   return (
@@ -132,9 +145,9 @@ export default function AdminFragranceDashboardPage() {
         </div>
 
         {/* ━━━━ KPI SUMMARY CARDS ━━━━ */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           
-          <div className="p-5 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
+          <div className="p-4 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
             <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider block">
               Total Formulations
             </span>
@@ -144,17 +157,35 @@ export default function AdminFragranceDashboardPage() {
             <p className="text-[11px] text-gray-500">Active catalog references</p>
           </div>
 
-          <div className="p-5 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
+          <button
+            type="button"
+            onClick={() => setPhotoFilter(photoFilter === "missing" ? "all" : "missing")}
+            className={`p-4 rounded-xl border shadow-xs space-y-1 text-left transition-all ${
+              photoFilter === "missing"
+                ? "bg-orange-50 border-orange-400 ring-2 ring-orange-300"
+                : "bg-white border-gray-200 hover:border-orange-300 hover:bg-orange-50/40"
+            }`}
+          >
+            <span className="text-[11px] font-semibold text-orange-700 uppercase tracking-wider block">
+              Sin Foto
+            </span>
+            <div className="text-2xl font-bold text-orange-700">
+              {missingPhotosCount.toLocaleString()} Oils
+            </div>
+            <p className="text-[11px] text-orange-600">Click to filter missing photos</p>
+          </button>
+
+          <div className="p-4 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
             <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider block">
               Bulk Inventory
             </span>
             <div className="text-2xl font-bold text-[#2B5F4A]">
               {Math.round(totalBulkOz).toLocaleString()} fl oz
             </div>
-            <p className="text-[11px] text-gray-500">≈ {(totalBulkOz / 128).toFixed(1)} gallons on hand</p>
+            <p className="text-[11px] text-gray-500">≈ {(totalBulkOz / 128).toFixed(1)} gal on hand</p>
           </div>
 
-          <div className="p-5 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
+          <div className="p-4 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
             <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider block">
               Repackaged Stock
             </span>
@@ -164,7 +195,7 @@ export default function AdminFragranceDashboardPage() {
             <p className="text-[11px] text-gray-500">Fractioned ready to ship</p>
           </div>
 
-          <div className="p-5 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
+          <div className="p-4 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
             <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider block">
               Low Bulk Stock
             </span>
@@ -215,6 +246,56 @@ export default function AdminFragranceDashboardPage() {
               <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
             </button>
           </div>
+        </div>
+
+        {/* ━━━━ VIEW TABS ━━━━ */}
+        <div className="flex items-center gap-1 border-b border-gray-200 -mb-2">
+          <button
+            type="button"
+            onClick={() => setPhotoFilter("all")}
+            className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-colors ${
+              photoFilter === "all"
+                ? "border-[#2B5F4A] text-[#2B5F4A]"
+                : "border-transparent text-gray-500 hover:text-gray-800"
+            }`}
+          >
+            Todas las Esencias
+            <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-600 text-[10px] font-mono">
+              {fragrances.length}
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setPhotoFilter("has_photo")}
+            className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-colors flex items-center gap-1.5 ${
+              photoFilter === "has_photo"
+                ? "border-emerald-600 text-emerald-700"
+                : "border-transparent text-gray-500 hover:text-emerald-700"
+            }`}
+          >
+            <ImageIcon className="w-3.5 h-3.5 text-emerald-600" />
+            Con Foto
+            <span className="px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-mono font-bold">
+              {withPhotosCount}
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setPhotoFilter("missing")}
+            className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-colors flex items-center gap-1.5 ${
+              photoFilter === "missing"
+                ? "border-orange-500 text-orange-700"
+                : "border-transparent text-gray-500 hover:text-orange-600"
+            }`}
+          >
+            <ImageIcon className="w-3.5 h-3.5 text-orange-500" />
+            Sin Foto
+            {missingPhotosCount > 0 && (
+              <span className="px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-700 text-[10px] font-mono font-bold">
+                {missingPhotosCount}
+              </span>
+            )}
+          </button>
         </div>
 
         {/* ━━━━ FRAGRANCE DATA TABLE ━━━━ */}
