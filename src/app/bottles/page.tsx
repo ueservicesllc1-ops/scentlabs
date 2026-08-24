@@ -7,8 +7,8 @@ export default function BottlesCategoryPage() {
     <CatalogBrowser
       initialProducts={INITIAL_PRODUCTS}
       fixedCategory="bottles"
-      title="Flint Glass Bottles & Atomizers"
-      subtitle="Precision glass enclosures across 5ml, 10ml, 30ml, 50ml, and 100ml roll-on and spray formats."
+      title="Frascos de Vidrio y Envases Plásticos HDPE"
+      subtitle="Frascos de vidrio para perfumería terminada (spray y roll-on) y botellas plásticas HDPE de alta resistencia química para formulación y maceración."
     />
   );
 }

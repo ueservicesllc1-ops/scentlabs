@@ -2,17 +2,17 @@ import { Product, ProductVariant } from "@/types";
 
 const SEED_PRODUCTS: Product[] = [
   // ==========================================
-  // PRODUCT #1: 500 ml Compounding Bottle
+  // PRODUCT #1: 500 ml HDPE Plastic Compounding Bottle
   // ==========================================
   {
     id: "prod_bottle_500ml",
-    name: "500 ml Compounding Bottle",
+    name: "500 ml HDPE Plastic Compounding Bottle",
     slug: "500ml-bottle",
-    description: "500 ml HDPE Plastic compounding bottle suitable for perfume bases, solvent decanting, and large fragrance compounding.",
-    shortDescription: "500 ml compounding bottle for formulations.",
+    description: "Botella de plástico HDPE de grado laboratorio (500 ml) de alta resistencia química, ideal para formulación, decantado, maceración de perfumes y mezclas mayoristas.",
+    shortDescription: "500 ml botella de plástico HDPE para formulación y maceración.",
     categoryId: "cat_bottles",
     category: "bottles",
-    subcategory: "500 ml",
+    subcategory: "Plástico HDPE",
     supplierId: "sup_amazon",
     asin: "B0FK9W4SPP",
     externalUrl: "https://www.amazon.com/dp/B0FK9W4SPP",
@@ -21,7 +21,7 @@ const SEED_PRODUCTS: Product[] = [
         id: "med_500ml_1",
         b2Key: "products/prod_bottle_500ml/images/500ml_main.webp",
         url: "",
-        altText: "500 ml Compounding Bottle",
+        altText: "500 ml HDPE Plastic Compounding Bottle",
         isPrimary: true,
         sortOrder: 1,
       },
@@ -46,14 +46,15 @@ const SEED_PRODUCTS: Product[] = [
     ],
     discountEligible: true,
     minimumDiscountMargin: 0.25,
-    sku: "BOT-500ML",
+    sku: "BOT-500ML-HDPE",
     unit: "unit",
     status: "active",
     featured: true,
-    tags: ["500ml", "bottles", "compounding", "hdpe"],
+    tags: ["500ml", "bottles", "compounding", "hdpe", "plastic", "plastico"],
     attributes: {
       capacity: "500 ml",
-      material: "HDPE Plastic",
+      material: "Plástico HDPE (No Vidrio)",
+      type: "Botella de Plástico para Maceración",
       fixedSize: "500 ml",
     },
     hasVariants: false,
@@ -74,17 +75,17 @@ const SEED_PRODUCTS: Product[] = [
   },
 
   // ==========================================
-  // PRODUCT #2: 250 ml Compounding Bottle
+  // PRODUCT #2: 250 ml HDPE Plastic Compounding Bottle
   // ==========================================
   {
     id: "prod_bottle_250ml",
-    name: "250 ml Compounding Bottle",
+    name: "250 ml HDPE Plastic Compounding Bottle",
     slug: "250ml-bottle",
-    description: "250 ml HDPE Plastic compounding bottle for fragrance formulations, compounding blends, and intermediate stock storage.",
-    shortDescription: "250 ml formulation bottle.",
+    description: "Botella de plástico HDPE de grado laboratorio (250 ml) para formulación de esencias, maceración de mezclas y almacenamiento de stock intermedio.",
+    shortDescription: "250 ml botella de plástico HDPE para formulación y maceración.",
     categoryId: "cat_bottles",
     category: "bottles",
-    subcategory: "250 ml",
+    subcategory: "Plástico HDPE",
     supplierId: "sup_amazon",
     asin: "B0BW8TJT3J",
     externalUrl: "https://www.amazon.com/dp/B0BW8TJT3J",
@@ -93,7 +94,7 @@ const SEED_PRODUCTS: Product[] = [
         id: "med_250ml_1",
         b2Key: "products/prod_bottle_250ml/images/250ml_main.webp",
         url: "",
-        altText: "250 ml Compounding Bottle",
+        altText: "250 ml HDPE Plastic Compounding Bottle",
         isPrimary: true,
         sortOrder: 1,
       },
@@ -118,14 +119,15 @@ const SEED_PRODUCTS: Product[] = [
     ],
     discountEligible: true,
     minimumDiscountMargin: 0.25,
-    sku: "BOT-250ML",
+    sku: "BOT-250ML-HDPE",
     unit: "unit",
     status: "active",
     featured: true,
-    tags: ["250ml", "bottles", "compounding", "hdpe"],
+    tags: ["250ml", "bottles", "compounding", "hdpe", "plastic", "plastico"],
     attributes: {
       capacity: "250 ml",
-      material: "HDPE Plastic",
+      material: "Plástico HDPE (No Vidrio)",
+      type: "Botella de Plástico para Maceración",
       fixedSize: "250 ml",
     },
     hasVariants: false,
