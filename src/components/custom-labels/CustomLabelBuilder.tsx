@@ -18,6 +18,7 @@ import { LabelSizeSelector } from "./LabelSizeSelector";
 import { LabelMaterialSelector } from "./LabelMaterialSelector";
 import { LabelQuantitySelector } from "./LabelQuantitySelector";
 import { LabelSheetYieldBadge } from "./LabelSheetYieldBadge";
+import { LabelFontSelector, LABEL_FONTS, LabelFontOption } from "./LabelFontSelector";
 import { 
   Sparkles, 
   Check, 
@@ -54,6 +55,7 @@ export function CustomLabelBuilder({ initialProductId }: CustomLabelBuilderProps
   const [selectedSize, setSelectedSize] = useState<LabelSize>(rollOnFixedSize);
   const [selectedMaterial, setSelectedMaterial] = useState<LabelMaterial>(STANDARD_LABEL_MATERIALS[0]);
   const [selectedQuantity, setSelectedQuantity] = useState<number>(50);
+  const [selectedFont, setSelectedFont] = useState<LabelFontOption>(LABEL_FONTS[0]);
 
   // Customization Form State
   const [brandName, setBrandName] = useState("AURA NOIR");
@@ -84,47 +86,55 @@ export function CustomLabelBuilder({ initialProductId }: CustomLabelBuilderProps
     selectedMaterial.id
   );
 
-  const handleFileUpload = async (file: File, type: "logo" | "design") => {
-    setUploading(true);
-    setError("");
+  const handleDesignFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setDesignFile(file);
+    const localUrl = URL.createObjectURL(file);
+    setDesignUrl(localUrl);
+    setDesignFileId(""); // Reset B2 fileId until purchased
+  };
 
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("customerId", user?.uid || "guest");
-      formData.append("fileType", type);
-      formData.append("configurationId", `cfg_${Date.now()}`);
-
-      const response = await fetch("/api/custom-labels/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to upload artwork file to storage.");
-      }
-
-      const data = await response.json();
-
-      if (type === "logo") {
-        setLogoFile(file);
-        setLogoUrl(data.url);
-        setLogoFileId(data.fileId);
-      } else {
-        setDesignFile(file);
-        setDesignUrl(data.url);
-        setDesignFileId(data.fileId);
-      }
-    } catch (err: any) {
-      console.error("Upload error:", err);
-      setError(err.message || "Failed to upload file. Please try again.");
-    } finally {
-      setUploading(false);
-    }
+  const handleRemoveDesignFile = () => {
+    setDesignFile(null);
+    setDesignUrl("");
+    setDesignFileId("");
   };
 
   const handleAddToCart = async () => {
     setError("");
+
+    let finalDesignUrl = designUrl;
+    let finalDesignFileId = designFileId;
+
+    // Deferred B2 Storage Upload on purchase / add to cart
+    if (designFile && !designFileId) {
+      setUploading(true);
+      try {
+        const formData = new FormData();
+        formData.append("file", designFile);
+        formData.append("customerId", user?.uid || "guest");
+        formData.append("fileType", "design");
+        formData.append("configurationId", `cfg_${Date.now()}`);
+
+        const response = await fetch("/api/custom-labels/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          finalDesignUrl = data.url;
+          finalDesignFileId = data.fileId;
+          setDesignUrl(data.url);
+          setDesignFileId(data.fileId);
+        }
+      } catch (err: any) {
+        console.error("Deferred B2 upload error:", err);
+      } finally {
+        setUploading(false);
+      }
+    }
 
     const configurationRecord: CustomLabelConfiguration = {
       id: `cfg_${Date.now()}`,
@@ -143,8 +153,8 @@ export function CustomLabelBuilder({ initialProductId }: CustomLabelBuilderProps
       customText: `${customText} | ${volumeText}`,
       logoUrl: logoUrl || undefined,
       logoFileId: logoFileId || undefined,
-      designUrl: designUrl || undefined,
-      designFileId: designFileId || undefined,
+      designUrl: finalDesignUrl || undefined,
+      designFileId: finalDesignFileId || undefined,
       notes: notes || undefined,
       status: "draft",
       price: pricing.totalPrice,
@@ -311,6 +321,8 @@ export function CustomLabelBuilder({ initialProductId }: CustomLabelBuilderProps
                 customText={customText}
                 volumeText={volumeText}
                 logoUrl={logoUrl}
+                designUrl={designUrl}
+                fontFamily={selectedFont.family}
                 size={effectiveSize}
                 material={selectedMaterial}
               />
@@ -366,58 +378,133 @@ export function CustomLabelBuilder({ initialProductId }: CustomLabelBuilderProps
               />
             </div>
 
-            {/* Typography Customization Form */}
+            {/* Custom Artwork Upload Section (2-Color Max Notice & Instant Visor Display) */}
             <div className="p-6 border border-gray-200 bg-white shadow-sm space-y-4">
               <div className="flex justify-between items-center text-xs">
                 <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-gray-900">
-                  {isRollOnLabel ? "2. Label Typography & Text" : "3. Label Typography & Text"}
+                  {isRollOnLabel ? "2. Subir Tu Propio Diseño (Opcional)" : "3. Subir Tu Propio Diseño (Opcional)"}
                 </span>
-                <span className="text-[10px] text-gray-400">Updates Proof in Real Time</span>
+                <span className="text-[10px] text-emerald-800 font-semibold bg-emerald-50 px-2 py-0.5 border border-emerald-200">
+                  Vista Previa Instantánea en Visor
+                </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-semibold uppercase tracking-wider text-gray-600 block">Brand / House Name</label>
-                  <input
-                    type="text"
-                    value={brandName}
-                    onChange={(e) => setBrandName(e.target.value)}
-                    className="w-full text-xs p-2.5 bg-gray-50 border border-gray-200 text-gray-900 focus:bg-white focus:border-[#2B5F4A] focus:outline-none transition"
-                    placeholder="e.g. AURA NOIR"
-                  />
+              {/* 2-Color Print Spec Notice Banner */}
+              <div className="p-4 bg-amber-50 border border-amber-200 text-xs text-amber-900 rounded space-y-1">
+                <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[10px] text-amber-800">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Aviso Importante: Impresión a 2 Colores Máximo</span>
                 </div>
+                <p className="text-[11px] leading-relaxed text-amber-800/90 font-light">
+                  Las etiquetas personalizadas se imprimen a un máximo de <strong>2 colores</strong> (Color base de fondo + Tinta/Foil metálico). Tu diseño se visualizará <strong>de inmediato en el visor de la izquierda</strong> y se guardará de forma segura en almacenamiento B2 al momento de añadir al carrito.
+                </p>
+              </div>
 
-                <div className="space-y-1">
-                  <label className="text-[10px] font-semibold uppercase tracking-wider text-gray-600 block">Fragrance Name</label>
-                  <input
-                    type="text"
-                    value={fragranceName}
-                    onChange={(e) => setFragranceName(e.target.value)}
-                    className="w-full text-xs p-2.5 bg-gray-50 border border-gray-200 text-gray-900 focus:bg-white focus:border-[#2B5F4A] focus:outline-none transition"
-                    placeholder="e.g. SANTAL IMPERIAL"
-                  />
-                </div>
+              {/* Upload Input & Drop Box */}
+              <div>
+                {designFile ? (
+                  <div className="p-4 border border-emerald-300 bg-emerald-50/50 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <FileText className="w-5 h-5 text-emerald-700" />
+                      <div>
+                        <span className="text-xs font-semibold text-gray-900 block">{designFile.name}</span>
+                        <span className="text-[10px] text-emerald-700 font-medium">
+                          Mostrando en visor • Se guardará en B2 al comprar ({(designFile.size / 1024).toFixed(1)} KB)
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRemoveDesignFile}
+                      className="text-xs text-red-600 hover:text-red-800 font-medium px-3 py-1 bg-white border border-red-200 rounded transition"
+                    >
+                      Quitar
+                    </button>
+                  </div>
+                ) : (
+                  <label className="border-2 border-dashed border-gray-200 hover:border-[#2B5F4A] p-6 text-center transition cursor-pointer flex flex-col items-center justify-center gap-2 bg-gray-50/50 hover:bg-white group">
+                    <UploadCloud className="w-6 h-6 text-gray-400 group-hover:text-[#2B5F4A] transition" />
+                    <span className="text-xs font-semibold text-gray-800">
+                      Haz clic para seleccionar o subir tu archivo de diseño completo
+                    </span>
+                    <span className="text-[10px] text-gray-500 font-light">
+                      Soporta PNG, JPG, SVG, WEBP, PDF (Impresión a 2 colores máx). Muestra inmediata en visor.
+                    </span>
+                    <input
+                      type="file"
+                      accept=".png,.jpg,.jpeg,.svg,.webp,.pdf"
+                      onChange={handleDesignFileChange}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+              </div>
+            </div>
 
-                <div className="space-y-1">
-                  <label className="text-[10px] font-semibold uppercase tracking-wider text-gray-600 block">Batch / Subtitle Text</label>
-                  <input
-                    type="text"
-                    value={customText}
-                    onChange={(e) => setCustomText(e.target.value)}
-                    className="w-full text-xs p-2.5 bg-gray-50 border border-gray-200 text-gray-900 focus:bg-white focus:border-[#2B5F4A] focus:outline-none transition"
-                    placeholder="e.g. BATCH NO. 04 • HAND POURED"
-                  />
-                </div>
+            {/* Typography Customization Form & Font Selection */}
+            <div className="p-6 border border-gray-200 bg-white shadow-sm space-y-6">
+              <div className="flex justify-between items-center text-xs border-b border-gray-100 pb-3">
+                <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-gray-900">
+                  {isRollOnLabel ? "3. Texto / Tipografía Alternativa (4. Selección de Fuente)" : "4. Texto y Selección de Tipografía (10 Fuentes)"}
+                </span>
+                <span className="text-[10px] text-gray-400">Prueba rápida en visor si no subes diseño</span>
+              </div>
 
-                <div className="space-y-1">
-                  <label className="text-[10px] font-semibold uppercase tracking-wider text-gray-600 block">Volume / Concentration</label>
-                  <input
-                    type="text"
-                    value={volumeText}
-                    onChange={(e) => setVolumeText(e.target.value)}
-                    className="w-full text-xs p-2.5 bg-gray-50 border border-gray-200 text-gray-900 focus:bg-white focus:border-[#2B5F4A] focus:outline-none transition"
-                    placeholder={isRollOnLabel ? "e.g. 10 ML / 0.34 FL OZ" : "e.g. 50 ML / 1.7 FL OZ"}
-                  />
+              {/* 10 Font Selector Grid */}
+              <LabelFontSelector
+                selectedFontId={selectedFont.id}
+                onSelectFont={setSelectedFont}
+              />
+
+              {/* Typography Input Fields */}
+              <div className="pt-2 border-t border-gray-100 space-y-4">
+                <span className="text-[10px] font-semibold tracking-wider uppercase text-gray-500 block">
+                  Contenido de Texto
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-semibold uppercase tracking-wider text-gray-600 block">Brand / House Name</label>
+                    <input
+                      type="text"
+                      value={brandName}
+                      onChange={(e) => setBrandName(e.target.value)}
+                      className="w-full text-xs p-2.5 bg-gray-50 border border-gray-200 text-gray-900 focus:bg-white focus:border-[#2B5F4A] focus:outline-none transition"
+                      placeholder="e.g. AURA NOIR"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-semibold uppercase tracking-wider text-gray-600 block">Fragrance Name</label>
+                    <input
+                      type="text"
+                      value={fragranceName}
+                      onChange={(e) => setFragranceName(e.target.value)}
+                      className="w-full text-xs p-2.5 bg-gray-50 border border-gray-200 text-gray-900 focus:bg-white focus:border-[#2B5F4A] focus:outline-none transition"
+                      placeholder="e.g. SANTAL IMPERIAL"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-semibold uppercase tracking-wider text-gray-600 block">Batch / Subtitle Text</label>
+                    <input
+                      type="text"
+                      value={customText}
+                      onChange={(e) => setCustomText(e.target.value)}
+                      className="w-full text-xs p-2.5 bg-gray-50 border border-gray-200 text-gray-900 focus:bg-white focus:border-[#2B5F4A] focus:outline-none transition"
+                      placeholder="e.g. BATCH NO. 04 • HAND POURED"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-semibold uppercase tracking-wider text-gray-600 block">Volume / Concentration</label>
+                    <input
+                      type="text"
+                      value={volumeText}
+                      onChange={(e) => setVolumeText(e.target.value)}
+                      className="w-full text-xs p-2.5 bg-gray-50 border border-gray-200 text-gray-900 focus:bg-white focus:border-[#2B5F4A] focus:outline-none transition"
+                      placeholder={isRollOnLabel ? "e.g. 10 ML / 0.34 FL OZ" : "e.g. 50 ML / 1.7 FL OZ"}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

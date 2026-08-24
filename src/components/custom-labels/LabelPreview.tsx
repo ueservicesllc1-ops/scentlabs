@@ -10,6 +10,8 @@ interface LabelPreviewProps {
   customText?: string;
   volumeText?: string;
   logoUrl?: string;
+  designUrl?: string;
+  fontFamily?: string;
   size: LabelSize;
   material: LabelMaterial;
   className?: string;
@@ -19,8 +21,10 @@ export function LabelPreview({
   brandName,
   fragranceName,
   customText,
-  volumeText = "EAU DE PARFUM \u2022 10 ML / 0.34 FL OZ",
+  volumeText = "EAU DE PARFUM • 10 ML / 0.34 FL OZ",
   logoUrl,
+  designUrl,
+  fontFamily = "'Bodoni Moda', serif",
   size,
   material,
   className = "",
@@ -110,46 +114,72 @@ export function LabelPreview({
           {/* Metallic Sheen Angle Reflex */}
           <div className={`absolute inset-0 pointer-events-none opacity-60 ${finish.sheen}`} />
 
-          {/* Top: Brand Logo / Monogram */}
-          <div className="relative z-10 w-full flex flex-col items-center pt-1">
-            {logoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
+          {designUrl ? (
+            /* Custom Uploaded Design Image View */
+            <div className="relative z-10 w-full h-full flex flex-col items-center justify-center p-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={logoUrl}
-                alt="Brand Logo"
-                className="max-h-12 max-w-[140px] object-contain filter drop-shadow mb-1"
+                src={designUrl}
+                alt="Uploaded Custom Label Artwork"
+                className="w-full h-full object-contain filter drop-shadow"
               />
-            ) : (
-              <div
-                className={`text-[11px] font-bold uppercase tracking-[0.25em] bg-gradient-to-r ${finish.gradient} bg-clip-text text-transparent`}
-              >
-                {brandName || "STUDIO BRAND"}
+              <div className="absolute bottom-1 bg-black/80 text-amber-300 text-[8px] uppercase tracking-widest px-2 py-0.5 rounded font-mono font-semibold backdrop-blur-xs border border-amber-400/30">
+                2-Color Print Proof
               </div>
-            )}
-            <div className="w-8 h-[1px] bg-outline-variant/60 my-1" />
-          </div>
-
-          {/* Center: Fragrance Name & Subtext */}
-          <div className="relative z-10 w-full py-2 space-y-1">
-            <h4
-              className={`text-lg font-bold uppercase tracking-widest bg-gradient-to-r ${finish.gradient} bg-clip-text text-transparent line-clamp-2`}
-            >
-              {fragranceName || "FRAGRANCE NAME"}
-            </h4>
-
-            {customText && (
-              <p className={`text-[10px] font-medium tracking-wide uppercase ${material.finishType.includes("vinyl") ? "text-secondary" : "text-white/80"}`}>
-                {customText}
-              </p>
-            )}
-          </div>
-
-          {/* Bottom: Volume / Formulation Standard */}
-          <div className={`relative z-10 w-full pb-1 border-t pt-2 ${material.finishType.includes("vinyl") ? "border-outline-variant" : "border-white/10"}`}>
-            <div className={`text-[9px] font-mono tracking-widest uppercase ${material.finishType.includes("vinyl") ? "text-secondary" : "text-white/60"}`}>
-              {volumeText}
             </div>
-          </div>
+          ) : (
+            /* Standard Typography Proof View */
+            <>
+              {/* Top: Brand Logo / Monogram */}
+              <div className="relative z-10 w-full flex flex-col items-center pt-1">
+                {logoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={logoUrl}
+                    alt="Brand Logo"
+                    className="max-h-12 max-w-[140px] object-contain filter drop-shadow mb-1"
+                  />
+                ) : (
+                  <div
+                    style={{ fontFamily }}
+                    className={`text-[11px] font-bold uppercase tracking-[0.25em] bg-gradient-to-r ${finish.gradient} bg-clip-text text-transparent`}
+                  >
+                    {brandName || "STUDIO BRAND"}
+                  </div>
+                )}
+                <div className="w-8 h-[1px] bg-outline-variant/60 my-1" />
+              </div>
+
+              {/* Center: Fragrance Name & Subtext */}
+              <div className="relative z-10 w-full py-2 space-y-1">
+                <h4
+                  style={{ fontFamily }}
+                  className={`text-lg font-bold uppercase tracking-widest bg-gradient-to-r ${finish.gradient} bg-clip-text text-transparent line-clamp-2`}
+                >
+                  {fragranceName || "FRAGRANCE NAME"}
+                </h4>
+
+                {customText && (
+                  <p
+                    style={{ fontFamily }}
+                    className={`text-[10px] font-medium tracking-wide uppercase ${material.finishType.includes("vinyl") ? "text-secondary" : "text-white/80"}`}
+                  >
+                    {customText}
+                  </p>
+                )}
+              </div>
+
+              {/* Bottom: Volume / Formulation Standard */}
+              <div className={`relative z-10 w-full pb-1 border-t pt-2 ${material.finishType.includes("vinyl") ? "border-outline-variant" : "border-white/10"}`}>
+                <div
+                  style={{ fontFamily }}
+                  className={`text-[9px] font-mono tracking-widest uppercase ${material.finishType.includes("vinyl") ? "text-secondary" : "text-white/60"}`}
+                >
+                  {volumeText}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
