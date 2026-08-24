@@ -13,6 +13,7 @@ interface LabelPreviewProps {
   designUrl?: string;
   fontFamily?: string;
   textColorHex?: string;
+  borderStyle?: "none" | "full_edge" | "inset_margin";
   size: LabelSize;
   material: LabelMaterial;
   className?: string;
@@ -27,6 +28,7 @@ export function LabelPreview({
   designUrl,
   fontFamily = "'Bodoni Moda', serif",
   textColorHex = "#E5A93C",
+  borderStyle = "none",
   size,
   material,
   className = "",
@@ -95,6 +97,20 @@ export function LabelPreview({
         >
           {/* Metallic Sheen Angle Reflex */}
           <div className={`absolute inset-0 pointer-events-none opacity-60 ${finish.sheen}`} />
+
+          {/* Decorative Border Frame Overlay */}
+          {borderStyle === "full_edge" && (
+            <div
+              className="absolute inset-1.5 pointer-events-none rounded-xs border-2 z-20"
+              style={{ borderColor: textColorHex }}
+            />
+          )}
+          {borderStyle === "inset_margin" && (
+            <div
+              className="absolute inset-4 pointer-events-none rounded-xs border-2 z-20"
+              style={{ borderColor: textColorHex }}
+            />
+          )}
 
           {designUrl ? (
             /* Custom Uploaded Design Image View */

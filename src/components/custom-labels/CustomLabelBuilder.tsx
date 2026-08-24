@@ -22,6 +22,7 @@ import { LabelQuantitySelector } from "./LabelQuantitySelector";
 import { LabelSheetYieldBadge } from "./LabelSheetYieldBadge";
 import { LabelFontSelector, LABEL_FONTS, LabelFontOption } from "./LabelFontSelector";
 import { LabelTextColorSelector } from "./LabelTextColorSelector";
+import { LabelBorderSelector, LabelBorderStyle } from "./LabelBorderSelector";
 import { 
   Sparkles, 
   Check, 
@@ -60,6 +61,7 @@ export function CustomLabelBuilder({ initialProductId }: CustomLabelBuilderProps
   const [selectedQuantity, setSelectedQuantity] = useState<number>(50);
   const [selectedFont, setSelectedFont] = useState<LabelFontOption>(LABEL_FONTS[0]);
   const [selectedTextColor, setSelectedTextColor] = useState<LabelTextColorOption>(LABEL_TEXT_COLORS[0]);
+  const [selectedBorderStyle, setSelectedBorderStyle] = useState<LabelBorderStyle>("none");
 
   // Customization Form State
   const [brandName, setBrandName] = useState("AURA NOIR");
@@ -329,6 +331,7 @@ export function CustomLabelBuilder({ initialProductId }: CustomLabelBuilderProps
                 designUrl={designUrl}
                 fontFamily={selectedFont.family}
                 textColorHex={selectedTextColor.hex}
+                borderStyle={selectedBorderStyle}
                 size={effectiveSize}
                 material={selectedMaterial}
               />
@@ -447,17 +450,17 @@ export function CustomLabelBuilder({ initialProductId }: CustomLabelBuilderProps
               </div>
             </div>
 
-            {/* Typography Customization Form & Font + Text Color Selection */}
+            {/* Typography Customization Form & Font + Text Color + Border Selection */}
             <div className="p-6 border border-gray-200 bg-white shadow-sm space-y-6">
               <div className="flex justify-between items-center text-xs border-b border-gray-100 pb-3">
                 <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-gray-900">
-                  {isRollOnLabel ? "3. Texto, Tipografía y Color (2 Colores Máx)" : "4. Texto, Tipografía (10 Fuentes) y Color de Texto"}
+                  {isRollOnLabel ? "3. Texto, Tipografía, Color y Marco" : "4. Texto, Tipografía (10 Fuentes), Color y Marco"}
                 </span>
                 <span className="text-[10px] text-gray-400">Prueba rápida en visor si no subes diseño</span>
               </div>
 
-              {/* 10 Font Selector Dropdown & Text Color Selector Dropdown */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* 10 Font Selector Dropdown, Text Color Dropdown & Border Style Dropdown */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <LabelFontSelector
                   selectedFontId={selectedFont.id}
                   onSelectFont={setSelectedFont}
@@ -465,6 +468,10 @@ export function CustomLabelBuilder({ initialProductId }: CustomLabelBuilderProps
                 <LabelTextColorSelector
                   selectedTextColor={selectedTextColor}
                   onSelectTextColor={setSelectedTextColor}
+                />
+                <LabelBorderSelector
+                  selectedBorderStyle={selectedBorderStyle}
+                  onSelectBorderStyle={setSelectedBorderStyle}
                 />
               </div>
 
