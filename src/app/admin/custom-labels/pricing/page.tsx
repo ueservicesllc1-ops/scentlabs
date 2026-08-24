@@ -9,7 +9,7 @@ import {
   STANDARD_LABEL_QUANTITIES,
   BASE_SHEET_CONFIG 
 } from "@/config/custom-labels";
-import { calculateLabelCost } from "@/lib/custom-labels/pricing";
+import { calculateLabelCost, calculateLabelPricing } from "@/lib/custom-labels/pricing";
 import { calculateLabelSheetYield } from "@/lib/custom-labels/sheet-calculator";
 import { formatCurrency, formatUnitPrice } from "@/lib/utils";
 import { 
@@ -206,7 +206,7 @@ export default function AdminLabelPricingPage() {
             <div className="p-6 rounded-2xl border border-lab-800 bg-lab-900/40 space-y-3 text-xs">
               <div className="flex justify-between items-center border-b border-lab-800 pb-2">
                 <span className="text-xs font-bold text-white uppercase tracking-wider">
-                  Active Pricing Schedule (1.5 × 2.5 in)
+                  Active Pricing Schedule ({selectedSize.name} • {selectedMaterial.name})
                 </span>
                 <span className="text-[10px] text-emerald-400 font-bold uppercase">LIVE</span>
               </div>
@@ -220,36 +220,17 @@ export default function AdminLabelPricingPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-lab-800/60 font-mono">
-                  <tr>
-                    <td className="p-2 font-bold text-white">50 Labels</td>
-                    <td className="p-2 text-amber-400 font-bold">$12.50</td>
-                    <td className="p-2 text-lab-300">$0.25 / label</td>
-                    <td className="p-2"><span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300">YES</span></td>
-                  </tr>
-                  <tr>
-                    <td className="p-2 font-bold text-white">100 Labels</td>
-                    <td className="p-2 text-amber-400 font-bold">$22.00</td>
-                    <td className="p-2 text-lab-300">$0.22 / label</td>
-                    <td className="p-2"><span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300">YES</span></td>
-                  </tr>
-                  <tr>
-                    <td className="p-2 font-bold text-white">250 Labels</td>
-                    <td className="p-2 text-amber-400 font-bold">$50.00</td>
-                    <td className="p-2 text-lab-300">$0.20 / label</td>
-                    <td className="p-2"><span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300">YES</span></td>
-                  </tr>
-                  <tr>
-                    <td className="p-2 font-bold text-white">500 Labels</td>
-                    <td className="p-2 text-amber-400 font-bold">$90.00</td>
-                    <td className="p-2 text-lab-300">$0.18 / label</td>
-                    <td className="p-2"><span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300">YES</span></td>
-                  </tr>
-                  <tr>
-                    <td className="p-2 font-bold text-white">1000 Labels</td>
-                    <td className="p-2 text-amber-400 font-bold">$160.00</td>
-                    <td className="p-2 text-lab-300">$0.16 / label</td>
-                    <td className="p-2"><span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300">YES</span></td>
-                  </tr>
+                  {STANDARD_LABEL_QUANTITIES.map((q) => {
+                    const pr = calculateLabelPricing(selectedSize.width, selectedSize.height, q, selectedMaterial.id);
+                    return (
+                      <tr key={q}>
+                        <td className="p-2 font-bold text-white">{q} Labels</td>
+                        <td className="p-2 text-amber-400 font-bold">${pr.totalPrice.toFixed(2)}</td>
+                        <td className="p-2 text-lab-300">${pr.unitPrice.toFixed(2)} / label</td>
+                        <td className="p-2"><span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300">YES</span></td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

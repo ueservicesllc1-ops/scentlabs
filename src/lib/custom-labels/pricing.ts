@@ -1,6 +1,7 @@
 import { 
   BASE_SHEET_CONFIG, 
   STANDARD_LABEL_MATERIALS, 
+  BASE_LABEL_PRICING_MATRIX,
   OFFICIAL_LABEL_PRICING_TIERS 
 } from "@/config/custom-labels";
 import { LabelCostBreakdown, LabelMaterial } from "@/types/custom-label";
@@ -42,7 +43,7 @@ export function calculateLabelCost(
   const totalCost = Math.round((totalMaterialWithWaste + productionCost + laborCost + packagingCost) * 100) / 100;
   const unitCost = Math.round((totalCost / Math.max(1, quantity)) * 1000) / 1000;
 
-  // Match selling price with official tier pricing
+  // Match selling price with official matrix pricing
   const pricing = calculateLabelPricing(width, height, quantity, material.id);
   const sellingPrice = pricing.totalPrice;
   const unitPrice = pricing.unitPrice;
@@ -71,71 +72,100 @@ export function calculateLabelCost(
 }
 
 /**
- * SINGLE SOURCE OF TRUTH for Custom Label Pricing across SCENTLAB.
+ * SINGLE SOURCE OF TRUTH for Custom Label Pricing across Georgina Wholesale.
  *
- * Official Tiers:
- * - 50 LABELS:   $12.50 ($0.25 / label)
- * - 100 LABELS:  $22.00 ($0.22 / label)
- * - 250 LABELS:  $50.00 ($0.20 / label)
- * - 500 LABELS:  $90.00 ($0.18 / label)
- * - 1000 LABELS: $160.00 ($0.16 / label)
+ * Formula: BASE_PRICE(Size, Quantity) * MATERIAL_MULTIPLIER
+ * Rounded to 2 decimal places.
  */
 export function calculateLabelPricing(
   width: number,
   height: number,
   quantity: number,
-  materialId: string = "mat_gold_foil"
+  materialId: string = "mat_matte_vinyl"
 ): {
   unitPrice: number;
   totalPrice: number;
   materialName: string;
+  materialMultiplier: number;
   volumeTierSavingsPercent: number;
 } {
-  const material = STANDARD_LABEL_MATERIALS.find((m) => m.id === materialId) || STANDARD_LABEL_MATERIALS[0];
+  // 1. Material lookup & Multiplier
+  const material = STANDARD_LABEL_MATERIALS.find((m) => m.id === materialId) ||
+    STANDARD_LABEL_MATERIALS.find((m) => m.finishType === materialId) ||
+    STANDARD_LABEL_MATERIALS[0];
 
-  // Exact tier lookup
-  const exactTier = OFFICIAL_LABEL_PRICING_TIERS.find((t) => t.quantity === quantity);
+  const materialMultiplier = material.priceMultiplier ?? 1.0;
 
-  let unitPrice: number;
-  let totalPrice: number;
+  // 2. Size Matrix lookup
+  const minDim = Math.min(width, height);
+  const maxDim = Math.max(width, height);
 
-  if (exactTier) {
-    unitPrice = exactTier.unitPrice;
-    totalPrice = exactTier.totalPrice;
-  } else {
-    // Continuous volume rate for custom quantities (minimum 50 labels = $12.50)
-    if (quantity < 50) {
-      unitPrice = 0.25;
-      totalPrice = 12.50; // Minimum order constraint ($12.50)
-    } else if (quantity < 100) {
-      unitPrice = 0.25;
-      totalPrice = Math.round(quantity * 0.25 * 100) / 100;
-    } else if (quantity < 250) {
-      unitPrice = 0.22;
-      totalPrice = Math.round(quantity * 0.22 * 100) / 100;
-    } else if (quantity < 500) {
-      unitPrice = 0.20;
-      totalPrice = Math.round(quantity * 0.20 * 100) / 100;
-    } else if (quantity < 1000) {
-      unitPrice = 0.18;
-      totalPrice = Math.round(quantity * 0.18 * 100) / 100;
-    } else {
-      unitPrice = 0.16;
-      totalPrice = Math.round(quantity * 0.16 * 100) / 100;
+  // Exact or min/max dimension match
+  let matchedRow = BASE_LABEL_PRICING_MATRIX.find((r) =>
+    (Math.abs(r.width - minDim) < 0.01 && Math.abs(r.height - maxDim) < 0.01) ||
+    (Math.abs(r.width - maxDim) < 0.01 && Math.abs(r.height - minDim) < 0.01)
+  );
+
+  // Closest match if custom size
+  if (!matchedRow) {
+    let minDistance = Infinity;
+    for (const r of BASE_LABEL_PRICING_MATRIX) {
+      const rMin = Math.min(r.width, r.height);
+      const rMax = Math.max(r.width, r.height);
+      const dist = Math.sqrt(Math.pow(minDim - rMin, 2) + Math.pow(maxDim - rMax, 2));
+      if (dist < minDistance) {
+        minDistance = dist;
+        matchedRow = r;
+      }
     }
   }
 
-  // Base comparison is 50-unit price ($0.25)
-  const baseUnitPrice = 0.25;
-  const savingsPercent = Math.max(
-    0,
-    Math.round(((baseUnitPrice - unitPrice) / baseUnitPrice) * 100)
-  );
+  const row = matchedRow || BASE_LABEL_PRICING_MATRIX[5]; // Fallback 1.5x2.5
+
+  // 3. Base Total Price lookup / interpolation for quantity
+  let baseTotalPrice: number;
+
+  if (row.prices[quantity] !== undefined) {
+    baseTotalPrice = row.prices[quantity];
+  } else {
+    const sortedQtys = [50, 100, 250, 500, 1000];
+    if (quantity <= 50) {
+      baseTotalPrice = row.prices[50];
+    } else if (quantity >= 1000) {
+      const base1000 = row.prices[1000];
+      const unit1000 = base1000 / 1000;
+      baseTotalPrice = Math.round(quantity * unit1000 * 100) / 100;
+    } else {
+      let lowerQty = 50;
+      let upperQty = 100;
+      for (let i = 0; i < sortedQtys.length - 1; i++) {
+        if (quantity >= sortedQtys[i] && quantity <= sortedQtys[i + 1]) {
+          lowerQty = sortedQtys[i];
+          upperQty = sortedQtys[i + 1];
+          break;
+        }
+      }
+      const lowerPrice = row.prices[lowerQty];
+      const upperPrice = row.prices[upperQty];
+      const fraction = (quantity - lowerQty) / (upperQty - lowerQty);
+      baseTotalPrice = lowerPrice + fraction * (upperPrice - lowerPrice);
+    }
+  }
+
+  // 4. Calculate Final Prices
+  const totalPrice = Math.round(baseTotalPrice * materialMultiplier * 100) / 100;
+  const unitPrice = Math.round((totalPrice / Math.max(1, quantity)) * 100) / 100;
+
+  // 5. Volume Tier Savings Percent (against 50 unit rate)
+  const base50Total = row.prices[50] * materialMultiplier;
+  const base50Unit = base50Total / 50;
+  const volumeTierSavingsPercent = Math.max(0, Math.round(((base50Unit - unitPrice) / base50Unit) * 100));
 
   return {
     unitPrice,
     totalPrice,
     materialName: material.name,
-    volumeTierSavingsPercent: savingsPercent,
+    materialMultiplier,
+    volumeTierSavingsPercent,
   };
 }

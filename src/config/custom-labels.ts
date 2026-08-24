@@ -118,6 +118,18 @@ export const STANDARD_LABEL_SIZES: LabelSize[] = [
 
 export const STANDARD_LABEL_MATERIALS: LabelMaterial[] = [
   {
+    id: "mat_matte_vinyl",
+    name: "Matte Black / White Waterproof Vinyl",
+    description: "Ultra-crisp high-density polymer vinyl, oil-proof and scratch-resistant.",
+    active: true,
+    materialCostPerSqIn: 0.00250,
+    productionCost: 0.03,
+    additionalCost: 0.0,
+    hexColorPreview: "#18181B",
+    finishType: "matte_vinyl",
+    priceMultiplier: 1.00,
+  },
+  {
     id: "mat_gold_foil",
     name: "Metallic Gold Foil + Premium Vinyl",
     description: "Reflective laboratory-grade gold foil on waterproof matte vinyl backing.",
@@ -127,6 +139,7 @@ export const STANDARD_LABEL_MATERIALS: LabelMaterial[] = [
     additionalCost: 0.04,
     hexColorPreview: "#E5A93C",
     finishType: "gold_foil",
+    priceMultiplier: 1.15,
   },
   {
     id: "mat_silver_foil",
@@ -138,6 +151,7 @@ export const STANDARD_LABEL_MATERIALS: LabelMaterial[] = [
     additionalCost: 0.04,
     hexColorPreview: "#D1D5DB",
     finishType: "silver_foil",
+    priceMultiplier: 1.15,
   },
   {
     id: "mat_rosegold_foil",
@@ -149,6 +163,7 @@ export const STANDARD_LABEL_MATERIALS: LabelMaterial[] = [
     additionalCost: 0.05,
     hexColorPreview: "#E09F8F",
     finishType: "rose_gold_foil",
+    priceMultiplier: 1.15,
   },
   {
     id: "mat_holo_foil",
@@ -160,22 +175,35 @@ export const STANDARD_LABEL_MATERIALS: LabelMaterial[] = [
     additionalCost: 0.06,
     hexColorPreview: "#818CF8",
     finishType: "holographic",
-  },
-  {
-    id: "mat_matte_vinyl",
-    name: "Matte Black / White Waterproof Vinyl",
-    description: "Ultra-crisp high-density polymer vinyl, oil-proof and scratch-resistant.",
-    active: true,
-    materialCostPerSqIn: 0.00250,
-    productionCost: 0.03,
-    additionalCost: 0.0,
-    hexColorPreview: "#18181B",
-    finishType: "matte_vinyl",
+    priceMultiplier: 1.25,
   },
 ];
 
-// Single source of truth: 25 labels removed. Minimum order quantity is 50.
+// Single source of truth: Minimum order quantity is 50. Quantities: 50, 100, 250, 500, 1000.
 export const STANDARD_LABEL_QUANTITIES = [50, 100, 250, 500, 1000];
+
+export interface LabelBasePricingRow {
+  sizeId: string;
+  width: number;
+  height: number;
+  name: string;
+  prices: Record<number, number>;
+}
+
+/**
+ * BASE PRICING MATRIX (Matte Black / White Waterproof Vinyl = 1.00x)
+ */
+export const BASE_LABEL_PRICING_MATRIX: LabelBasePricingRow[] = [
+  { sizeId: "size_1x1", width: 1.0, height: 1.0, name: "1\" × 1\"", prices: { 50: 12.50, 100: 20.00, 250: 40.00, 500: 70.00, 1000: 120.00 } },
+  { sizeId: "size_1x1_5", width: 1.0, height: 1.5, name: "1\" × 1.5\"", prices: { 50: 13.50, 100: 22.00, 250: 45.00, 500: 78.00, 1000: 135.00 } },
+  { sizeId: "size_1x2", width: 1.0, height: 2.0, name: "1\" × 2\"", prices: { 50: 15.00, 100: 24.00, 250: 50.00, 500: 85.00, 1000: 145.00 } },
+  { sizeId: "size_1_5x2", width: 1.5, height: 2.0, name: "1.5\" × 2\"", prices: { 50: 17.50, 100: 28.00, 250: 58.00, 500: 98.00, 1000: 165.00 } },
+  { sizeId: "size_1_5x2_25", width: 1.5, height: 2.25, name: "1.5\" × 2.25\"", prices: { 50: 18.50, 100: 30.00, 250: 62.00, 500: 105.00, 1000: 175.00 } },
+  { sizeId: "size_1_5x2_5", width: 1.5, height: 2.5, name: "1.5\" × 2.5\"", prices: { 50: 20.00, 100: 32.00, 250: 65.00, 500: 110.00, 1000: 185.00 } },
+  { sizeId: "size_2x2_5", width: 2.0, height: 2.5, name: "2\" × 2.5\"", prices: { 50: 22.00, 100: 35.00, 250: 72.00, 500: 120.00, 1000: 200.00 } },
+  { sizeId: "size_2x3", width: 2.0, height: 3.0, name: "2\" × 3\"", prices: { 50: 23.50, 100: 38.00, 250: 78.00, 500: 130.00, 1000: 215.00 } },
+  { sizeId: "size_3x3", width: 3.0, height: 3.0, name: "3\" × 3\"", prices: { 50: 25.00, 100: 42.00, 250: 85.00, 500: 145.00, 1000: 240.00 } },
+];
 
 export interface CustomLabelPricingTier {
   quantity: number;
@@ -185,9 +213,9 @@ export interface CustomLabelPricingTier {
 }
 
 export const OFFICIAL_LABEL_PRICING_TIERS: CustomLabelPricingTier[] = [
-  { quantity: 50, totalPrice: 12.50, unitPrice: 0.25, active: true },
-  { quantity: 100, totalPrice: 22.00, unitPrice: 0.22, active: true },
-  { quantity: 250, totalPrice: 50.00, unitPrice: 0.20, active: true },
-  { quantity: 500, totalPrice: 90.00, unitPrice: 0.18, active: true },
-  { quantity: 1000, totalPrice: 160.00, unitPrice: 0.16, active: true },
+  { quantity: 50, totalPrice: 20.00, unitPrice: 0.40, active: true },
+  { quantity: 100, totalPrice: 32.00, unitPrice: 0.32, active: true },
+  { quantity: 250, totalPrice: 65.00, unitPrice: 0.26, active: true },
+  { quantity: 500, totalPrice: 110.00, unitPrice: 0.22, active: true },
+  { quantity: 1000, totalPrice: 185.00, unitPrice: 0.185, active: true },
 ];

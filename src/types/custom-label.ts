@@ -29,6 +29,7 @@ export interface LabelMaterial {
   additionalCost: number; // premium finishes
   hexColorPreview?: string;
   finishType: 'gold_foil' | 'silver_foil' | 'rose_gold_foil' | 'holographic' | 'matte_vinyl' | 'gloss_vinyl';
+  priceMultiplier?: number;
 }
 
 export interface CustomLabelPricing {
