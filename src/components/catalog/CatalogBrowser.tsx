@@ -40,9 +40,24 @@ export function CatalogBrowser({
         return false;
       }
 
-      // Subcategory filter
-      if (selectedSubcategory !== "all" && product.subcategory !== selectedSubcategory) {
-        return false;
+      // Subcategory / Capacity / Format filter
+      if (selectedSubcategory !== "all") {
+        const subClean = selectedSubcategory.toLowerCase().trim();
+        const subNoSpace = subClean.replace(/\s+/g, "");
+        const prodSub = (product.subcategory || "").toLowerCase();
+        const prodName = product.name.toLowerCase();
+        const prodCap = (product.attributes?.capacity || product.attributes?.fixedSize || "").toLowerCase();
+        const prodTags = (product.tags || []).map((t) => t.toLowerCase());
+
+        const matchesSub = prodSub === subClean || prodSub.includes(subClean) || prodSub.includes(subNoSpace);
+        const matchesName = prodName.includes(subClean) || prodName.includes(subNoSpace);
+        const matchesCap = prodCap.includes(subClean) || prodCap.includes(subNoSpace);
+        const matchesTag = prodTags.some((t) => t === subClean || t === subNoSpace || t.includes(subNoSpace));
+        const matchesRollOn = subClean.includes("roll-on") && (prodName.includes("roll-on") || prodName.includes("roll on") || prodSub.includes("roll-on"));
+
+        if (!matchesSub && !matchesName && !matchesCap && !matchesTag && !matchesRollOn) {
+          return false;
+        }
       }
 
       // Search query
