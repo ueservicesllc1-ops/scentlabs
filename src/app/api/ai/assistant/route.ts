@@ -12,6 +12,43 @@ interface FamousPerfumeProfile {
 }
 
 const FAMOUS_PERFUMES: FamousPerfumeProfile[] = [
+  // ━━━ ARABIC & ORIENTAL PERFUMES ━━━
+  {
+    aliases: [
+      "arabe",
+      "arabes",
+      "árabe",
+      "árabes",
+      "dubai",
+      "saudi",
+      "lattafa",
+      "al haramain",
+      "haramain",
+      "afnan",
+      "rasasi",
+      "khamrah",
+      "oud",
+      "oudh",
+      "attar",
+      "oriental",
+      "orientales",
+      "perfumeria arabe",
+      "perfumería árabe",
+      "almizcle arabe",
+    ],
+    house: "Perfumería Oriental & Árabe",
+    name: "Perfumes Árabes & Acordes Orientales",
+    notes: "Madera de oud oscuro, azafrán, rosa de Damasco, ámbar dorado, resinas de incienso, mirra, almizcle blanco y especias cálidas de alta proyección",
+    recommendations: [
+      { name: "Al Haramain: Amber Oud Gold Edition (U) Type", slug: "al-haramain-amber-oud-gold-edition-u-type", desc: "El legendario perfume árabe frutal dulce con ámbar y oud majestuoso." },
+      { name: "Initio: Oud For Greatness (U) Type", slug: "initio-parfums-prives-oud-for-greatness-u-type", desc: "Oud místico, azafrán y nuez moscada con estela monumental." },
+      { name: "Maison Francis Kurkdjian: Oud Satin Mood (U) Type", slug: "maison-francis-kurkdjian-oud-satin-mood-u-type", desc: "Rosa turca, violeta empolvada, vainilla y oud suntuoso." },
+      { name: "Arabian Oud: Only White (U) Type", slug: "arabian-oud-only-white-u-type", desc: "Almizcle blanco árabe puro, fresco, sedoso y elegante." },
+      { name: "Amber White", slug: "amber-white", desc: "El clásico ámbar oriental de SCENTLAB de altísima fijación." },
+      { name: "Al Rehab: Dehn Al Oud (U) Type", slug: "al-rehab-dehn-al-oud-u-type", desc: "Oud árabe tradicional amaderado y profundo." },
+    ],
+  },
+  // ━━━ GOD OF FIRE / TROPICAL NICHE ━━━
   {
     aliases: ["god of fire", "god of fir", "stephane humbert", "lucas 777", "humbert lucas", "mango god"],
     house: "Stéphane Humbert Lucas 777",
@@ -24,6 +61,7 @@ const FAMOUS_PERFUMES: FamousPerfumeProfile[] = [
       { name: "Amber White", slug: "amber-white", desc: "Ideal como base ambarada y amaderada para fijar acordes frutales." },
     ],
   },
+  // ━━━ SANTAL 33 ━━━
   {
     aliases: ["santal 33", "le labo", "santal33", "santal"],
     house: "Le Labo",
@@ -35,6 +73,7 @@ const FAMOUS_PERFUMES: FamousPerfumeProfile[] = [
       { name: "Frankincense & Sandalwood", slug: "frankincense-sandalwood", desc: "Madera de sándalo noble con resinas místicas." },
     ],
   },
+  // ━━━ ERBA PURA ━━━
   {
     aliases: ["erba pura", "xerjoff", "erba gold", "sospiro"],
     house: "Xerjoff",
@@ -46,6 +85,7 @@ const FAMOUS_PERFUMES: FamousPerfumeProfile[] = [
       { name: "Egyptian Musk", slug: "egyptian-musk", desc: "La base de almizcle blanco perfecta para notas frutales." },
     ],
   },
+  // ━━━ ANGELS' SHARE ━━━
   {
     aliases: ["angels share", "angel share", "angels' share", "kilian"],
     house: "Kilian Paris",
@@ -56,6 +96,7 @@ const FAMOUS_PERFUMES: FamousPerfumeProfile[] = [
       { name: "Amber White", slug: "amber-white", desc: "Fondo ambarado envolvente para fragancias licorosas." },
     ],
   },
+  // ━━━ LOST CHERRY ━━━
   {
     aliases: ["lost cherry", "cherry", "cereza"],
     house: "Tom Ford",
@@ -66,6 +107,7 @@ const FAMOUS_PERFUMES: FamousPerfumeProfile[] = [
       { name: "Tom Ford: Tobacco Vanille (U) Type", slug: "tom-ford-tobacco-vanille-u-type", desc: "Excelente para mezclar y aportar fondo dulce ambarado." },
     ],
   },
+  // ━━━ DELINA ━━━
   {
     aliases: ["delina", "parfums de marly", "marly delina", "delina exclusif"],
     house: "Parfums de Marly",
@@ -76,6 +118,7 @@ const FAMOUS_PERFUMES: FamousPerfumeProfile[] = [
       { name: "Egyptian Musk", slug: "egyptian-musk", desc: "Base de almizcle suave que realza cualquier acorde floral." },
     ],
   },
+  // ━━━ IMAGINATION / LV ━━━
   {
     aliases: ["imagination", "louis vuitton", "lv imagination", "afternoon swim", "pacific chill"],
     house: "Louis Vuitton",
@@ -86,6 +129,7 @@ const FAMOUS_PERFUMES: FamousPerfumeProfile[] = [
       { name: "Baby Powder: Clear", slug: "baby-powder-clear", desc: "Limpieza fresca y estela suave durante todo el día." },
     ],
   },
+  // ━━━ TYGAR ━━━
   {
     aliases: ["tygar", "bvlgari tygar", "turathi blue"],
     house: "Bvlgari",
@@ -96,6 +140,7 @@ const FAMOUS_PERFUMES: FamousPerfumeProfile[] = [
       { name: "Lemongrass", slug: "lemongrass", desc: "Energía cítrica y fresca." },
     ],
   },
+  // ━━━ BLEU DE CHANEL ━━━
   {
     aliases: ["bleu de chanel", "bleu", "blue chanel"],
     house: "Chanel",
@@ -106,6 +151,7 @@ const FAMOUS_PERFUMES: FamousPerfumeProfile[] = [
       { name: "Creed: Aventus (M) Type", slug: "creed-aventus-m-type", desc: "Elegancia masculina con maderas nobles y frutas frescas." },
     ],
   },
+  // ━━━ BACCARAT ROUGE 540 ━━━
   {
     aliases: ["baccarat", "540", "baccarat rouge", "br540", "kurkdjian"],
     house: "Maison Francis Kurkdjian",
@@ -116,6 +162,7 @@ const FAMOUS_PERFUMES: FamousPerfumeProfile[] = [
       { name: "Amber White", slug: "amber-white", desc: "Cálido y ambarado con fijación profunda." },
     ],
   },
+  // ━━━ SAUVAGE ━━━
   {
     aliases: ["sauvage", "dior sauvage", "sauvage elixir"],
     house: "Dior",
@@ -125,6 +172,7 @@ const FAMOUS_PERFUMES: FamousPerfumeProfile[] = [
       { name: "Dior: Sauvage (M) Type", slug: "dior-sauvage-m-type", desc: "¡Disponible directamente en nuestro catálogo Grado A puro!" },
     ],
   },
+  // ━━━ AVENTUS ━━━
   {
     aliases: ["aventus", "creed aventus", "creed"],
     house: "Creed",
@@ -134,6 +182,7 @@ const FAMOUS_PERFUMES: FamousPerfumeProfile[] = [
       { name: "Creed: Aventus (M) Type", slug: "creed-aventus-m-type", desc: "¡Nuestra versión tipo concentrada de máxima proyección!" },
     ],
   },
+  // ━━━ TOBACCO VANILLE ━━━
   {
     aliases: ["tobacco vanille", "tom ford tobacco"],
     house: "Tom Ford",
@@ -145,13 +194,20 @@ const FAMOUS_PERFUMES: FamousPerfumeProfile[] = [
   },
 ];
 
+const STOP_WORDS = new Set([
+  "necesito", "busco", "quiero", "tienen", "algo", "como", "para", "unos", "unas", "sobre", "hola",
+  "perfume", "perfumes", "esencia", "esencias", "fragancia", "fragancias", "aceite", "aceites",
+  "dime", "recomiendame", "recomiéndame", "que", "qué", "los", "las", "del", "con", "tipo",
+  "buenos", "dias", "tardes", "noches", "saludos", "favor", "gracias"
+]);
+
 /**
  * Intelligent Olfactory Matching Engine
  */
 function getSmartOlfactoryResponse(userQuery: string): string {
   const q = userQuery.toLowerCase().trim();
 
-  // 1. Check famous perfume knowledgebase
+  // 1. Check famous perfume knowledgebase & Arabic collection
   for (const p of FAMOUS_PERFUMES) {
     const isMatch = p.aliases.some((alias) => q.includes(alias));
     if (isMatch) {
@@ -162,6 +218,10 @@ function getSmartOlfactoryResponse(userQuery: string): string {
 
       if (isDirect) {
         return `✨ **${p.name} (${p.house})**\n\n¡Sí, contamos con esta formulación en nuestro catálogo Grado A puro sin cortar!\n\n${recList}\n\n📦 *Disponible en presentaciones de 1 oz, 2 oz, 4 oz, 8 oz y 16 oz en botellas de plástico transparente con tapa hermética.*`;
+      }
+
+      if (p.name.includes("Árabes")) {
+        return `🕌 **Colección de Perfumes y Esencias Árabes / Orientales**\n\nEn **SCENTLAB** contamos con una destacada selección de concentrados de estilo árabe y nicho oriental (maderas nobles de Oud, Ámbar dorado, Azafrán y Almizcles de gran estela y fijación):\n\n${recList}\n\n👉 [Ver todas las esencias Ámbar y Orientales en el Catálogo](/fragrance)\n\n📦 *Disponibles en botellas de plástico transparente con tapa hermética de 1 oz, 2 oz, 4 oz, 8 oz y 16 oz.*`;
       }
 
       return `✨ **Perfil de ${p.name} (${p.house})**\n\nActualmente no contamos con la referencia exacta de ${p.name}, pero su pirámide olfativa se destaca por:\n*${p.notes}*.\n\nPara recrear o disfrutar de ese mismo acorde vibrante, te recomiendo estas opciones disponibles con enlace directo:\n\n${recList}\n\n💡 *Tip de formulación:* Mezclando nuestras esencias frutales con una base de [Amber White](/fragrance/amber-white) obtienes la misma fijación y estela cálida. Disponibles en botellas de plástico transparente desde 1 oz hasta 16 oz.`;
@@ -235,25 +295,27 @@ Nuestras esencias son **100% puras Grado A sin cortar**, por lo que rinden al m�
 • [Explorar Catálogo de Esencias](/fragrance)`;
   }
 
-  // 4. Note/family keyword search across catalog
+  // 4. Note/family keyword search across catalog with clean stop words
   const searchWords = q
     .replace(/[¿?¡!.,;:()]/g, "")
     .split(/\s+/)
-    .filter((w) => w.length >= 3 && !["necesito", "busco", "quiero", "tienen", "algo", "como", "para", "unos", "unas", "sobre", "hola"].includes(w));
+    .filter((w) => w.length >= 3 && !STOP_WORDS.has(w));
 
-  let candidateMatches = INITIAL_FRAGRANCES.filter((f) => {
-    const text = `${f.name} ${f.scentFamily} ${f.description || ""}`.toLowerCase();
-    return searchWords.some((w) => text.includes(w));
-  }).slice(0, 4);
+  if (searchWords.length > 0) {
+    let candidateMatches = INITIAL_FRAGRANCES.filter((f) => {
+      const text = `${f.name} ${f.scentFamily} ${f.description || ""}`.toLowerCase();
+      return searchWords.some((w) => text.includes(w));
+    }).slice(0, 4);
 
-  if (candidateMatches.length > 0) {
-    const list = candidateMatches
-      .map((m) => `• [${m.name}](/fragrance/${m.slug}) — *Familia: ${m.scentFamily}*`)
-      .join("\n");
-    return `Encontré estas excelentes esencias en nuestro catálogo que coinciden con lo que buscas:\n\n${list}\n\n👉 [Ver todas las esencias en el Catálogo](/fragrance)\n\n¿Deseas saber más sobre sus notas o cómo formularlas?`;
+    if (candidateMatches.length > 0) {
+      const list = candidateMatches
+        .map((m) => `• [${m.name}](/fragrance/${m.slug}) — *Familia: ${m.scentFamily}*`)
+        .join("\n");
+      return `Encontré estas excelentes esencias en nuestro catálogo que coinciden con lo que buscas:\n\n${list}\n\n👉 [Ver todas las esencias en el Catálogo](/fragrance)\n\n¿Deseas saber más sobre sus notas o cómo formularlas?`;
+    }
   }
 
-  return "¡Con gusto te asesoro! En **SCENTLAB** contamos con más de 1,390 aceites de fragancia puros Grado A sin cortar.\n\n• [Ver Catálogo de Esencias](/fragrance)\n• [Ver Frascos y Atomizadores](/bottles)\n• [Ver Suministros de Laboratorio](/testing)\n\n¿Buscas alguna fragancia o diseñador en especial (ej. *God of Fire*, *Santal 33*, *Baccarat 540*, *Sauvage*), o qué tipo de notas olfativas prefieres (cítricas, amaderadas, dulces, florales)?";
+  return "¡Con gusto te asesoro! En **SCENTLAB** contamos con más de 1,390 aceites de fragancia puros Grado A sin cortar.\n\n• [Ver Catálogo de Esencias](/fragrance)\n• [Ver Frascos y Atomizadores](/bottles)\n• [Ver Suministros de Laboratorio](/testing)\n\n¿Buscas alguna fragancia o diseñador en especial (ej. *Perfumes Árabes*, *God of Fire*, *Santal 33*, *Baccarat 540*, *Sauvage*), o qué tipo de notas olfativas prefieres (cítricas, amaderadas, dulces, florales)?";
 }
 
 export async function POST(req: NextRequest) {
