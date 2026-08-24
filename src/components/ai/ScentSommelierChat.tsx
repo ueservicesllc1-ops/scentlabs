@@ -36,7 +36,7 @@ export function ScentSommelierChat() {
       id: "welcome",
       role: "assistant",
       content:
-        "¡Hola! 👋 Soy tu **Sommelier y Asistente Olfativo de SCENTLAB**. ¿Buscas una fragancia en particular, equivalencias de notas, o asesoría para formular tu propio perfume?",
+        "¡Hola! 👋 Soy tu **Asesor Experto en Perfumería de SCENTLAB**. ¿Buscas una fragancia en particular, equivalencias de notas olfativas o asesoría para formular tu propio perfume?",
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     },
   ]);
@@ -114,7 +114,7 @@ export function ScentSommelierChat() {
         id: "welcome",
         role: "assistant",
         content:
-          "¡Hola! 👋 Soy tu **Sommelier y Asistente Olfativo de SCENTLAB**. ¿En qué puedo orientarte hoy?",
+          "¡Hola! 👋 Soy tu **Asesor Experto en Perfumería de SCENTLAB**. ¿En qué te puedo orientar hoy?",
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       },
     ]);
@@ -129,15 +129,15 @@ export function ScentSommelierChat() {
             type="button"
             onClick={() => setIsOpen(true)}
             className="group flex items-center gap-2.5 px-4 py-3 bg-[#2B5F4A] hover:bg-[#1E4233] text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 border border-[#3E8064]/50"
-            aria-label="Abrir Sommelier Olfativo IA"
+            aria-label="Abrir Asesor Experto en Perfumería"
           >
             <div className="relative flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-amber-300 animate-pulse" />
             </div>
             <div className="text-left">
-              <span className="block text-xs font-bold tracking-wide">Sommelier IA</span>
+              <span className="block text-xs font-bold tracking-wide">Experto en Perfumes</span>
               <span className="block text-[10px] text-emerald-200/90 font-light -mt-0.5">
-                Recomendaciones y Asesoría
+                Asesoría y Ayuda en vivo
               </span>
             </div>
           </button>
@@ -156,13 +156,13 @@ export function ScentSommelierChat() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-xs font-bold tracking-wide">ScentSommelier IA</h3>
+                  <h3 className="text-xs font-bold tracking-wide">Experto en Perfumes & Ayuda</h3>
                   <span className="inline-flex items-center gap-1 text-[9px] font-semibold bg-emerald-400/20 text-emerald-200 px-1.5 py-0.2 rounded-full border border-emerald-300/30">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> En línea
                   </span>
                 </div>
                 <p className="text-[10px] text-emerald-100/80 font-light">
-                  Experto en perfumería y formulación
+                  Asesoría en esencias, fórmulas y pedidos
                 </p>
               </div>
             </div>
