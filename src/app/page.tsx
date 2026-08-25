@@ -47,23 +47,30 @@ export default function HomePage() {
           fragranceRepository.getAllFragrances(),
         ]);
 
-        const validProducts = (activeProducts || []).filter(
-          (p) => p && p.status === "active" && p.name && p.sku
-        );
-        const validFragrances = (activeFragrances || []).filter(
-          (f) => f && f.status === "active" && f.name
-        );
+        // Filter only active items that have a valid photo image
+        const validProducts = (activeProducts || []).filter((p) => {
+          if (!p || p.status !== "active" || !p.name || !p.sku) return false;
+          const img = p.primaryImageUrl || (p.media && (p.media as any[])[0]?.url) || (p.images && p.images[0]?.url);
+          return !!(img && img.trim().length > 0);
+        });
+
+        const validFragrancesWithPhoto = (activeFragrances || []).filter((f) => {
+          if (!f || (f as any).status === "draft" || !f.name) return false;
+          const img = f.primaryImage || (f.images && f.images[0]) || ((f as any).media && (f as any).media[0]?.url);
+          return !!(img && img.trim().length > 0);
+        });
 
         const cards: TrendingCardItem[] = [];
 
-        // 1. Featured / Best-Selling Physical Products
-        // Preferred order: Roll-On Bottle, Custom Labels, Roll-On Box
+        // 1. Featured / Best-Selling Physical Products with Photos
         const prioritizedIds = [
           "prod_rollon_10ml",
           "prod_custom_labels",
           "prod_box_10ml",
           "prod_atomizer_10ml",
           "prod_shrink_4x6",
+          "prod_oud_mood",
+          "prod_qaed_al_fursan",
         ];
 
         const sortedProducts = [...validProducts].sort((a, b) => {
@@ -77,8 +84,9 @@ export default function HomePage() {
           return 0;
         });
 
-        // Add top 3 physical products
-        for (const prod of sortedProducts.slice(0, 3)) {
+        // Add physical products (up to 3, or 4 if no fragrance with photo)
+        const maxProds = validFragrancesWithPhoto.length > 0 ? 3 : 4;
+        for (const prod of sortedProducts.slice(0, maxProds)) {
           let priceLabel = `From $${prod.basePrice.toFixed(2)}`;
 
           if (prod.id === "prod_custom_labels") {
@@ -89,48 +97,58 @@ export default function HomePage() {
             priceLabel = "From $11.25 (25 Boxes)";
           } else if (prod.packageOptions && prod.packageOptions.length > 0) {
             const firstPkg = prod.packageOptions[0];
-            priceLabel = `From $${firstPkg.price.toFixed(2)} (${firstPkg.quantity}u)`;
+            priceLabel = `From $${firstPkg.price.toFixed(2)}`;
           }
 
           let href = `/product/${prod.slug}`;
           if (prod.id === "prod_custom_labels") href = "/custom-labels";
 
           const imageUrl =
-            prod.media && prod.media[0]?.url
-              ? prod.media[0].url
-              : prod.primaryImageUrl || "";
+            prod.primaryImageUrl ||
+            (prod.media && (prod.media as any[])[0]?.url) ||
+            (prod.images && prod.images[0]?.url) ||
+            "";
 
-          cards.push({
-            id: prod.id,
-            name: prod.name,
-            category: (prod.subcategory || prod.category).toUpperCase(),
-            price: priceLabel,
-            sku: prod.sku,
-            href,
-            imageUrl: imageUrl || undefined,
-            placeholderLabel: prod.category,
-          });
+          if (imageUrl) {
+            cards.push({
+              id: prod.id,
+              name: prod.name,
+              category: (prod.subcategory || prod.category).toUpperCase(),
+              price: priceLabel,
+              sku: prod.sku,
+              href,
+              imageUrl,
+              placeholderLabel: prod.category,
+            });
+          }
         }
 
-        // 2. Featured Fragrance Oil (e.g. Santal 33 Type)
-        if (validFragrances.length > 0) {
-          const topFragrance = validFragrances[0];
+        // 2. Featured Fragrance Oil (ONLY IF IT HAS A PHOTO)
+        if (validFragrancesWithPhoto.length > 0 && cards.length < 4) {
+          const topFragrance = validFragrancesWithPhoto[0];
           const activeVariants = (topFragrance.repackagingVariants || []).filter((v) => v.active);
           const firstVariant = activeVariants[0];
           const fragPrice = firstVariant
             ? `From $${firstVariant.retailPrice.toFixed(2)} (${firstVariant.sellingSize} oz)`
             : "From $8.50";
 
-          cards.push({
-            id: topFragrance.id,
-            name: topFragrance.name,
-            category: (topFragrance.scentFamily || "Fragrance Oil").toUpperCase(),
-            price: fragPrice,
-            sku: firstVariant?.sku || topFragrance.id,
-            href: `/fragrance/${topFragrance.slug}`,
-            imageUrl: topFragrance.primaryImage || topFragrance.images?.[0] || undefined,
-            placeholderLabel: topFragrance.scentFamily || "Fragrance",
-          });
+          const fragImg =
+            topFragrance.primaryImage ||
+            (topFragrance.images && topFragrance.images[0]) ||
+            ((topFragrance as any).media && (topFragrance as any).media[0]?.url);
+
+          if (fragImg) {
+            cards.push({
+              id: topFragrance.id,
+              name: topFragrance.name,
+              category: (topFragrance.scentFamily || "Fragrance Oil").toUpperCase(),
+              price: fragPrice,
+              sku: firstVariant?.sku || topFragrance.id,
+              href: `/fragrance/${topFragrance.slug}`,
+              imageUrl: fragImg,
+              placeholderLabel: topFragrance.scentFamily || "Fragrance",
+            });
+          }
         }
 
         setTrendingProducts(cards);
