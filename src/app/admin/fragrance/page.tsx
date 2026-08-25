@@ -57,6 +57,17 @@ export default function AdminFragranceDashboardPage() {
     }
   };
 
+  const handleToggleFragranceVisibility = async (f: FragranceOil) => {
+    const nextStatus = (f as any).status === "draft" ? "active" : "draft";
+    const updated = { ...f, status: nextStatus, updatedAt: new Date().toISOString() };
+    setFragrances(prev => prev.map(item => item.id === f.id ? (updated as any) : item));
+    try {
+      await fragranceRepository.saveFragrance(updated as any);
+    } catch {
+      fetchFragrances();
+    }
+  };
+
   useEffect(() => {
     fetchFragrances();
   }, []);
@@ -311,6 +322,7 @@ export default function AdminFragranceDashboardPage() {
                   <th className="py-3.5 px-4">Cost / Oz</th>
                   <th className="py-3.5 px-4">Bulk Stock</th>
                   <th className="py-3.5 px-4">Selling Sizes</th>
+                  <th className="py-3.5 px-4 text-center">Visibilidad</th>
                   <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
@@ -320,6 +332,7 @@ export default function AdminFragranceDashboardPage() {
                     (v) => v.active && ALLOWED_SIZES.includes(v.sellingSize)
                   );
                   const isLowBulk = (f.inventoryVolumeOz || 0) < 32;
+                  const isVisible = (f as any).status !== "draft";
 
                   return (
                     <tr key={f.id} className="hover:bg-gray-50/80 transition">
@@ -390,6 +403,22 @@ export default function AdminFragranceDashboardPage() {
                             <span className="text-gray-400 text-[10px] italic">1oz, 2oz, 4oz</span>
                           )}
                         </div>
+                      </td>
+
+                      {/* 1-Click Visibility Toggle */}
+                      <td className="py-3.5 px-4 text-center">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleFragranceVisibility(f)}
+                          className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition inline-flex items-center gap-1 border ${
+                            isVisible 
+                              ? "bg-[#F0FDF4] text-[#166534] border-[#BBF7D0] hover:bg-amber-50 hover:text-amber-800 hover:border-amber-200" 
+                              : "bg-amber-50 text-amber-800 border-amber-200 hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-200"
+                          }`}
+                          title={isVisible ? "Clic para ocultar de la tienda" : "Clic para hacer visible en la tienda"}
+                        >
+                          {isVisible ? "Visible" : "Oculto"}
+                        </button>
                       </td>
 
                       {/* Action Button */}

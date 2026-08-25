@@ -25,7 +25,10 @@ import {
   Edit,
   Image as ImageIcon,
   CheckCircle2,
-  Search
+  Search,
+  Eye,
+  EyeOff,
+  Trash2
 } from "lucide-react";
 
 // Master seed for packaging products displayed in /packaging
@@ -206,7 +209,6 @@ export default function AdminPackagingDashboardPage() {
     try {
       const allProds = await productService.getAllProducts();
       
-      // Merge Firestore products with all master packaging items
       const map = new Map<string, Product>();
       MASTER_PACKAGING_SEED.forEach(p => map.set(p.id, p));
 
@@ -243,6 +245,61 @@ export default function AdminPackagingDashboardPage() {
     loadData();
   }, []);
 
+  // 1-Click Visibility Toggle (Active <-> Draft)
+  const handleToggleVisibility = async (p: Product) => {
+    const nextStatus = p.status === "active" ? "draft" : "active";
+    const updated = { ...p, status: nextStatus as any, updatedAt: new Date().toISOString() };
+    
+    // Update local state immediately for instant feedback
+    setPackagingProducts(prev => prev.map(item => item.id === p.id ? updated : item));
+    
+    try {
+      await productService.saveProduct(updated);
+    } catch {
+      loadData();
+    }
+  };
+
+  // 1-Click Delete Product
+  const handleDeleteProduct = async (p: Product) => {
+    if (!confirm(`¿Estás seguro de que deseas ELIMINAR '${p.name}' permanentemente?`)) {
+      return;
+    }
+    
+    setPackagingProducts(prev => prev.filter(item => item.id !== p.id));
+    
+    try {
+      await productService.deleteProduct(p.id, true);
+    } catch {
+      loadData();
+    }
+  };
+
+  // Create New Packaging Item
+  const handleCreateNew = () => {
+    const newProd: Product = {
+      id: `prod_pack_${Date.now()}`,
+      name: "Nuevo Producto de Empaque",
+      slug: `nuevo-empaque-${Date.now().toString().slice(-4)}`,
+      sku: `PKG-NEW-${Date.now().toString().slice(-4)}`,
+      category: "packaging",
+      subcategory: "Boxes",
+      description: "",
+      shortDescription: "",
+      basePrice: 1.00,
+      currency: "USD",
+      unit: "unit",
+      status: "active",
+      primaryImageUrl: "",
+      media: [],
+      packageOptions: [],
+      inventory: { quantityInStock: 100, status: "in_stock", lowStockThreshold: 10, reorderPoint: 20 },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    } as any;
+    setEditingProduct(newProd);
+  };
+
   const totalRawSheets = materials.reduce((acc, m) => acc + m.quantity, 0);
   const totalFinishedBoxes = boxes.reduce((acc, b) => acc + b.inventory, 0);
   const activeJobs = jobs.filter((j) => j.status === "queued" || j.status === "cutting" || j.status === "assembly");
@@ -275,31 +332,25 @@ export default function AdminPackagingDashboardPage() {
               Empaques, Cajas & Suministros
             </h1>
             <p className="text-xs text-gray-600 mt-1 max-w-2xl leading-relaxed">
-              Administra todos los productos de la categoría Empaque: Cajas Cricut, Bolsas Termorretráctiles POF, Sellos de Seguridad y Etiquetas Colgantes.
+              Edita precios, fotos, descripciones, activa/oculta productos de la tienda o elimínalos según tus necesidades.
             </p>
           </div>
 
           <div className="flex flex-wrap gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={handleCreateNew}
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#2B5F4A] hover:bg-[#1E4233] text-white font-bold uppercase tracking-wider text-xs shadow-xs transition"
+            >
+              <Plus className="w-4 h-4" /> Nuevo Empaque
+            </button>
+
             <Link
               href="/packaging"
               target="_blank"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-gray-300 text-gray-800 hover:bg-gray-50 text-xs font-semibold shadow-xs transition"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-gray-300 text-gray-800 hover:bg-gray-50 text-xs font-semibold shadow-xs transition"
             >
-              <Package className="w-3.5 h-3.5 text-gray-500" /> Ver Catálogo en Tienda &rarr;
-            </Link>
-
-            <Link
-              href="/admin/packaging/boxes"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-gray-300 text-gray-800 hover:bg-gray-50 text-xs font-semibold shadow-xs transition"
-            >
-              <Box className="w-3.5 h-3.5 text-gray-500" /> Diseñador de Cajas
-            </Link>
-
-            <Link
-              href="/admin/packaging/production"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#2B5F4A] hover:bg-[#1E4233] text-white font-bold uppercase tracking-wider text-xs shadow-xs transition"
-            >
-              <Scissors className="w-3.5 h-3.5" /> Cola de Producción
+              <Package className="w-3.5 h-3.5 text-gray-500" /> Ver Tienda &rarr;
             </Link>
           </div>
         </div>
@@ -309,7 +360,9 @@ export default function AdminPackagingDashboardPage() {
           <div className="p-5 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
             <span className="text-[11px] font-semibold text-gray-500 uppercase block">Total Productos Empaque</span>
             <div className="text-2xl font-bold text-gray-950">{packagingProducts.length} Artículos</div>
-            <span className="text-[11px] text-[#166534] block">Cajas, Bolsas, Sellos y Tags</span>
+            <span className="text-[11px] text-[#166534] block">
+              {packagingProducts.filter(p => p.status === "active").length} Visibles &bull; {packagingProducts.filter(p => p.status !== "active").length} Ocultos
+            </span>
           </div>
 
           <div className="p-5 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
@@ -331,17 +384,17 @@ export default function AdminPackagingDashboardPage() {
           </div>
         </div>
 
-        {/* ━━━━ ALL PACKAGING PRODUCTS TABLE (WITH PHOTO EDIT) ━━━━ */}
+        {/* ━━━━ ALL PACKAGING PRODUCTS TABLE (WITH PHOTO EDIT, VISIBILITY & DELETE) ━━━━ */}
         <div className="rounded-2xl border border-gray-200 bg-white shadow-xs overflow-hidden space-y-4">
           
           {/* Table Header & Search Filter Bar */}
           <div className="p-5 bg-gray-50/70 border-b border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <h3 className="text-sm font-bold uppercase tracking-wider text-gray-950 flex items-center gap-2">
-                <Package className="w-4 h-4 text-[#2B5F4A]" /> Catálogo Completo de Empaques ({filteredProducts.length})
+                <Package className="w-4 h-4 text-[#2B5F4A]" /> Catálogo de Empaques ({filteredProducts.length})
               </h3>
               <p className="text-[11px] text-gray-500 font-light mt-0.5">
-                Haz clic en &quot;Editar / Subir Foto&quot; o sobre la imagen de cualquier producto para cambiar precios, stock o subir fotos.
+                Edita fotos, información completa, oculta productos o elimínalos en 1 clic.
               </p>
             </div>
 
@@ -381,8 +434,8 @@ export default function AdminPackagingDashboardPage() {
                   <th className="py-3.5 px-4">Subcategoría</th>
                   <th className="py-3.5 px-4 text-right">Precio Base</th>
                   <th className="py-3.5 px-4 text-right">Stock</th>
-                  <th className="py-3.5 px-4 text-center">Estado</th>
-                  <th className="py-3.5 px-4 text-right">Acción</th>
+                  <th className="py-3.5 px-4 text-center">Visibilidad</th>
+                  <th className="py-3.5 px-4 text-right">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -392,6 +445,8 @@ export default function AdminPackagingDashboardPage() {
                     (p.media && (p.media as any[])[0]?.url) ||
                     (p.images && p.images[0]?.url);
 
+                  const isVisible = p.status === "active";
+
                   return (
                     <tr key={p.id} className="hover:bg-gray-50/80 transition">
                       <td className="py-3 px-4">
@@ -400,7 +455,7 @@ export default function AdminPackagingDashboardPage() {
                             type="button"
                             onClick={() => setEditingProduct(p)}
                             className="w-12 h-12 rounded-lg bg-gray-50 border border-gray-200 overflow-hidden shrink-0 flex items-center justify-center relative hover:ring-2 hover:ring-[#2B5F4A] transition group"
-                            title="Hacer clic para subir o cambiar foto"
+                            title="Hacer clic para editar o subir foto"
                           >
                             {image ? (
                               // eslint-disable-next-line @next/next/no-img-element
@@ -416,7 +471,7 @@ export default function AdminPackagingDashboardPage() {
                             <button
                               type="button"
                               onClick={() => setEditingProduct(p)}
-                              className="font-bold text-gray-950 hover:text-[#2B5F4A] text-left hover:underline"
+                              className="font-bold text-gray-950 hover:text-[#2B5F4A] text-left hover:underline block"
                             >
                               {p.name}
                             </button>
@@ -443,23 +498,54 @@ export default function AdminPackagingDashboardPage() {
                         {p.inventory?.quantityInStock ?? p.inventory?.availableQuantity ?? 0} u
                       </td>
 
+                      {/* 1-Click Visibility Toggle */}
                       <td className="py-3 px-4 text-center">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                          p.status === "active" ? "bg-[#F0FDF4] text-[#166534] border border-[#BBF7D0]" : "bg-gray-100 text-gray-700"
-                        }`}>
-                          {p.status || "active"}
-                        </span>
-                      </td>
-
-                      <td className="py-3 px-4 text-right">
                         <button
                           type="button"
-                          onClick={() => setEditingProduct(p)}
-                          className="px-3 py-1.5 rounded-lg bg-[#2B5F4A] hover:bg-[#1E4233] text-white font-bold text-[11px] uppercase tracking-wider transition inline-flex items-center gap-1.5 shadow-2xs"
+                          onClick={() => handleToggleVisibility(p)}
+                          className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition inline-flex items-center gap-1 border ${
+                            isVisible 
+                              ? "bg-[#F0FDF4] text-[#166534] border-[#BBF7D0] hover:bg-amber-50 hover:text-amber-800 hover:border-amber-200" 
+                              : "bg-amber-50 text-amber-800 border-amber-200 hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-200"
+                          }`}
+                          title={isVisible ? "Hacer clic para ocultar de la tienda" : "Hacer clic para hacer visible en la tienda"}
                         >
-                          <ImageIcon className="w-3.5 h-3.5 text-amber-300" />
-                          <span>Editar / Foto</span>
+                          {isVisible ? (
+                            <>
+                              <Eye className="w-3 h-3 text-[#166534]" />
+                              <span>Visible</span>
+                            </>
+                          ) : (
+                            <>
+                              <EyeOff className="w-3 h-3 text-amber-700" />
+                              <span>Oculto</span>
+                            </>
+                          )}
                         </button>
+                      </td>
+
+                      {/* Actions: Edit Full & Delete */}
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setEditingProduct(p)}
+                            className="px-2.5 py-1.5 rounded-lg bg-[#2B5F4A] hover:bg-[#1E4233] text-white font-bold text-[11px] uppercase tracking-wider transition inline-flex items-center gap-1 shadow-2xs"
+                            title="Editar todos los datos y fotos"
+                          >
+                            <Edit className="w-3 h-3 text-amber-300" />
+                            <span>Editar</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteProduct(p)}
+                            className="p-1.5 rounded-lg border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition"
+                            title="Eliminar producto permanentemente"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -518,7 +604,7 @@ export default function AdminPackagingDashboardPage() {
           </div>
         </div>
 
-        {/* Quick Edit & Photo Upload Modal */}
+        {/* Full Product Edit & Photo Modal */}
         {editingProduct && (
           <ProductQuickEditModal
             isOpen={!!editingProduct}

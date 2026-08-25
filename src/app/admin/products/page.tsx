@@ -13,6 +13,7 @@ import {
   Archive,
   Trash2,
   Eye,
+  EyeOff,
   ExternalLink,
   AlertTriangle,
   Image as ImageIcon,
@@ -153,6 +154,21 @@ export default function AdminProductsPage() {
       setFeedbackMsg({ type: "error", text: err.message });
     } finally {
       setActionLoadingId(null);
+    }
+  };
+
+  const handleToggleVisibility = async (product: Product) => {
+    const nextStatus = product.status === "active" ? "draft" : "active";
+    const updated = { ...product, status: nextStatus as any, updatedAt: new Date().toISOString() };
+    setProducts(prev => prev.map(p => p.id === product.id ? updated : p));
+    try {
+      await productService.saveProduct(updated);
+      setFeedbackMsg({
+        type: "success",
+        text: `Producto '${product.name}' ahora está ${nextStatus === "active" ? "🟢 Visible en tienda" : "🟡 Oculto (Borrador)"}.`
+      });
+    } catch {
+      await fetchProducts();
     }
   };
 
@@ -597,19 +613,30 @@ export default function AdminProductsPage() {
                             </div>
                           </td>
 
-                          {/* Status Badge */}
+                          {/* Status Badge & 1-Click Visibility Toggle */}
                           <td className="py-3 px-4 text-center">
-                            <span
-                              className={`inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+                            <button
+                              type="button"
+                              onClick={() => handleToggleVisibility(product)}
+                              className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition inline-flex items-center gap-1 border ${
                                 product.status === "active"
-                                  ? "bg-[#F0FDF4] border-[#BBF7D0] text-[#166534]"
-                                  : product.status === "draft"
-                                  ? "bg-amber-50 border-amber-200 text-amber-800"
-                                  : "bg-gray-100 border-gray-200 text-gray-700"
+                                  ? "bg-[#F0FDF4] border-[#BBF7D0] text-[#166534] hover:bg-amber-50 hover:text-amber-800 hover:border-amber-200"
+                                  : "bg-amber-50 border-amber-200 text-amber-800 hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-200"
                               }`}
+                              title={product.status === "active" ? "Clic para ocultar de la tienda" : "Clic para hacer visible en la tienda"}
                             >
-                              {product.status}
-                            </span>
+                              {product.status === "active" ? (
+                                <>
+                                  <Eye className="w-3 h-3 text-[#166534]" />
+                                  <span>Visible</span>
+                                </>
+                              ) : (
+                                <>
+                                  <EyeOff className="w-3 h-3 text-amber-700" />
+                                  <span>Oculto</span>
+                                </>
+                              )}
+                            </button>
                           </td>
 
                           {/* Completeness Bar */}
@@ -644,15 +671,15 @@ export default function AdminProductsPage() {
                           {/* Row Actions */}
                           <td className="py-3 px-4 text-right">
                             <div className="flex items-center justify-end gap-1.5">
-                              {/* Edit / Upload Photo Button */}
+                              {/* Edit All & Photo Button */}
                               <button
                                 type="button"
                                 onClick={() => setQuickEditProduct(product)}
                                 className="px-2.5 py-1.5 rounded-lg bg-[#2B5F4A] hover:bg-[#1E4233] text-white font-bold text-[11px] uppercase tracking-wider transition flex items-center gap-1 shadow-2xs"
-                                title="Editar producto y subir fotos"
+                                title="Editar todos los campos y fotos"
                               >
-                                <ImageIcon className="w-3.5 h-3.5 text-amber-300" />
-                                <span>Editar / Foto</span>
+                                <Edit className="w-3.5 h-3.5 text-amber-300" />
+                                <span>Editar</span>
                               </button>
 
                               {/* Preview button */}
@@ -674,6 +701,17 @@ export default function AdminProductsPage() {
                                 title="Duplicate Product Specification"
                               >
                                 <Copy className="w-3.5 h-3.5" />
+                              </button>
+
+                              {/* Delete */}
+                              <button
+                                type="button"
+                                disabled={isActionLoading}
+                                onClick={() => handleDelete(product.id, product.name)}
+                                className="p-1.5 rounded-lg bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 hover:text-red-700 disabled:opacity-30 transition"
+                                title="Eliminar producto permanentemente"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
                               </button>
 
                               {/* Archive */}
