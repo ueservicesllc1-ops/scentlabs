@@ -33,6 +33,9 @@ export const metadata: Metadata = {
     "Premium fragrance oils, clinical-grade packaging, and custom foil labels for creators, perfumers and growing fragrance brands.",
 };
 
+import { Suspense } from "react";
+import { ScrollToTop } from "@/components/layout/ScrollToTop";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -51,6 +54,9 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-surface text-on-surface font-body-md antialiased flex flex-col selection:bg-primary selection:text-on-primary">
+        <Suspense fallback={null}>
+          <ScrollToTop />
+        </Suspense>
         <AuthProvider>
           <CartProvider>
             <Navbar />

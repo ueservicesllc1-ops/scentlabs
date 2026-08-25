@@ -34,6 +34,7 @@ export default function FragranceProductPage({ params }: FragrancePageProps) {
   const ALLOWED_SIZES = [1, 2, 4, 8, 16];
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchFragrance = async () => {
       const found = await fragranceRepository.getFragranceBySlug(params.slug);
       if (found) {
@@ -42,6 +43,7 @@ export default function FragranceProductPage({ params }: FragrancePageProps) {
         if (active.length > 0) setSelectedVariant(active[0]);
       }
       setLoading(false);
+      window.scrollTo(0, 0);
     };
 
     fetchFragrance();

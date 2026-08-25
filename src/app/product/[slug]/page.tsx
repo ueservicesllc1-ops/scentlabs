@@ -35,6 +35,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
   const { addItem } = useCart();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     async function loadProduct() {
       const slug = params.slug;
 
