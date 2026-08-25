@@ -23,8 +23,11 @@ import {
   AlertCircle,
   Headphones,
   Check,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import Link from "next/link";
+import { playIncomingMessageSound } from "@/lib/sound";
 
 const CANNED_RESPONSES = [
   {
@@ -58,13 +61,23 @@ export default function AdminLiveChatPage() {
   const [statusFilter, setStatusFilter] = useState<"all" | "waiting_agent" | "active" | "resolved">("all");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const prevUnreadTotalRef = useRef<number>(0);
 
   // 1. Subscribe to all conversations in real-time
   useEffect(() => {
     const unsubscribe = liveChatRepository.subscribeAllChats((data) => {
+      const currentUnreadTotal = data.reduce((acc, c) => acc + (c.unreadByAdmin || 0), 0);
+
+      // If unread count increased, play sound alert!
+      if (currentUnreadTotal > prevUnreadTotalRef.current && soundEnabled && !loading) {
+        playIncomingMessageSound();
+      }
+      prevUnreadTotalRef.current = currentUnreadTotal;
+
       setChats(data);
       setLoading(false);
 
@@ -75,7 +88,7 @@ export default function AdminLiveChatPage() {
     });
 
     return () => unsubscribe();
-  }, [selectedChatId]);
+  }, [selectedChatId, soundEnabled, loading]);
 
   // 2. Subscribe to messages of the selected conversation
   useEffect(() => {
@@ -168,6 +181,33 @@ export default function AdminLiveChatPage() {
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                const next = !soundEnabled;
+                setSoundEnabled(next);
+                if (next) playIncomingMessageSound();
+              }}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition ${
+                soundEnabled
+                  ? "bg-white border-gray-300 text-gray-800 hover:bg-gray-50 shadow-2xs"
+                  : "bg-gray-100 border-gray-200 text-gray-400"
+              }`}
+              title={soundEnabled ? "Silenciar notificaciones de sonido" : "Activar sonido de nuevos mensajes"}
+            >
+              {soundEnabled ? (
+                <>
+                  <Volume2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Sonido: Activo</span>
+                </>
+              ) : (
+                <>
+                  <VolumeX className="w-3.5 h-3.5 text-gray-400" />
+                  <span>Sonido: Silenciado</span>
+                </>
+              )}
+            </button>
+
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               Sincronización en vivo activa

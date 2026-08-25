@@ -20,6 +20,7 @@ import {
   LiveChatMessage,
   LiveChatSession,
 } from "@/lib/firestore/live-chat";
+import { playAgentReplySound } from "@/lib/sound";
 
 interface DisplayMessage {
   id: string;
@@ -56,6 +57,7 @@ export function ScentSommelierChat() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const prevMsgCountRef = useRef<number>(0);
 
   // 1. Initialize persistent session ID
   useEffect(() => {
@@ -83,6 +85,18 @@ export function ScentSommelierChat() {
     // Real-time listener for incoming messages from Admin or AI
     const unsubscribe = liveChatRepository.subscribeMessages(sessionId, (firestoreMsgs) => {
       if (firestoreMsgs.length > 0) {
+        // If a new message was added from admin, play sound chime
+        if (
+          firestoreMsgs.length > prevMsgCountRef.current &&
+          prevMsgCountRef.current > 0
+        ) {
+          const lastMsg = firestoreMsgs[firestoreMsgs.length - 1];
+          if (lastMsg.sender === "admin") {
+            playAgentReplySound();
+          }
+        }
+        prevMsgCountRef.current = firestoreMsgs.length;
+
         const mapped: DisplayMessage[] = firestoreMsgs.map((m) => ({
           id: m.id,
           role: m.sender === "admin" ? "admin" : m.sender === "customer" ? "user" : "assistant",
