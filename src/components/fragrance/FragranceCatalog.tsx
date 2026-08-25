@@ -35,6 +35,8 @@ export function FragranceCatalog() {
   const filtered = useMemo(() => {
     return fragrances
       .filter((f) => {
+        if ((f as any).status === "draft" || (f as any).status === "archived") return false;
+
         const q = search.toLowerCase();
         const matchQ = !q || f.name.toLowerCase().includes(q) ||
           (f.scentFamily && f.scentFamily.toLowerCase().includes(q)) ||

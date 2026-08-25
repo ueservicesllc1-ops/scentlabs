@@ -271,27 +271,80 @@ export function PackagingCatalog() {
   useEffect(() => {
     productService.getAllProducts().then((allProds) => {
       if (allProds && allProds.length > 0) {
-        setProductsList((prev) => {
-          return prev.map((item) => {
-            const match = allProds.find(
-              (p) => p.id === item.id || p.slug === item.slug || p.sku === item.sku
-            );
-            if (match) {
+        // Collect all packaging items that are explicitly active
+        const updatedList: PackagingItem[] = [];
+
+        PACKAGING_PRODUCTS.forEach((staticItem) => {
+          const match = allProds.find(
+            (p) => p.id === staticItem.id || p.slug === staticItem.slug || p.sku === staticItem.sku
+          );
+
+          // If found in Firestore, check if it's active
+          if (match) {
+            if (match.status === "active") {
               const liveImg =
                 match.primaryImageUrl ||
                 (match.media && (match.media as any[])[0]?.url) ||
                 (match.images && match.images[0]?.url) ||
-                item.imageUrl;
-              return {
-                ...item,
-                name: match.name || item.name,
-                description: match.description || match.shortDescription || item.description,
+                staticItem.imageUrl;
+
+              updatedList.push({
+                ...staticItem,
+                name: match.name || staticItem.name,
+                description: match.description || match.shortDescription || staticItem.description,
                 imageUrl: liveImg,
-              };
+              });
             }
-            return item;
-          });
+            // If match.status !== "active" (draft/archived), do NOT push (hide from catalog)
+          } else {
+            // Not yet modified in Firestore, show default
+            updatedList.push(staticItem);
+          }
         });
+
+        // Also check if new custom packaging products were created in Firestore
+        allProds.forEach((p) => {
+          if (
+            p.status === "active" &&
+            (p.category === "packaging" || p.categoryId === "cat_packaging" || p.id.startsWith("prod_pack_")) &&
+            !updatedList.some((item) => item.id === p.id)
+          ) {
+            const liveImg =
+              p.primaryImageUrl ||
+              (p.media && (p.media as any[])[0]?.url) ||
+              (p.images && p.images[0]?.url) ||
+              "";
+            updatedList.push({
+              id: p.id,
+              name: p.name,
+              slug: p.slug,
+              subcategory: (p.subcategory as any) || "Boxes",
+              description: p.description || p.shortDescription || "",
+              sku: p.sku,
+              imageUrl: liveImg,
+              packageOptions:
+                p.packageOptions && p.packageOptions.length > 0
+                  ? p.packageOptions.map((opt: any) => ({
+                      id: opt.id,
+                      label: opt.name || `${opt.quantity}u`,
+                      quantity: opt.quantity,
+                      price: opt.price,
+                      unitPrice: opt.unitPrice || opt.price / opt.quantity,
+                    }))
+                  : [
+                      {
+                        id: `pkg_${p.id}`,
+                        label: "1u",
+                        quantity: 1,
+                        price: p.basePrice,
+                        unitPrice: p.basePrice,
+                      },
+                    ],
+            });
+          }
+        });
+
+        setProductsList(updatedList);
       }
     }).catch(() => {});
   }, []);

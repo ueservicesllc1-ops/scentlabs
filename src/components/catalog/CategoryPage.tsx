@@ -68,6 +68,8 @@ export function CategoryPage({
   const filteredProducts = useMemo(() => {
     return products
       .filter((p) => {
+        if (p.status && p.status !== "active") return false;
+
         const matchesSearch =
           !searchQuery.trim() ||
           p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
