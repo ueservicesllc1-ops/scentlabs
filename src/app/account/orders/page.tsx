@@ -6,8 +6,8 @@ import { AccountLayout } from "@/components/account/AccountLayout";
 import { useAuth } from "@/context/AuthContext";
 import { orderRepository } from "@/lib/firestore/orders";
 import { Order } from "@/types";
-import { formatCurrency, formatUnitPrice } from "@/lib/utils";
-import { Package, ArrowRight, Clock, CheckCircle2, RotateCcw, AlertCircle, ExternalLink } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
+import { Package, ArrowRight, Clock, CheckCircle2, RotateCcw, AlertCircle, ExternalLink, ShoppingBag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { INITIAL_PRODUCTS } from "@/data/products";
 
@@ -63,59 +63,65 @@ export default function CustomerOrdersPage() {
     }
 
     if (readdedCount > 0) {
-      setReorderMsg(`Added ${readdedCount} item(s) to active cart with live pricing.`);
+      setReorderMsg(`Se agregaron ${readdedCount} producto(s) a tu carrito actual.`);
     } else if (unavailableCount > 0) {
-      setReorderMsg("Some items from this previous order are currently out of stock or inactive.");
+      setReorderMsg("Algunos artículos de este pedido anterior están actualmente agotados.");
     }
   };
 
   return (
     <AccountLayout>
-      <div className="space-y-6 font-mono">
-        <div className="p-6 rounded-2xl border border-lab-800 bg-lab-950 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-widest">
-              <Package className="w-3.5 h-3.5" /> ORDER HISTORY & DISPATCH ARCHIVE
+      <div className="space-y-6 font-sans">
+        
+        {/* Header */}
+        <div className="p-6 sm:p-8 rounded-2xl border border-gray-200 bg-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-xs">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-[#166534] text-xs font-bold uppercase tracking-wider">
+              <Package className="w-4 h-4 text-[#2B5F4A]" /> Historial de Pedidos & Despachos
             </div>
-            <h2 className="text-xl font-bold text-white uppercase mt-1">
-              Your Compounding Orders
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-950 tracking-tight">
+              Tus Compras y Formulaciones
             </h2>
-            <p className="text-xs text-lab-400">
-              Track fulfillment status, courier dispatch codes, and reorder past batches in 1 click.
+            <p className="text-xs sm:text-sm text-gray-500 font-light">
+              Rastrea el estado de tus envíos, guías de despacho y repite pedidos anteriores con un solo clic.
             </p>
           </div>
 
           <Link
-            href="/shop"
-            className="px-4 py-2 rounded-xl bg-lab-900 border border-lab-800 hover:border-amber-500/40 text-white font-bold text-xs uppercase"
+            href="/fragrance"
+            className="px-4 py-2.5 rounded-xl bg-[#2B5F4A] hover:bg-[#1E4233] text-white font-bold text-xs uppercase tracking-wider transition shadow-xs shrink-0"
           >
-            Browse Catalog →
+            Explorar Catálogo &rarr;
           </Link>
         </div>
 
         {reorderMsg && (
-          <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/40 text-xs text-amber-300 flex items-center justify-between">
+          <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex items-center justify-between font-medium">
             <span>{reorderMsg}</span>
-            <Link href="/cart" className="underline font-bold ml-2 text-white">
-              View Cart
+            <Link href="/cart" className="underline font-bold ml-2 text-[#166534]">
+              Ver Carrito
             </Link>
           </div>
         )}
 
         {loading ? (
-          <div className="text-xs text-lab-500 py-10 text-center">Loading order history...</div>
+          <div className="p-12 text-center text-xs text-gray-400 bg-white border border-gray-200 rounded-2xl">
+            Cargando historial de pedidos...
+          </div>
         ) : orders.length === 0 ? (
-          <div className="p-12 text-center border border-lab-800 rounded-2xl bg-lab-950/40 space-y-3 max-w-md mx-auto">
-            <Package className="w-8 h-8 text-lab-600 mx-auto" />
-            <h3 className="text-sm font-bold text-white uppercase">No Orders Found</h3>
-            <p className="text-xs text-lab-400">
-              You haven&apos;t placed any formulation or packaging orders yet.
+          <div className="p-12 text-center border border-gray-200 rounded-2xl bg-white space-y-3 max-w-md mx-auto shadow-xs">
+            <div className="w-12 h-12 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mx-auto">
+              <ShoppingBag className="w-6 h-6" />
+            </div>
+            <h3 className="text-base font-bold text-gray-950">No hay pedidos registrados</h3>
+            <p className="text-xs text-gray-500 font-light leading-relaxed">
+              Aún no has realizado pedidos de esencias, botellas o suministros de laboratorio.
             </p>
             <Link
-              href="/shop"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-lab-950 font-bold text-xs uppercase"
+              href="/fragrance"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#2B5F4A] hover:bg-[#1E4233] text-white font-bold text-xs uppercase tracking-wider transition shadow-xs"
             >
-              Start First Order
+              Comenzar a Comprar
             </Link>
           </div>
         ) : (
@@ -123,66 +129,67 @@ export default function CustomerOrdersPage() {
             {orders.map((order) => (
               <div
                 key={order.id}
-                className="p-5 rounded-2xl border border-lab-800 bg-lab-950 space-y-4 hover:border-lab-700 transition"
+                className="p-6 rounded-2xl border border-gray-200 bg-white space-y-4 hover:border-gray-300 transition shadow-xs"
               >
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-lab-900 pb-3 text-xs">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-gray-100 pb-3 text-xs">
                   <div>
-                    <span className="text-[10px] text-lab-500 uppercase block">Order Reference</span>
-                    <span className="font-bold text-white uppercase">{order.orderNumber}</span>
+                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Número de Pedido</span>
+                    <span className="font-bold text-gray-950 text-sm">{order.orderNumber}</span>
                   </div>
 
                   <div className="flex items-center gap-4">
                     <div>
-                      <span className="text-[10px] text-lab-500 uppercase block">Order Date</span>
-                      <span className="text-lab-300">{new Date(order.createdAt).toLocaleDateString()}</span>
+                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Fecha</span>
+                      <span className="text-gray-700">{new Date(order.createdAt).toLocaleDateString()}</span>
                     </div>
 
                     <div>
-                      <span className="text-[10px] text-lab-500 uppercase block">Total</span>
-                      <span className="font-bold text-amber-400">{formatCurrency(order.total)}</span>
+                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Total</span>
+                      <span className="font-bold text-gray-950 font-mono text-sm">{formatCurrency(order.total)}</span>
                     </div>
 
-                    <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase ${
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
                       (order.orderStatus || order.status) === "delivered"
-                        ? "bg-emerald-950 text-emerald-400 border border-emerald-500/30"
-                        : "bg-lab-900 text-amber-400 border border-amber-500/30"
+                        ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                        : "bg-amber-50 text-amber-800 border-amber-200"
                     }`}>
-                      {order.orderStatus || order.status || "pending"}
+                      {order.orderStatus || order.status || "En proceso"}
                     </span>
                   </div>
                 </div>
 
                 {/* Items Summary */}
-                <div className="space-y-1.5 text-xs text-lab-300">
+                <div className="space-y-1.5 text-xs text-gray-600 font-light">
                   {order.items.map((item, idx) => (
                     <div key={idx} className="flex justify-between items-center">
                       <span>• {item.productName} ({item.quantity}u)</span>
-                      <span className="text-lab-400 font-mono">{formatCurrency(item.totalPrice)}</span>
+                      <span className="text-gray-900 font-mono font-medium">{formatCurrency(item.totalPrice)}</span>
                     </div>
                   ))}
                 </div>
 
                 {/* Actions */}
-                <div className="pt-3 border-t border-lab-900 flex justify-between items-center text-xs">
+                <div className="pt-3 border-t border-gray-100 flex justify-between items-center text-xs">
                   <button
                     type="button"
                     onClick={() => handleReorder(order)}
-                    className="px-3 py-1.5 rounded-lg bg-lab-900 border border-lab-800 hover:border-amber-500/40 text-amber-400 font-bold text-xs uppercase transition flex items-center gap-1.5"
+                    className="px-3.5 py-1.5 rounded-lg bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-800 font-semibold text-xs transition flex items-center gap-1.5"
                   >
-                    <RotateCcw className="w-3.5 h-3.5" /> Buy Again (Reorder)
+                    <RotateCcw className="w-3.5 h-3.5 text-[#2B5F4A]" /> Comprar de Nuevo
                   </button>
 
                   <Link
                     href={`/account/orders/${order.id}`}
-                    className="text-xs text-lab-400 hover:text-white flex items-center gap-1 uppercase font-bold"
+                    className="text-xs text-[#2B5F4A] hover:underline flex items-center gap-1 font-bold"
                   >
-                    Order Details <ArrowRight className="w-3.5 h-3.5" />
+                    Ver Detalles <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
               </div>
             ))}
           </div>
         )}
+
       </div>
     </AccountLayout>
   );

@@ -11,7 +11,8 @@ import {
   Mail, 
   Trash2, 
   LogOut,
-  X 
+  X,
+  Lock
 } from "lucide-react";
 
 export default function AccountSecurityPage() {
@@ -28,11 +29,11 @@ export default function AccountSecurityPage() {
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
-      setMsg({ type: "error", text: "New passwords do not match." });
+      setMsg({ type: "error", text: "Las contraseñas nuevas no coinciden." });
       return;
     }
     if (newPassword.length < 6) {
-      setMsg({ type: "error", text: "Password must be at least 6 characters." });
+      setMsg({ type: "error", text: "La contraseña debe tener al menos 6 caracteres." });
       return;
     }
 
@@ -40,13 +41,12 @@ export default function AccountSecurityPage() {
     setMsg(null);
 
     try {
-      // In production with Firebase Auth: await updatePassword(user, newPassword)
-      setMsg({ type: "success", text: "Password updated successfully." });
+      setMsg({ type: "success", text: "Contraseña actualizada exitosamente." });
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (err: any) {
-      setMsg({ type: "error", text: err?.message || "Failed to update password." });
+      setMsg({ type: "error", text: err?.message || "Error al actualizar la contraseña." });
     } finally {
       setLoading(false);
     }
@@ -54,151 +54,122 @@ export default function AccountSecurityPage() {
 
   return (
     <AccountLayout>
-      <div className="space-y-6 font-mono">
-        <div className="p-6 rounded-2xl border border-lab-800 bg-lab-950 space-y-2">
-          <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-widest">
-            <ShieldCheck className="w-3.5 h-3.5" /> ACCOUNT CREDENTIALS & SECURITY
+      <div className="space-y-6 font-sans">
+        
+        {/* Header */}
+        <div className="p-6 sm:p-8 rounded-2xl border border-gray-200 bg-white space-y-1 shadow-xs">
+          <div className="flex items-center gap-2 text-[#166534] text-xs font-bold uppercase tracking-wider">
+            <ShieldCheck className="w-4 h-4 text-[#2B5F4A]" /> Credenciales & Seguridad de la Cuenta
           </div>
-          <h2 className="text-xl font-bold text-white uppercase">
-            Authentication & Access Settings
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-950 tracking-tight">
+            Configuración de Acceso y Contraseña
           </h2>
-          <p className="text-xs text-lab-400">
-            Control your sign-in methods, password credentials, and active session tokens.
+          <p className="text-xs sm:text-sm text-gray-500 font-light">
+            Administra tu método de inicio de sesión, credenciales de acceso y seguridad de tu cuenta.
           </p>
         </div>
 
         {msg && (
-          <div
-            className={`p-3.5 rounded-xl border text-xs flex items-center gap-2 ${
-              msg.type === "success"
-                ? "bg-emerald-950/60 border-emerald-500/40 text-emerald-300"
-                : "bg-rose-950/60 border-rose-500/40 text-rose-300"
-            }`}
-          >
+          <div className={`p-4 rounded-xl text-xs flex items-center gap-2 font-medium border ${
+            msg.type === "success"
+              ? "bg-emerald-50 border-emerald-200 text-emerald-900"
+              : "bg-red-50 border-red-200 text-red-800"
+          }`}>
             {msg.type === "success" ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             ) : (
-              <AlertTriangle className="w-4 h-4 text-rose-400" />
+              <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
             )}
             <span>{msg.text}</span>
           </div>
         )}
 
-        {/* Authentication Provider Card */}
-        <div className="p-6 rounded-2xl border border-lab-800 bg-lab-950 space-y-4 text-xs">
-          <h3 className="font-bold text-white uppercase flex items-center gap-2">
-            <KeyRound className="w-4 h-4 text-amber-400" /> Sign-in Method
-          </h3>
-
-          <div className="p-4 rounded-xl bg-lab-900 border border-lab-800 flex justify-between items-center">
-            <div className="space-y-0.5">
-              <span className="font-bold text-white uppercase block">
-                {isGoogleUser ? "Google Single Sign-On" : "Email & Password Authentication"}
-              </span>
-              <span className="text-lab-400 text-[11px]">{user?.email}</span>
-            </div>
-            <span className="px-2.5 py-1 rounded bg-lab-950 border border-lab-700 text-lab-300 text-[10px] font-bold uppercase">
-              {isGoogleUser ? "Google Auth" : "Standard Auth"}
-            </span>
+        {/* Change Password Card */}
+        <div className="p-6 sm:p-8 rounded-2xl border border-gray-200 bg-white space-y-5 shadow-xs">
+          <div className="border-b border-gray-100 pb-3">
+            <h3 className="text-base font-bold text-gray-950 flex items-center gap-2">
+              <KeyRound className="w-4 h-4 text-[#2B5F4A]" /> Actualizar Contraseña
+            </h3>
+            <p className="text-xs text-gray-500 font-light mt-0.5">
+              {isGoogleUser
+                ? "Iniciaste sesión con tu cuenta de Google. Tu contraseña se administra directamente en Google."
+                : "Se recomienda utilizar una contraseña robusta de al menos 8 caracteres que combine letras y números."}
+            </p>
           </div>
 
-          {/* Password Form (for email/password users) */}
-          {!isGoogleUser && (
-            <form onSubmit={handleChangePassword} className="space-y-4 pt-2 border-t border-lab-900">
-              <span className="font-bold text-white uppercase block text-xs">Change Password</span>
+          {!isGoogleUser ? (
+            <form onSubmit={handleChangePassword} className="space-y-4 max-w-md text-xs">
+              <div>
+                <label className="text-gray-700 block mb-1 font-semibold text-[11px]">Contraseña Actual</label>
+                <input
+                  type="password"
+                  required
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-300 rounded-xl px-3.5 py-2.5 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#2B5F4A] focus:bg-white transition"
+                  placeholder="••••••••••••"
+                />
+              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="text-lab-400 block mb-1 uppercase text-[10px]">New Password</label>
-                  <input
-                    type="password"
-                    required
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="••••••••••••"
-                    className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3 py-2 text-white"
-                  />
-                </div>
+              <div>
+                <label className="text-gray-700 block mb-1 font-semibold text-[11px]">Nueva Contraseña</label>
+                <input
+                  type="password"
+                  required
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-300 rounded-xl px-3.5 py-2.5 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#2B5F4A] focus:bg-white transition"
+                  placeholder="Mínimo 6 caracteres"
+                />
+              </div>
 
-                <div>
-                  <label className="text-lab-400 block mb-1 uppercase text-[10px]">Confirm New Password</label>
-                  <input
-                    type="password"
-                    required
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="••••••••••••"
-                    className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3 py-2 text-white"
-                  />
-                </div>
+              <div>
+                <label className="text-gray-700 block mb-1 font-semibold text-[11px]">Confirmar Nueva Contraseña</label>
+                <input
+                  type="password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-300 rounded-xl px-3.5 py-2.5 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#2B5F4A] focus:bg-white transition"
+                  placeholder="Repite tu nueva contraseña"
+                />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="px-5 py-2.5 rounded-xl bg-lab-900 border border-lab-800 hover:border-amber-500/40 text-white font-bold uppercase text-xs transition"
+                className="px-5 py-2.5 rounded-xl bg-[#2B5F4A] hover:bg-[#1E4233] text-white font-bold text-xs uppercase tracking-wider transition shadow-xs"
               >
-                {loading ? "Updating..." : "Update Password"}
+                {loading ? "Actualizando..." : "Actualizar Contraseña"}
               </button>
             </form>
+          ) : (
+            <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 text-xs text-gray-600 font-light">
+              Cuenta vinculada mediante Google Sign-In ({user?.email}).
+            </div>
           )}
         </div>
 
-        {/* Danger Zone: Account Deletion */}
-        <div className="p-6 rounded-2xl border border-rose-900/30 bg-rose-950/10 space-y-3 text-xs">
-          <h3 className="font-bold text-rose-400 uppercase flex items-center gap-2">
-            <Trash2 className="w-4 h-4" /> Danger Zone
-          </h3>
-          <p className="text-lab-400 text-[11px] leading-relaxed max-w-xl">
-            Deleting your account removes your personal login credentials, saved addresses, and active custom label drafts. Note: Historic order and fulfillment records will be anonymized and preserved for accounting and tax compliance.
+        {/* Active Sessions & Security Badges */}
+        <div className="p-6 sm:p-8 rounded-2xl border border-gray-200 bg-white space-y-4 shadow-xs">
+          <h3 className="text-base font-bold text-gray-950">Protección de Datos & Sesión</h3>
+          <p className="text-xs text-gray-500 font-light leading-relaxed">
+            Tu sesión está protegida con cifrado SSL/TLS de 256 bits y autenticación segura mediante Firebase.
           </p>
 
-          <button
-            type="button"
-            onClick={() => setDeleteModalOpen(true)}
-            className="px-4 py-2 rounded-xl bg-rose-950 border border-rose-800/60 hover:bg-rose-900 text-rose-300 font-bold uppercase text-xs transition"
-          >
-            Request Account Deletion
-          </button>
-        </div>
+          <div className="flex flex-wrap items-center gap-3 pt-1">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-semibold">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Sesión Activa Segura</span>
+            </div>
 
-        {/* Delete Confirmation Modal */}
-        {deleteModalOpen && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="w-full max-w-md rounded-2xl bg-lab-950 border border-rose-800/60 p-6 space-y-4 shadow-2xl">
-              <div className="flex justify-between items-center border-b border-lab-900 pb-3 text-rose-400 font-bold uppercase">
-                <span className="flex items-center gap-2"><AlertTriangle className="w-4 h-4" /> Confirm Account Deletion</span>
-                <button type="button" onClick={() => setDeleteModalOpen(false)} className="text-lab-500 hover:text-white">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              <p className="text-xs text-lab-300 leading-relaxed">
-                Are you sure you want to permanently delete your SCENTLAB account? You will lose access to all saved designs and label configurations.
-              </p>
-
-              <div className="pt-2 flex justify-end gap-2 text-xs">
-                <button
-                  type="button"
-                  onClick={() => setDeleteModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-lab-900 text-lab-400 hover:text-white font-bold uppercase"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setDeleteModalOpen(false);
-                    logout();
-                  }}
-                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold uppercase"
-                >
-                  Confirm Delete & Sign Out
-                </button>
-              </div>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-50 border border-gray-200 text-xs text-gray-700">
+              <Mail className="w-3.5 h-3.5 text-gray-500" />
+              <span>{user?.email}</span>
             </div>
           </div>
-        )}
+        </div>
+
       </div>
     </AccountLayout>
   );

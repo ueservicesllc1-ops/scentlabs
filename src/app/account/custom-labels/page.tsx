@@ -18,7 +18,8 @@ import {
   ArrowRight, 
   CheckCircle2, 
   Clock, 
-  ExternalLink 
+  ExternalLink,
+  Plus
 } from "lucide-react";
 
 export default function CustomerCustomLabelsPage() {
@@ -68,133 +69,122 @@ export default function CustomerCustomLabelsPage() {
           bottleName: config.labelSizeName,
           dimensions: `${config.width}" x ${config.height}" (${config.materialName})`,
           material: config.materialName,
-          customText: `${config.brandName} — ${config.fragranceName}`,
+          customText: config.customText || config.fragranceName,
         },
       }
     );
 
-    setActionMsg(`Added "${config.brandName} - ${config.fragranceName}" (${config.quantity}u) to cart with live pricing (${formatCurrency(livePricing.totalPrice)}).`);
-  };
-
-  const handleDuplicateDesign = async (config: CustomLabelConfiguration) => {
-    if (!user) return;
-
-    const duplicateId = `cl_config_${Date.now()}`;
-    const duplicateConfig: CustomLabelConfiguration = {
-      ...config,
-      id: duplicateId,
-      brandName: `${config.brandName} (Copy)`,
-      status: "draft",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    await customLabelRepository.saveConfiguration(duplicateConfig);
-    await loadConfigs();
-    setActionMsg(`Duplicated design "${config.brandName}" as a new draft (${duplicateId}).`);
+    setActionMsg(`Etiqueta "${config.brandName || "Personalizada"}" agregada al carrito.`);
   };
 
   return (
     <AccountLayout>
-      <div className="space-y-6 font-mono">
-        <div className="p-6 rounded-2xl border border-lab-800 bg-lab-950 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-widest">
-              <Tag className="w-3.5 h-3.5" /> METALLIC FOIL DESIGN STUDIO ARCHIVE
+      <div className="space-y-6 font-sans">
+        
+        {/* Header */}
+        <div className="p-6 sm:p-8 rounded-2xl border border-gray-200 bg-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-xs">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-amber-700 text-xs font-bold uppercase tracking-wider">
+              <Tag className="w-4 h-4 text-amber-600" /> Diseños de Etiquetas Foil & Acabados
             </div>
-            <h2 className="text-xl font-bold text-white uppercase mt-1">
-              Custom Labels & Artwork
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-950 tracking-tight">
+              Proyectos de Etiquetas Personalizadas
             </h2>
-            <p className="text-xs text-lab-400">
-              Manage saved metallic foil label specs, artwork uploads, duplicate recipes, or reorder directly.
+            <p className="text-xs sm:text-sm text-gray-500 font-light">
+              Revisa tus diseños guardados, materiales metálicos/matte y reordena tiradas con precios por volumen.
             </p>
           </div>
 
           <Link
             href="/custom-labels"
-            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-lab-950 font-bold uppercase text-xs hover:brightness-110 transition flex items-center gap-1.5 shadow"
+            className="px-4 py-2.5 rounded-xl bg-[#2B5F4A] hover:bg-[#1E4233] text-white font-bold uppercase text-xs tracking-wider transition flex items-center gap-2 shadow-xs shrink-0"
           >
-            <Sparkles className="w-4 h-4" /> Create New Design
+            <Plus className="w-4 h-4" /> Diseñar Nueva Etiqueta
           </Link>
         </div>
 
         {actionMsg && (
-          <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/40 text-xs text-amber-300 flex items-center justify-between">
+          <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex items-center justify-between font-medium">
             <span>{actionMsg}</span>
-            <Link href="/cart" className="underline font-bold ml-2 text-white">
-              View Cart
+            <Link href="/cart" className="underline font-bold ml-2 text-[#166534]">
+              Ver Carrito
             </Link>
           </div>
         )}
 
+        {/* Configurations Grid */}
         {loading ? (
-          <div className="text-xs text-lab-500 py-10 text-center">Loading saved label designs...</div>
+          <div className="p-12 text-center text-xs text-gray-400 bg-white border border-gray-200 rounded-2xl">
+            Cargando proyectos de etiquetas...
+          </div>
         ) : configs.length === 0 ? (
-          <div className="p-12 text-center border border-lab-800 rounded-2xl bg-lab-950/40 space-y-3 max-w-md mx-auto">
-            <Tag className="w-8 h-8 text-lab-600 mx-auto" />
-            <h3 className="text-sm font-bold text-white uppercase">No Saved Label Configurations</h3>
-            <p className="text-xs text-lab-400">
-              Customize metallic foil labels matched to 10ml roll-ons, 30ml atomizers, or custom glassware.
+          <div className="p-12 text-center border border-gray-200 rounded-2xl bg-white space-y-3 max-w-md mx-auto shadow-xs">
+            <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto border border-amber-200">
+              <Tag className="w-6 h-6" />
+            </div>
+            <h3 className="text-base font-bold text-gray-950">No hay etiquetas guardadas</h3>
+            <p className="text-xs text-gray-500 font-light leading-relaxed">
+              Crea tu primer diseño con estampado metálico foil a la medida exacta de tus botellas de perfumería.
             </p>
             <Link
               href="/custom-labels"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-lab-950 font-bold text-xs uppercase"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#2B5F4A] hover:bg-[#1E4233] text-white font-bold text-xs uppercase tracking-wider transition shadow-xs"
             >
-              Start First Label Design
+              Comenzar a Diseñar
             </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {configs.map((config) => (
+            {configs.map((cfg) => (
               <div
-                key={config.id}
-                className="p-5 rounded-2xl border border-lab-800 bg-lab-950 space-y-3 flex flex-col justify-between hover:border-amber-500/40 transition"
+                key={cfg.id}
+                className="p-6 rounded-2xl border border-gray-200 bg-white space-y-4 shadow-xs hover:border-gray-300 transition flex flex-col justify-between"
               >
-                <div className="space-y-2 text-xs">
+                <div className="space-y-3">
                   <div className="flex justify-between items-start">
                     <div>
-                      <span className="font-bold text-white uppercase block text-sm">
-                        {config.brandName || "Custom Label"}
-                      </span>
-                      <span className="text-[11px] text-amber-400 font-bold">
-                        {config.fragranceName}
-                      </span>
+                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Nombre de Marca</span>
+                      <h4 className="text-base font-bold text-gray-950">
+                        {cfg.brandName || "Etiqueta Personalizada"}
+                      </h4>
+                      <p className="text-xs text-gray-600 font-medium">
+                        {cfg.fragranceName || cfg.labelSizeName}
+                      </p>
                     </div>
 
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-lab-900 text-amber-400 border border-amber-500/30">
-                      {config.status}
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold uppercase tracking-wider">
+                      {cfg.materialName}
                     </span>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-lab-900/60 border border-lab-800/80 space-y-1 text-[11px] text-lab-300">
-                    <div>• Format: {config.labelSizeName} ({config.width}&quot; x {config.height}&quot;)</div>
-                    <div>• Material: {config.materialName}</div>
-                    <div>• Batch Size: {config.quantity} units</div>
+                  <div className="p-3 bg-gray-50 rounded-xl border border-gray-200 text-xs space-y-1 text-gray-600 font-light">
+                    <div><strong>Dimensiones:</strong> {cfg.width}&quot; x {cfg.height}&quot; ({cfg.labelSizeName})</div>
+                    <div><strong>Material:</strong> {cfg.materialName}</div>
+                    <div><strong>Tirada guardada:</strong> {cfg.quantity} unidades</div>
                   </div>
                 </div>
 
-                {/* Actions */}
-                <div className="pt-3 border-t border-lab-900 flex justify-between items-center text-xs">
+                <div className="pt-3 border-t border-gray-100 flex justify-between items-center text-xs">
                   <button
                     type="button"
-                    onClick={() => handleDuplicateDesign(config)}
-                    className="text-[11px] text-lab-400 hover:text-white font-bold uppercase flex items-center gap-1"
+                    onClick={() => handleReorderLabel(cfg)}
+                    className="px-3.5 py-1.5 rounded-lg bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-800 font-semibold text-xs transition flex items-center gap-1.5"
                   >
-                    <Copy className="w-3.5 h-3.5" /> Duplicate Design
+                    <RotateCcw className="w-3.5 h-3.5 text-[#2B5F4A]" /> Reordenar Lote
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => handleReorderLabel(config)}
-                    className="px-3 py-1.5 rounded-lg bg-lab-900 border border-lab-800 hover:border-amber-500/40 text-amber-400 font-bold text-xs uppercase transition flex items-center gap-1.5"
+                  <Link
+                    href={`/custom-labels?configId=${cfg.id}`}
+                    className="text-xs text-[#2B5F4A] hover:underline font-bold"
                   >
-                    <RotateCcw className="w-3.5 h-3.5" /> Reorder ({formatCurrency(config.price)})
-                  </button>
+                    Editar en Estudio &rarr;
+                  </Link>
                 </div>
               </div>
             ))}
           </div>
         )}
+
       </div>
     </AccountLayout>
   );

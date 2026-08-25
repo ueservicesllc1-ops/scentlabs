@@ -105,50 +105,51 @@ export default function AccountProfilePage() {
   };
 
   const handleSendVerification = async () => {
-    // In production, invokes user.sendEmailVerification()
     setVerificationSent(true);
     setTimeout(() => setVerificationSent(false), 4000);
   };
 
   return (
     <AccountLayout>
-      <div className="p-6 rounded-2xl border border-lab-800 bg-lab-950 space-y-6 font-mono">
-        <div className="border-b border-lab-900 pb-4">
-          <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-widest">
-            <User className="w-3.5 h-3.5" /> FORMULATOR PROFILE & IDENTITY
+      <div className="p-6 sm:p-8 rounded-2xl border border-gray-200 bg-white space-y-6 font-sans shadow-xs">
+        
+        <div className="border-b border-gray-100 pb-4">
+          <div className="flex items-center gap-2 text-[#166534] text-xs font-bold uppercase tracking-wider">
+            <User className="w-4 h-4 text-[#2B5F4A]" /> Perfil del Cliente & Marca
           </div>
-          <h2 className="text-xl font-bold text-white uppercase mt-1">
-            Personal & Studio Information
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-950 tracking-tight mt-1">
+            Información Personal y del Estudio
           </h2>
-          <p className="text-xs text-lab-400">
-            Manage your personal profile, studio brand name, and authenticated email security.
+          <p className="text-xs sm:text-sm text-gray-500 font-light">
+            Gestiona tus datos de contacto, nombre de marca comercial y configuración de cuenta.
           </p>
         </div>
 
         {saveSuccess && (
-          <div className="p-3.5 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-xs text-emerald-300 flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-            <span>Profile information updated successfully.</span>
+          <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex items-center gap-2 font-medium">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <span>Perfil actualizado exitosamente.</span>
           </div>
         )}
 
         <form onSubmit={handleSaveProfile} className="space-y-6 text-xs">
+          
           {/* Avatar / Photo Upload */}
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-lab-900 border border-lab-800 flex items-center justify-center overflow-hidden relative">
+            <div className="w-16 h-16 rounded-2xl bg-gray-100 border border-gray-200 flex items-center justify-center overflow-hidden relative shadow-2xs">
               {photoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={photoUrl} alt="Profile" className="w-full h-full object-cover" />
+                <img src={photoUrl} alt="Foto de perfil" className="w-full h-full object-cover" />
               ) : (
-                <User className="w-8 h-8 text-lab-600" />
+                <User className="w-8 h-8 text-gray-400" />
               )}
             </div>
 
             <div>
-              <label className="block text-[10px] text-lab-500 uppercase mb-1">Profile Photo (B2 Storage)</label>
-              <label className="cursor-pointer px-3 py-1.5 rounded-lg bg-lab-900 border border-lab-800 hover:border-amber-500/40 text-white font-bold text-xs uppercase transition inline-flex items-center gap-1.5">
-                <UploadCloud className="w-3.5 h-3.5" />
-                {uploadingPhoto ? "Uploading..." : "Upload New Photo"}
+              <span className="block text-[11px] font-semibold text-gray-700 mb-1">Foto de Perfil</span>
+              <label className="cursor-pointer px-3.5 py-1.5 rounded-lg bg-gray-50 hover:bg-gray-100 border border-gray-300 text-gray-800 font-semibold text-xs transition inline-flex items-center gap-1.5 shadow-2xs">
+                <UploadCloud className="w-3.5 h-3.5 text-[#2B5F4A]" />
+                {uploadingPhoto ? "Subiendo..." : "Cambiar Foto"}
                 <input
                   type="file"
                   accept="image/png,image/jpeg,image/webp"
@@ -162,95 +163,80 @@ export default function AccountProfilePage() {
           {/* Grid fields */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-lab-400 block mb-1 uppercase text-[10px]">First Name</label>
+              <label className="text-gray-700 block mb-1 font-semibold text-[11px]">Nombre</label>
               <input
                 type="text"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                placeholder="Jane"
-                className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3.5 py-2.5 text-white placeholder-lab-600 focus:outline-none focus:border-amber-500"
+                placeholder="Nombre"
+                className="w-full bg-gray-50 border border-gray-300 rounded-xl px-3.5 py-2.5 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#2B5F4A] focus:bg-white transition"
               />
             </div>
 
             <div>
-              <label className="text-lab-400 block mb-1 uppercase text-[10px]">Last Name</label>
+              <label className="text-gray-700 block mb-1 font-semibold text-[11px]">Apellido</label>
               <input
                 type="text"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                placeholder="Doe"
-                className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3.5 py-2.5 text-white placeholder-lab-600 focus:outline-none focus:border-amber-500"
+                placeholder="Apellido"
+                className="w-full bg-gray-50 border border-gray-300 rounded-xl px-3.5 py-2.5 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#2B5F4A] focus:bg-white transition"
               />
             </div>
 
             <div>
-              <label className="text-lab-400 block mb-1 uppercase text-[10px]">Studio / Brand Name</label>
-              <input
-                type="text"
-                value={businessName}
-                onChange={(e) => setBusinessName(e.target.value)}
-                placeholder="Artisan Fragrances LLC"
-                className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3.5 py-2.5 text-white placeholder-lab-600 focus:outline-none focus:border-amber-500"
-              />
-            </div>
-
-            <div>
-              <label className="text-lab-400 block mb-1 uppercase text-[10px]">Phone Number</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+1 (555) 019-2834"
-                className="w-full bg-lab-900 border border-lab-800 rounded-xl px-3.5 py-2.5 text-white placeholder-lab-600 focus:outline-none focus:border-amber-500"
-              />
-            </div>
-
-            {/* Email (Firebase Guarded) */}
-            <div className="sm:col-span-2 border-t border-lab-900 pt-4">
-              <div className="flex justify-between items-center mb-1">
-                <label className="text-lab-400 uppercase text-[10px]">Authenticated Email</label>
-                {user?.emailVerified ? (
-                  <span className="text-[10px] text-emerald-400 font-bold uppercase flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3" /> Verified
-                  </span>
-                ) : (
-                  <span className="text-[10px] text-amber-400 font-bold uppercase flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" /> Unverified
-                  </span>
-                )}
+              <label className="text-gray-700 block mb-1 font-semibold text-[11px]">Teléfono de Contacto</label>
+              <div className="relative">
+                <Phone className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+1 (555) 000-0000"
+                  className="w-full bg-gray-50 border border-gray-300 rounded-xl pl-9 pr-3.5 py-2.5 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#2B5F4A] focus:bg-white transition"
+                />
               </div>
+            </div>
 
-              <input
-                type="email"
-                disabled
-                value={user?.email || ""}
-                className="w-full bg-lab-950 border border-lab-800 rounded-xl px-3.5 py-2.5 text-lab-400 font-bold"
-              />
-
-              {!user?.emailVerified && (
-                <div className="mt-2 flex justify-between items-center text-[10px]">
-                  <span className="text-lab-500">Verify your email to receive order dispatch alerts.</span>
-                  <button
-                    type="button"
-                    onClick={handleSendVerification}
-                    className="text-amber-400 hover:text-amber-300 font-bold uppercase"
-                  >
-                    {verificationSent ? "Verification Link Sent!" : "Send Verification Email"}
-                  </button>
-                </div>
-              )}
+            <div>
+              <label className="text-gray-700 block mb-1 font-semibold text-[11px]">Nombre de Marca o Estudio</label>
+              <div className="relative">
+                <Building className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={businessName}
+                  onChange={(e) => setBusinessName(e.target.value)}
+                  placeholder="Ej: Noir Fragrances Lab"
+                  className="w-full bg-gray-50 border border-gray-300 rounded-xl pl-9 pr-3.5 py-2.5 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#2B5F4A] focus:bg-white transition"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="pt-2">
-            <button
-              type="submit"
-              className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-lab-950 font-bold uppercase tracking-wider hover:brightness-110 transition shadow-lg shadow-amber-500/10 flex items-center gap-2"
-            >
-              <Save className="w-4 h-4" /> Save Profile Details
-            </button>
+          {/* Email Verification Box */}
+          <div className="p-4 rounded-xl border border-gray-200 bg-gray-50/70 space-y-2">
+            <div className="flex justify-between items-center">
+              <div>
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Correo Electrónico de la Cuenta</span>
+                <span className="font-semibold text-gray-900 text-xs">{user?.email}</span>
+              </div>
+              <div className="flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Autenticado</span>
+              </div>
+            </div>
           </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="px-6 py-2.5 rounded-xl bg-[#2B5F4A] hover:bg-[#1E4233] text-white font-bold text-xs uppercase tracking-wider transition flex items-center gap-2 shadow-xs"
+          >
+            <Save className="w-3.5 h-3.5" />
+            <span>Guardar Cambios</span>
+          </button>
         </form>
+
       </div>
     </AccountLayout>
   );

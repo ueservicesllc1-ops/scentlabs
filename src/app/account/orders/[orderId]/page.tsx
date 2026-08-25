@@ -54,14 +54,14 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
     }
 
     if (addedCount > 0) {
-      setReorderMsg(`Added ${addedCount} items to your cart with current catalog pricing.`);
+      setReorderMsg(`Se agregaron ${addedCount} artículos a tu carrito.`);
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-2 border-amber-500 border-t-transparent animate-spin" />
+      <div className="min-h-[50vh] flex items-center justify-center bg-[#F9FAFB]">
+        <div className="w-8 h-8 rounded-full border-2 border-[#2B5F4A] border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -73,127 +73,136 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
   const isPaid = order.paymentStatus === "paid";
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 font-mono">
-      <div>
-        <Link href="/account/orders" className="inline-flex items-center gap-1.5 text-xs text-lab-400 hover:text-white mb-2 transition">
-          <ArrowLeft className="w-3.5 h-3.5" /> Back to Orders
-        </Link>
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
-          <div>
-            <h1 className="text-3xl font-black text-white uppercase">
-              Order {order.orderNumber}
-            </h1>
-            <p className="text-xs text-lab-400 mt-1">
-              Historical Snapshot • Created {new Date(order.createdAt).toLocaleString()}
-            </p>
-          </div>
-
-          <button
-            onClick={handleReorder}
-            className="px-4 py-2 rounded-lg bg-amber-500 text-lab-950 font-bold text-xs uppercase hover:brightness-110 transition flex items-center gap-1.5 shadow"
+    <div className="min-h-screen bg-[#F9FAFB] py-10 font-sans text-gray-900">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        
+        {/* Top bar */}
+        <div>
+          <Link
+            href="/account/orders"
+            className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-900 mb-3 transition font-medium"
           >
-            <RotateCcw className="w-3.5 h-3.5" /> Reorder This Batch
-          </button>
-        </div>
-      </div>
-
-      {reorderMsg && (
-        <div className="p-3 rounded bg-emerald-950/50 border border-emerald-500/40 text-xs text-emerald-300 flex justify-between items-center">
-          <span>{reorderMsg}</span>
-          <Link href="/cart" className="underline font-bold">
-            View Cart →
+            <ArrowLeft className="w-3.5 h-3.5" /> Volver a Mis Pedidos
           </Link>
-        </div>
-      )}
+          
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-950 tracking-tight">
+                Pedido {order.orderNumber}
+              </h1>
+              <p className="text-xs text-gray-500 font-light mt-1">
+                Registrado el {new Date(order.createdAt).toLocaleDateString()} a las {new Date(order.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              </p>
+            </div>
 
-      {/* Status Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="p-4 rounded-xl border border-lab-800 bg-lab-900/40 space-y-1">
-          <span className="text-[10px] text-lab-500 uppercase block">Payment Status</span>
-          <div className="flex items-center gap-1.5 text-xs font-bold text-white">
-            {isPaid ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Clock className="w-4 h-4 text-amber-400" />}
-            <span className="capitalize">{order.paymentStatus}</span>
+            <button
+              onClick={handleReorder}
+              className="px-5 py-2.5 rounded-xl bg-[#2B5F4A] hover:bg-[#1E4233] text-white font-bold text-xs uppercase tracking-wider transition flex items-center gap-2 shadow-xs"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Comprar este Lote de Nuevo
+            </button>
           </div>
         </div>
 
-        <div className="p-4 rounded-xl border border-lab-800 bg-lab-900/40 space-y-1">
-          <span className="text-[10px] text-lab-500 uppercase block">Order Fulfillment</span>
-          <div className="flex items-center gap-1.5 text-xs font-bold text-white">
-            <Package className="w-4 h-4 text-amber-400" />
-            <span className="capitalize">{order.orderStatus}</span>
+        {reorderMsg && (
+          <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex justify-between items-center font-medium">
+            <span>{reorderMsg}</span>
+            <Link href="/cart" className="underline font-bold text-[#166534]">
+              Ver Carrito &rarr;
+            </Link>
+          </div>
+        )}
+
+        {/* Status KPI Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="p-5 rounded-2xl border border-gray-200 bg-white shadow-xs space-y-1">
+            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Estado de Pago</span>
+            <div className="flex items-center gap-1.5 text-xs font-bold text-gray-900 pt-0.5">
+              {isPaid ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Clock className="w-4 h-4 text-amber-600" />}
+              <span className="capitalize">{order.paymentStatus === "paid" ? "Pagado con Éxito" : order.paymentStatus}</span>
+            </div>
+          </div>
+
+          <div className="p-5 rounded-2xl border border-gray-200 bg-white shadow-xs space-y-1">
+            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Despacho y Envío</span>
+            <div className="flex items-center gap-1.5 text-xs font-bold text-gray-900 pt-0.5">
+              <Package className="w-4 h-4 text-[#2B5F4A]" />
+              <span className="capitalize">{order.orderStatus === "delivered" ? "Entregado" : "En Proceso de Despacho"}</span>
+            </div>
+          </div>
+
+          <div className="p-5 rounded-2xl border border-gray-200 bg-white shadow-xs space-y-1">
+            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Total Facturado</span>
+            <div className="text-base font-bold text-gray-950 font-mono">
+              {formatCurrency(order.total)}
+            </div>
           </div>
         </div>
 
-        <div className="p-4 rounded-xl border border-lab-800 bg-lab-900/40 space-y-1">
-          <span className="text-[10px] text-lab-500 uppercase block">Total Billed</span>
-          <div className="text-sm font-bold text-amber-400">
-            {formatCurrency(order.total)}
-          </div>
-        </div>
-      </div>
+        {/* Purchased Items List */}
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 sm:p-8 space-y-4 shadow-xs">
+          <h2 className="text-xs font-bold text-gray-950 uppercase tracking-wider border-b border-gray-100 pb-3">
+            Artículos del Pedido ({order.items.length} productos)
+          </h2>
 
-      {/* Purchased Line Items Snapshot */}
-      <div className="rounded-2xl border border-lab-800 bg-lab-950 p-6 space-y-4 shadow-xl">
-        <h2 className="text-xs font-bold text-white uppercase tracking-wider border-b border-lab-800 pb-3">
-          Historical Purchase Snapshot ({order.items.length} lines)
-        </h2>
-
-        <div className="divide-y divide-lab-800/60 text-xs">
-          {order.items.map((item) => (
-            <div key={item.id} className="py-3 flex justify-between items-start">
-              <div className="space-y-0.5">
-                <div className="font-bold text-white">{item.productName}</div>
-                <div className="text-[11px] text-lab-400">
-                  SKU: {item.sku} • {item.quantity} units ({formatUnitPrice(item.unitPrice)}/u)
-                </div>
-                {item.customization && (
-                  <div className="text-[10px] text-amber-400">
-                    Custom Specs: {item.customization.bottleName} ({item.customization.dimensions} - {item.customization.material})
+          <div className="divide-y divide-gray-100 text-xs">
+            {order.items.map((item) => (
+              <div key={item.id} className="py-3.5 flex justify-between items-start">
+                <div className="space-y-0.5">
+                  <div className="font-bold text-gray-950">{item.productName}</div>
+                  <div className="text-[11px] text-gray-500 font-light">
+                    SKU: {item.sku} &bull; {item.quantity} unidades ({formatUnitPrice(item.unitPrice)}/u)
                   </div>
-                )}
+                  {item.customization && (
+                    <div className="text-[11px] text-amber-700 font-medium">
+                      Personalización: {item.customization.bottleName} ({item.customization.dimensions} - {item.customization.material})
+                    </div>
+                  )}
+                </div>
+                <div className="text-sm font-bold text-gray-950 font-mono">
+                  {formatCurrency(item.totalPrice)}
+                </div>
               </div>
-              <div className="text-sm font-bold text-white">
-                {formatCurrency(item.totalPrice)}
-              </div>
+            ))}
+          </div>
+
+          {/* Financial Calculation */}
+          <div className="border-t border-gray-100 pt-4 space-y-2 text-xs">
+            <div className="flex justify-between text-gray-600">
+              <span>Subtotal</span>
+              <span className="text-gray-950 font-mono font-medium">{formatCurrency(order.subtotal)}</span>
             </div>
-          ))}
+            {order.discount > 0 && (
+              <div className="flex justify-between text-emerald-700 font-medium">
+                <span>Descuento por Volumen</span>
+                <span className="font-mono">-{formatCurrency(order.discount)}</span>
+              </div>
+            )}
+            <div className="flex justify-between text-gray-600">
+              <span>Costo de Envío ({order.shippingMethod || "Estándar"})</span>
+              <span className="text-gray-950 font-mono font-medium">{formatCurrency(order.shipping)}</span>
+            </div>
+            <div className="flex justify-between text-base font-bold text-gray-950 pt-3 border-t border-gray-100">
+              <span>Total General</span>
+              <span className="text-lg font-mono text-[#2B5F4A]">{formatCurrency(order.total)}</span>
+            </div>
+          </div>
         </div>
 
-        {/* Financial Calculation Snapshot */}
-        <div className="border-t border-lab-800 pt-4 space-y-2 text-xs">
-          <div className="flex justify-between text-lab-400">
-            <span>Subtotal</span>
-            <span className="text-white">{formatCurrency(order.subtotal)}</span>
+        {/* Shipping Address Box */}
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 space-y-2 text-xs shadow-xs">
+          <h3 className="font-bold text-gray-950 uppercase flex items-center gap-2 text-xs">
+            <Truck className="w-4 h-4 text-[#2B5F4A]" /> Dirección de Entrega
+          </h3>
+          <div className="text-gray-900 font-bold">{order.shippingAddress.fullName || order.shippingAddress.name || "Cliente"}</div>
+          <div className="text-gray-600 font-light leading-relaxed">
+            {order.shippingAddress.streetAddress || order.shippingAddress.street1 || ""}, {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.postalCode}, {order.shippingAddress.country}
           </div>
-          {order.discount > 0 && (
-            <div className="flex justify-between text-emerald-400">
-              <span>Volume Discount</span>
-              <span>-{formatCurrency(order.discount)}</span>
-            </div>
-          )}
-          <div className="flex justify-between text-lab-400">
-            <span>Shipping ({order.shippingMethod})</span>
-            <span className="text-white">{formatCurrency(order.shipping)}</span>
-          </div>
-          <div className="flex justify-between text-base font-bold text-white pt-2 border-t border-lab-800">
-            <span>Grand Total</span>
-            <span className="text-amber-400 text-lg">{formatCurrency(order.total)}</span>
+          <div className="text-gray-400 text-[11px] pt-1">
+            Contacto del destinatario: {order.customerEmail}
           </div>
         </div>
-      </div>
 
-      {/* Shipping Address */}
-      <div className="rounded-xl border border-lab-800 bg-lab-900/40 p-5 space-y-2 text-xs">
-        <h3 className="font-bold text-white uppercase flex items-center gap-2 text-[11px]">
-          <Truck className="w-4 h-4 text-amber-400" /> Delivery Address
-        </h3>
-        <div className="text-white font-medium">{order.shippingAddress.fullName || order.shippingAddress.name || "Customer"}</div>
-        <div className="text-lab-400">
-          {order.shippingAddress.streetAddress || order.shippingAddress.street1 || ""}, {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.postalCode}, {order.shippingAddress.country}
-        </div>
-        <div className="text-lab-500 text-[11px] pt-1">
-          Recipient Contact: {order.customerEmail}
-        </div>
       </div>
     </div>
   );
