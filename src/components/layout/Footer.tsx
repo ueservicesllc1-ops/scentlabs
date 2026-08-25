@@ -5,6 +5,7 @@ import Link from "next/link";
 import { VisitorCounter } from "./VisitorCounter";
 
 const shopLinks = [
+  { label: "🚀 Kits Emprendedor", href: "/kits" },
   { label: "Fragrance Oils", href: "/fragrance" },
   { label: "Glass Bottles", href: "/bottles" },
   { label: "Custom Labels", href: "/custom-labels" },

@@ -1515,6 +1515,69 @@ const SEED_PRODUCTS: Product[] = [
     createdAt: "2026-08-23T00:00:00Z",
     updatedAt: "2026-08-23T00:00:00Z",
   },
+
+  // ==========================================
+  // PRODUCT: Kit Emprendedor — 6 Perfumes de 50 ml
+  // ==========================================
+  {
+    id: "prod_kit_emprendedor_6",
+    name: "Kit Emprendedor — 6 Perfumes de 50 ml",
+    slug: "kit-emprendedor-6-perfumes",
+    description: "Kit completo para preparar tus primeros 6 perfumes de 50 ml y comenzar a vender. Incluye 6 botellas de vidrio vacías con tapa dorada oficial, 2 esencias de 2 oz a elección, 8 oz de base alcohólica oficial, jeringa, pipetas y 6 etiquetas identificadoras.",
+    shortDescription: "Todo lo necesario para preparar tus primeros 6 perfumes de 50 ml.",
+    categoryId: "cat_kits",
+    category: "kits",
+    subcategory: "Perfume Business Kit",
+    media: [
+      {
+        id: "med_kit_6",
+        b2Key: "",
+        url: "/heromodal.png",
+        altText: "Kit Emprendedor — 6 Perfumes de 50 ml",
+        isPrimary: true,
+        sortOrder: 1,
+      },
+    ],
+    costData: {
+      supplierCost: 22.50,
+      supplierQuantity: 1,
+      unitCost: 22.50,
+      totalUnitCost: 22.50,
+    },
+    currency: "USD",
+    basePrice: 49.99,
+    packageOptions: [
+      { id: "pkg_kit_6", quantity: 1, price: 49.99, unitPrice: 49.99, isDefault: true },
+    ],
+    volumePricing: [
+      { minQuantity: 1, unitPrice: 49.99 },
+    ],
+    discountEligible: true,
+    minimumDiscountMargin: 0.25,
+    sku: "KIT-EMP-06P-50ML",
+    unit: "kit",
+    status: "active",
+    featured: true,
+    tags: ["kit", "emprendedor", "perfumes", "50ml", "starter kit", "negocio"],
+    attributes: {
+      capacity: "6 Perfumes × 50 ml (300 ml total)",
+      bottles: "6 × Botellas transparentes rectangulares 50ml con tapa dorada oficial",
+      alcoholBase: "8 oz Base Alcohólica Oficial Scentlabs Supply",
+      tools: "1 × Jeringa 5ml, 2 × Pipetas 5ml, 6 × Etiquetas",
+    },
+    hasVariants: false,
+    customizable: true,
+    inventory: {
+      quantityInStock: 50,
+      reservedQuantity: 0,
+      availableQuantity: 50,
+      lowStockThreshold: 5,
+      reorderPoint: 10,
+      status: "in_stock",
+    },
+    createdAt: "2026-08-25T00:00:00Z",
+    updatedAt: "2026-08-25T00:00:00Z",
+  },
 ];
 
 export const INITIAL_PRODUCTS: Product[] = SEED_PRODUCTS;

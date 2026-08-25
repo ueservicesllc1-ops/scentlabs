@@ -5,6 +5,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { ScentSommelierChat } from "@/components/ai/ScentSommelierChat";
+import { HeroPromoModal } from "@/components/layout/HeroPromoModal";
 import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
 
@@ -64,6 +65,7 @@ export default function RootLayout({
             <Footer />
             <CartDrawer />
             <ScentSommelierChat />
+            <HeroPromoModal />
           </CartProvider>
         </AuthProvider>
       </body>

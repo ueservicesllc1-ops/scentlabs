@@ -27,6 +27,7 @@ export function Navbar() {
   };
 
   const navLinks = [
+    { name: "Kits Emprendedor", href: "/kits" },
     { name: "Fragrances", href: "/fragrance" },
     { name: "Perfumes", href: "/perfumes" },
     { name: "Packaging & Boxes", href: "/packaging" },
