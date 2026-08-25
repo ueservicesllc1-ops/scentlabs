@@ -215,12 +215,20 @@ export default function FragranceProductPage({ params }: FragrancePageProps) {
               </p>
             </div>
 
-            {/* Variant Size Selector */}
-            <div className="space-y-4 mb-8">
-              <label className="font-label-caps text-label-caps text-primary uppercase block">
-                Select Size:
-              </label>
-              <div className="grid grid-cols-2 gap-4">
+            {/* Variant Size Selector - Compact 1-2 Row Grid */}
+            <div className="space-y-2.5 mb-6">
+              <div className="flex justify-between items-center">
+                <label className="font-label-caps text-xs text-primary uppercase font-bold tracking-wider">
+                  Select Size (Pure Concentrate):
+                </label>
+                {selectedVariant && (
+                  <span className="text-xs text-emerald-700 font-semibold font-mono">
+                    Selected: {selectedVariant.sellingSize} OZ (${selectedVariant.retailPrice.toFixed(2)})
+                  </span>
+                )}
+              </div>
+
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                 {activeVariants.map((variant) => {
                   const isSelected = selectedVariant?.id === variant.id;
                   const vPrice = typeof variant.retailPrice === "number" ? variant.retailPrice : 0;
@@ -233,20 +241,20 @@ export default function FragranceProductPage({ params }: FragrancePageProps) {
                       key={variant.id}
                       type="button"
                       onClick={() => setSelectedVariant(variant)}
-                      className={`p-4 border text-left transition rounded-sm flex flex-col justify-between ${
+                      className={`p-2.5 sm:p-3 text-center transition rounded-xl border flex flex-col items-center justify-center gap-1 ${
                         isSelected
-                          ? "bg-primary text-on-primary border-primary shadow-sm"
-                          : "bg-surface text-primary border-outline-variant hover:border-primary"
+                          ? "bg-[#111827] text-white border-[#111827] ring-2 ring-[#2B5F4A] shadow-sm"
+                          : "bg-white text-gray-900 border-gray-200 hover:border-gray-400 hover:bg-gray-50/80"
                       }`}
                     >
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="font-label-caps text-label-caps uppercase">{sizeText}</span>
-                        <span className="font-body-md font-semibold font-mono">
-                          ${vPrice.toFixed(2)}
-                        </span>
-                      </div>
-                      <span className={`text-[10px] uppercase font-semibold ${isSelected ? "text-on-primary-container" : "text-secondary"}`}>
-                        ${vUnitPrice.toFixed(2)} / oz
+                      <span className="font-bold text-xs sm:text-sm uppercase tracking-tight">
+                        {sizeText}
+                      </span>
+                      <span className={`font-mono text-xs font-bold ${isSelected ? "text-amber-300" : "text-gray-950"}`}>
+                        ${vPrice.toFixed(2)}
+                      </span>
+                      <span className={`text-[9px] font-medium leading-none ${isSelected ? "text-gray-300" : "text-gray-500"}`}>
+                        ${vUnitPrice.toFixed(2)}/oz
                       </span>
                     </button>
                   );
@@ -256,33 +264,36 @@ export default function FragranceProductPage({ params }: FragrancePageProps) {
 
             {/* Price & Add to Order Bar */}
             {selectedVariant && (
-              <div className="border border-outline-variant p-6 bg-surface-bright rounded-sm space-y-6">
+              <div className="border border-gray-200 p-5 bg-gray-50/80 rounded-2xl space-y-4 shadow-2xs">
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="font-caption text-caption text-secondary block">Total Unit Price</span>
-                    <span className="font-body-lg text-body-lg text-primary font-semibold">
+                    <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">Total por Frasco</span>
+                    <span className="text-2xl font-black text-gray-950 font-mono">
                       ${(typeof selectedVariant.retailPrice === "number" ? selectedVariant.retailPrice : 0).toFixed(2)}
                     </span>
                   </div>
-                  <span className="font-caption text-caption text-secondary">
-                    (${ ((selectedVariant.retailPrice || 0) / (selectedVariant.sellingSize || 1)).toFixed(2)} / {selectedVariant.sellingUnit})
-                  </span>
+                  <div className="text-right">
+                    <span className="text-xs font-semibold text-emerald-700 block">En Stock para despacho</span>
+                    <span className="text-[11px] text-gray-500 font-mono">
+                      (${ ((selectedVariant.retailPrice || 0) / (selectedVariant.sellingSize || 1)).toFixed(2)} / {selectedVariant.sellingUnit})
+                    </span>
+                  </div>
                 </div>
 
                 <button
                   type="button"
                   onClick={handleAddToCart}
-                  className={`flat-btn w-full py-4 text-xs font-label-caps uppercase transition ${
-                    added ? "bg-emerald-700 hover:bg-emerald-700" : ""
+                  className={`w-full py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-xs ${
+                    added ? "bg-emerald-700 text-white" : "bg-[#2B5F4A] hover:bg-[#1E4233] text-white"
                   }`}
                 >
                   {added ? (
                     <>
-                      <Check className="w-4 h-4 mr-1.5" /> Added to Order
+                      <Check className="w-4 h-4" /> ¡Agregado al Pedido!
                     </>
                   ) : (
                     <>
-                      <ShoppingBag className="w-4 h-4 mr-1.5" /> Add to Order
+                      <ShoppingBag className="w-4 h-4" /> Agregar al Pedido
                     </>
                   )}
                 </button>
@@ -290,10 +301,10 @@ export default function FragranceProductPage({ params }: FragrancePageProps) {
             )}
 
             {/* Formulation Tip Box */}
-            <div className="p-4 border border-outline-variant bg-surface-container-low flex items-start gap-3 rounded-sm mt-6">
-              <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-              <p className="font-caption text-caption text-secondary">
-                <strong className="text-primary font-medium">Atelier Formula Tip:</strong> Dilute concentrate at 15% to 20% by weight with SDA-40B 200-Proof Perfumer&apos;s Alcohol Base to achieve fine EDP fragrance strength.
+            <div className="p-4 border border-gray-200 bg-white flex items-start gap-3 rounded-2xl mt-4 shadow-2xs">
+              <Info className="w-4 h-4 text-[#2B5F4A] shrink-0 mt-0.5" />
+              <p className="text-xs text-gray-600 font-light leading-relaxed">
+                <strong className="text-gray-900 font-semibold">Consejo de Formulación:</strong> Diluye el concentrado puro al 15% - 20% en peso con alcohol perfumista SDA-40B para obtener un Eau de Parfum (EDP) de alta fijación.
               </p>
             </div>
 
