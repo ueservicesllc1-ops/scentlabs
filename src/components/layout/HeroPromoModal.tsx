@@ -4,21 +4,23 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { X, ArrowRight, Clock, ShoppingBag } from "lucide-react";
 
+const DURATION_SECONDS = 15;
+
 export function HeroPromoModal() {
   const [isOpen, setIsOpen] = useState(false);
-  const [secondsRemaining, setSecondsRemaining] = useState(8);
+  const [secondsRemaining, setSecondsRemaining] = useState(DURATION_SECONDS);
 
   useEffect(() => {
     // Always show on page load/refresh as requested
     const openTimer = setTimeout(() => {
       setIsOpen(true);
-      setSecondsRemaining(8);
+      setSecondsRemaining(DURATION_SECONDS);
     }, 400);
 
     return () => clearTimeout(openTimer);
   }, []);
 
-  // 8-second auto close countdown
+  // 15-second auto close countdown
   useEffect(() => {
     if (!isOpen) return;
 
@@ -69,7 +71,7 @@ export function HeroPromoModal() {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Top 8-Second Animated Progress Bar */}
+        {/* Top 15-Second Animated Progress Bar */}
         <div
           style={{
             position: "absolute",
@@ -85,7 +87,7 @@ export function HeroPromoModal() {
             style={{
               height: "100%",
               backgroundColor: "#5EAB85",
-              width: `${(secondsRemaining / 8) * 100}%`,
+              width: `${(secondsRemaining / DURATION_SECONDS) * 100}%`,
               transition: "width 1s linear",
             }}
           />

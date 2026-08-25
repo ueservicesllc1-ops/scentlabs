@@ -27,14 +27,13 @@ export function Navbar() {
   };
 
   const navLinks = [
-    { name: "Kits Emprendedor", href: "/kits" },
-    { name: "Tutorial & Calculadora", href: "/tutorial" },
+    { name: "Kits", href: "/kits" },
     { name: "Fragrances", href: "/fragrance" },
     { name: "Perfumes", href: "/perfumes" },
-    { name: "Packaging & Boxes", href: "/packaging" },
     { name: "Bottles", href: "/bottles" },
-    { name: "Custom Labels", href: "/custom-labels" },
-    { name: "Supplies", href: "/testing" },
+    { name: "Packaging", href: "/packaging" },
+    { name: "Labels", href: "/custom-labels" },
+    { name: "Tutorial", href: "/tutorial" },
     { name: "Catalog", href: "/shop" },
   ];
 
@@ -49,22 +48,21 @@ export function Navbar() {
 
       {/* ── Main Top Navbar ── */}
       <header style={{ background: "rgba(255,255,255,0.98)", backdropFilter: "blur(8px)", position: "sticky", top: 0, zIndex: 50, borderBottom: "1px solid #EEEEEE" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", maxWidth: "1280px", margin: "0 auto", padding: "8px 24px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", maxWidth: "1280px", margin: "0 auto", padding: "10px 24px", gap: "20px" }}>
           
           {/* Logo */}
           <Link
             href="/"
-            style={{ display: "flex", alignItems: "center", textDecoration: "none" }}
-            className="shrink-0"
+            style={{ display: "flex", alignItems: "center", textDecoration: "none", flexShrink: 0 }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logo.png?v=10"
               alt="Logo"
-              style={{ height: "40px", width: "auto", objectFit: "contain" }}
+              style={{ height: "38px", width: "auto", objectFit: "contain", display: "block" }}
             />
           </Link>
-          <nav className="hidden md:flex items-center gap-7">
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-6 flex-nowrap whitespace-nowrap">
             {navLinks.map((link) => {
               const isActive = pathname === link.href || (link.href !== "/" && pathname?.startsWith(link.href));
               return (
@@ -74,12 +72,13 @@ export function Navbar() {
                   style={{
                     fontSize: "11px",
                     fontWeight: isActive ? 700 : 500,
-                    letterSpacing: "0.14em",
+                    letterSpacing: "0.12em",
                     textTransform: "uppercase",
                     color: isActive ? "#2B5F4A" : "#666666",
                     textDecoration: "none",
                     borderBottom: isActive ? "2px solid #2B5F4A" : "2px solid transparent",
                     paddingBottom: "3px",
+                    whiteSpace: "nowrap",
                     transition: "color 0.15s ease",
                   }}
                   onMouseEnter={(e) => {
@@ -163,7 +162,7 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden"
+              className="lg:hidden"
               style={{ background: "none", border: "none", cursor: "pointer", color: "#333333", padding: "4px" }}
               aria-label="Toggle navigation menu"
             >
@@ -209,7 +208,7 @@ export function Navbar() {
 
         {/* Mobile Menu Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden" style={{ borderTop: "1px solid #EEEEEE", background: "white", padding: "20px 24px" }}>
+          <div className="lg:hidden" style={{ borderTop: "1px solid #EEEEEE", background: "white", padding: "20px 24px" }}>
             <nav style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               {navLinks.map((link) => (
                 <Link
