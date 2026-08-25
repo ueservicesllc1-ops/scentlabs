@@ -1,19 +1,21 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { Check, Search, X } from "lucide-react";
+import { Check, Search, X, Package as PackageIcon } from "lucide-react";
+import { productService } from "@/lib/firestore/products";
 
 interface PackagingItem {
   id: string;
   name: string;
   slug: string;
-  subcategory: "Boxes" | "Tags" | "Security Stickers" | "Heat Shrink Wrap Bags";
+  subcategory: "Boxes" | "Tags" | "Security Stickers" | "Heat Shrink Wrap Bags" | string;
   description: string;
   dimensions?: string;
   imageUrl?: string;
   sku: string;
+  status?: string;
   packageOptions: Array<{
     id: string;
     label: string;
@@ -23,7 +25,7 @@ interface PackagingItem {
   }>;
 }
 
-const PACKAGING_PRODUCTS: PackagingItem[] = [
+const DEFAULT_PACKAGING_PRODUCTS: PackagingItem[] = [
   {
     id: "prod_box_10ml",
     name: "Roll-On Box — 10 ml",
@@ -32,7 +34,7 @@ const PACKAGING_PRODUCTS: PackagingItem[] = [
     description: "110 lb Smooth White Cardstock. Fixed dimensions: 0.95\" × 3.65\" × 0.95\" (2.4 × 9.3 × 2.4 cm) for 10ml glass roll-ons.",
     dimensions: "0.95\" × 3.65\" × 0.95\"",
     sku: "BOX-ROL-10ML",
-    imageUrl: "/images/products/perfume-boxes.jpg",
+    status: "active",
     packageOptions: [
       { id: "pkg_box_10ml_25", label: "25u", quantity: 25, price: 11.25, unitPrice: 0.45 },
       { id: "pkg_box_10ml_50", label: "50u", quantity: 50, price: 20.00, unitPrice: 0.40 },
@@ -48,7 +50,7 @@ const PACKAGING_PRODUCTS: PackagingItem[] = [
     description: "110 lb Smooth White Cardstock. Fixed dimensions: 1.65\" × 4.85\" × 1.65\" (4.2 × 12.3 × 4.2 cm) for 30ml spray bottles.",
     dimensions: "1.65\" × 4.85\" × 1.65\"",
     sku: "BOX-FLD-30ML",
-    imageUrl: "/images/products/perfume-boxes.jpg",
+    status: "active",
     packageOptions: [
       { id: "pkg_box_30ml_25", label: "25u", quantity: 25, price: 16.25, unitPrice: 0.65 },
       { id: "pkg_box_30ml_50", label: "50u", quantity: 50, price: 29.00, unitPrice: 0.58 },
@@ -63,7 +65,7 @@ const PACKAGING_PRODUCTS: PackagingItem[] = [
     description: "110 lb Smooth White Cardstock. Fixed dimensions: 2.10\" × 5.20\" × 2.10\" (5.3 × 13.2 × 5.3 cm) for 50ml perfume bottles.",
     dimensions: "2.10\" × 5.20\" × 2.10\"",
     sku: "BOX-FLD-50ML",
-    imageUrl: "/images/products/perfume-boxes.jpg",
+    status: "active",
     packageOptions: [
       { id: "pkg_box_50ml_25", label: "25u", quantity: 25, price: 18.75, unitPrice: 0.75 },
       { id: "pkg_box_50ml_50", label: "50u", quantity: 50, price: 34.00, unitPrice: 0.68 },
@@ -78,7 +80,8 @@ const PACKAGING_PRODUCTS: PackagingItem[] = [
     description: "100 Gauge crystal-clear polyolefin shrink film. Pre-sealed bottom for 10ml roll-on bottles and packaging.",
     dimensions: "4\" × 6\"",
     sku: "PKG-SHR-0406",
-    imageUrl: "/images/products/shrink-wrap.jpg",
+    imageUrl: "https://m.media-amazon.com/images/I/71WjT-Yc7OL._AC_SL1500_.jpg",
+    status: "active",
     packageOptions: [
       { id: "pkg_shrink_4x6_50", label: "50u", quantity: 50, price: 5.00, unitPrice: 0.10 },
       { id: "pkg_shrink_4x6_100", label: "100u", quantity: 100, price: 10.00, unitPrice: 0.10 },
@@ -92,7 +95,8 @@ const PACKAGING_PRODUCTS: PackagingItem[] = [
     description: "100 Gauge POF heat shrink film for 30ml spray atomizers and small rectangular perfume boxes.",
     dimensions: "6\" × 6\"",
     sku: "PKG-SHR-0606",
-    imageUrl: "/images/products/shrink-wrap.jpg",
+    imageUrl: "https://m.media-amazon.com/images/I/71WjT-Yc7OL._AC_SL1500_.jpg",
+    status: "active",
     packageOptions: [
       { id: "pkg_shrink_6x6_50", label: "50u", quantity: 50, price: 6.00, unitPrice: 0.12 },
       { id: "pkg_shrink_6x6_100", label: "100u", quantity: 100, price: 11.00, unitPrice: 0.11 },
@@ -106,7 +110,8 @@ const PACKAGING_PRODUCTS: PackagingItem[] = [
     description: "100 Gauge POF heat shrink film for 50ml and 100ml presentation boxes and glass bottles.",
     dimensions: "6\" × 8\"",
     sku: "PKG-SHR-0608",
-    imageUrl: "/images/products/shrink-wrap.jpg",
+    imageUrl: "https://m.media-amazon.com/images/I/71WjT-Yc7OL._AC_SL1500_.jpg",
+    status: "active",
     packageOptions: [
       { id: "pkg_shrink_6x8_50", label: "50u", quantity: 50, price: 6.00, unitPrice: 0.12 },
       { id: "pkg_shrink_6x8_100", label: "100u", quantity: 100, price: 11.00, unitPrice: 0.11 },
@@ -120,7 +125,7 @@ const PACKAGING_PRODUCTS: PackagingItem[] = [
     description: "Tamper-evident holographic security stickers for box tucks, bottle caps, and laboratory closures.",
     dimensions: "0.75 in diameter",
     sku: "PKG-SEC-HOLO-100",
-    imageUrl: "/images/products/security-stickers.jpg",
+    status: "active",
     packageOptions: [
       { id: "pkg_sec_100", label: "100u", quantity: 100, price: 4.50, unitPrice: 0.045 },
       { id: "pkg_sec_200", label: "200u", quantity: 200, price: 6.00, unitPrice: 0.03 },
@@ -134,7 +139,7 @@ const PACKAGING_PRODUCTS: PackagingItem[] = [
     description: "Metallic hang tags with elastic cord for perfume packaging, bottle neck presentation, and branding.",
     dimensions: "Pack with Cord",
     sku: "PKG-TAG-50",
-    imageUrl: "/images/products/hang-tags.jpg",
+    status: "active",
     packageOptions: [
       { id: "pkg_tag_50", label: "50u", quantity: 50, price: 3.80, unitPrice: 0.076 },
       { id: "pkg_tag_100", label: "100u", quantity: 100, price: 5.00, unitPrice: 0.05 },
@@ -186,17 +191,19 @@ function PackagingProductCard({ item }: { item: PackagingItem }) {
     setTimeout(() => setAdded(false), 2000);
   };
 
+  const hasValidImage = !!(item.imageUrl && item.imageUrl.trim().length > 0 && !imgError);
+
   return (
     <article className="sl-card">
       {/* ── Image ── */}
       <Link href={`/product/${item.slug}`} className="sl-card-image block" style={{ display: "block" }}>
-        {item.imageUrl && !imgError ? (
+        {hasValidImage ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={item.imageUrl}
             alt={item.name}
             onError={() => setImgError(true)}
-            style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s ease" }}
+            style={{ width: "100%", height: "100%", objectFit: "contain", padding: "12px", transition: "transform 0.4s ease" }}
           />
         ) : (
           <div className="sl-card-placeholder">
@@ -242,9 +249,9 @@ function PackagingProductCard({ item }: { item: PackagingItem }) {
         {/* Footer: Price + Add Button */}
         <div className="sl-card-footer">
           <div>
-            <span className="sl-price">${activePkg.price.toFixed(2)}</span>
+            <span className="sl-price">${(activePkg?.price || 0).toFixed(2)}</span>
             <span className="sl-price-unit">
-              ${activePkg.unitPrice.toFixed(2)} / unit
+              ${(activePkg?.unitPrice || 0).toFixed(2)} / unit
             </span>
           </div>
           <button
@@ -260,61 +267,67 @@ function PackagingProductCard({ item }: { item: PackagingItem }) {
   );
 }
 
-import { useEffect } from "react";
-import { productService } from "@/lib/firestore/products";
-
 export function PackagingCatalog() {
-  const [productsList, setProductsList] = useState<PackagingItem[]>(PACKAGING_PRODUCTS);
+  const [productsList, setProductsList] = useState<PackagingItem[]>([]);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    productService.getAllProducts().then((allProds) => {
-      if (allProds && allProds.length > 0) {
-        // Collect all packaging items that are explicitly active
-        const updatedList: PackagingItem[] = [];
+    async function loadCatalog() {
+      try {
+        const allProds = await productService.getAllProducts();
+        
+        // Build initial active map
+        const activeItems: PackagingItem[] = [];
 
-        PACKAGING_PRODUCTS.forEach((staticItem) => {
-          const match = allProds.find(
-            (p) => p.id === staticItem.id || p.slug === staticItem.slug || p.sku === staticItem.sku
+        // 1. Process default items
+        DEFAULT_PACKAGING_PRODUCTS.forEach((defItem) => {
+          const match = (allProds || []).find(
+            (p) => p.id === defItem.id || p.slug === defItem.slug || p.sku === defItem.sku
           );
 
-          // If found in Firestore, check if it's active
           if (match) {
+            // Only add if explicitly active
             if (match.status === "active") {
               const liveImg =
                 match.primaryImageUrl ||
                 (match.media && (match.media as any[])[0]?.url) ||
                 (match.images && match.images[0]?.url) ||
-                staticItem.imageUrl;
+                defItem.imageUrl ||
+                "";
 
-              updatedList.push({
-                ...staticItem,
-                name: match.name || staticItem.name,
-                description: match.description || match.shortDescription || staticItem.description,
+              activeItems.push({
+                ...defItem,
+                name: match.name || defItem.name,
+                description: match.description || match.shortDescription || defItem.description,
                 imageUrl: liveImg,
+                status: match.status,
               });
             }
-            // If match.status !== "active" (draft/archived), do NOT push (hide from catalog)
+            // If match.status === "draft" or "archived", do NOT add (it's hidden!)
           } else {
-            // Not yet modified in Firestore, show default
-            updatedList.push(staticItem);
+            // Not customized yet, show default if active
+            if (defItem.status === "active") {
+              activeItems.push(defItem);
+            }
           }
         });
 
-        // Also check if new custom packaging products were created in Firestore
-        allProds.forEach((p) => {
+        // 2. Add any other custom active packaging products created in Firestore
+        (allProds || []).forEach((p) => {
           if (
             p.status === "active" &&
             (p.category === "packaging" || p.categoryId === "cat_packaging" || p.id.startsWith("prod_pack_")) &&
-            !updatedList.some((item) => item.id === p.id)
+            !activeItems.some((item) => item.id === p.id)
           ) {
             const liveImg =
               p.primaryImageUrl ||
               (p.media && (p.media as any[])[0]?.url) ||
               (p.images && p.images[0]?.url) ||
               "";
-            updatedList.push({
+
+            activeItems.push({
               id: p.id,
               name: p.name,
               slug: p.slug,
@@ -322,6 +335,7 @@ export function PackagingCatalog() {
               description: p.description || p.shortDescription || "",
               sku: p.sku,
               imageUrl: liveImg,
+              status: p.status,
               packageOptions:
                 p.packageOptions && p.packageOptions.length > 0
                   ? p.packageOptions.map((opt: any) => ({
@@ -344,13 +358,21 @@ export function PackagingCatalog() {
           }
         });
 
-        setProductsList(updatedList);
+        setProductsList(activeItems);
+      } catch (err) {
+        console.error("Failed to load packaging catalog:", err);
+      } finally {
+        setLoading(false);
       }
-    }).catch(() => {});
+    }
+
+    loadCatalog();
   }, []);
 
   const filteredProducts = useMemo(() => {
     return productsList.filter((item) => {
+      if (item.status && item.status !== "active") return false;
+
       const matchCat =
         selectedSubcategory === "All" ||
         item.subcategory === selectedSubcategory;
@@ -413,46 +435,41 @@ export function PackagingCatalog() {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* ── Sticky Filter Bar ── */}
-      <div className="sl-filter-bar" style={{ top: 48 }}>
-        <div style={{ display: "flex", alignItems: "center", paddingLeft: 40, paddingRight: 40, gap: 0 }}>
-          {SUBCATEGORIES.map((sub) => (
-            <button
-              key={sub}
-              type="button"
-              className={`sl-filter-pill ${selectedSubcategory === sub ? "active" : ""}`}
-              onClick={() => setSelectedSubcategory(sub)}
-            >
-              {sub}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="max-w-screen-xl mx-auto px-6 lg:px-10 py-8 space-y-12">
-        
-        {/* ── Standard Product Grid (4 Columns) ── */}
-        <div className="space-y-4">
-          <div className="border-b border-gray-200 pb-3 flex justify-between items-center">
-            <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-gray-900">
-              Packaging Catalog
-            </span>
-            <span className="text-xs text-gray-400 font-mono">
-              {filteredProducts.length} productos
-            </span>
+        {/* ── Subcategory Navigation Tabs ── */}
+        <div className="sl-filter-bar flex justify-between items-center">
+          <div className="sl-tabs">
+            {SUBCATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setSelectedSubcategory(cat)}
+                className={`sl-tab ${selectedSubcategory === cat ? "active" : ""}`}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
 
-          {filteredProducts.length === 0 ? (
-            <div className="py-20 text-center space-y-3">
-              <h3 className="text-base font-semibold text-gray-950">No Packaging Products Found</h3>
-              <p className="text-xs text-gray-500 font-light">
-                No items match your search or filter selection.
-              </p>
+          <span className="text-xs text-gray-500 font-mono">
+            {filteredProducts.length} productos
+          </span>
+        </div>
+
+        {/* ── Product Grid ── */}
+        <div className="py-8 pb-16">
+          {loading ? (
+            <div className="py-20 text-center text-gray-400 text-xs">
+              Cargando catálogo de empaques...
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="py-20 text-center border border-dashed border-gray-200 rounded-2xl bg-gray-50/50 space-y-2">
+              <PackageIcon className="w-8 h-8 text-gray-300 mx-auto" />
+              <p className="text-sm font-semibold text-gray-900">No hay productos de empaque visibles en esta sección</p>
+              <p className="text-xs text-gray-500 font-light">Prueba seleccionando otra subcategoría o ajustando la búsqueda.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
               {filteredProducts.map((item) => (
                 <PackagingProductCard key={item.id} item={item} />
               ))}
@@ -461,7 +478,6 @@ export function PackagingCatalog() {
         </div>
 
       </div>
-
     </div>
   );
 }
