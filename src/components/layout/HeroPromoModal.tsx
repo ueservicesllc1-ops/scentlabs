@@ -2,25 +2,20 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { X, Sparkles, ArrowRight, Clock, Rocket } from "lucide-react";
+import { X, ArrowRight, Clock, ShoppingBag } from "lucide-react";
 
 export function HeroPromoModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [secondsRemaining, setSecondsRemaining] = useState(8);
 
   useEffect(() => {
-    // Check if seen in current session
-    if (typeof window !== "undefined") {
-      const hasSeenModal = sessionStorage.getItem("scentlab_heromodal_seen");
-      if (!hasSeenModal) {
-        // Show after a slight delay for smooth page entrance
-        const openTimer = setTimeout(() => {
-          setIsOpen(true);
-          sessionStorage.setItem("scentlab_heromodal_seen", "true");
-        }, 800);
-        return () => clearTimeout(openTimer);
-      }
-    }
+    // Always show on page load/refresh as requested
+    const openTimer = setTimeout(() => {
+      setIsOpen(true);
+      setSecondsRemaining(8);
+    }, 400);
+
+    return () => clearTimeout(openTimer);
   }, []);
 
   // 8-second auto close countdown
@@ -50,10 +45,10 @@ export function HeroPromoModal() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "rgba(10, 20, 15, 0.85)",
-        backdropFilter: "blur(8px)",
-        padding: 16,
-        animation: "fadeIn 0.3s ease-out",
+        backgroundColor: "rgba(5, 12, 8, 0.88)",
+        backdropFilter: "blur(10px)",
+        padding: "16px",
+        animation: "fadeIn 0.25s ease-out",
       }}
       onClick={() => setIsOpen(false)}
     >
@@ -61,17 +56,20 @@ export function HeroPromoModal() {
         style={{
           position: "relative",
           width: "100%",
-          maxWidth: 680,
-          backgroundColor: "#0E1A14",
-          border: "1px solid rgba(94, 171, 133, 0.35)",
-          borderRadius: 20,
+          maxWidth: 580,
+          maxHeight: "92vh",
+          backgroundColor: "#0B1510",
+          border: "1px solid rgba(94, 171, 133, 0.4)",
+          borderRadius: 18,
           overflow: "hidden",
-          boxShadow: "0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 40px rgba(94, 171, 133, 0.2)",
-          animation: "scaleIn 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+          display: "flex",
+          flexDirection: "column",
+          boxShadow: "0 25px 70px -10px rgba(0, 0, 0, 0.9), 0 0 50px rgba(94, 171, 133, 0.25)",
+          animation: "scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Top Progress Bar (8s Timer) */}
+        {/* Top 8-Second Animated Progress Bar */}
         <div
           style={{
             position: "absolute",
@@ -79,8 +77,8 @@ export function HeroPromoModal() {
             left: 0,
             right: 0,
             height: 4,
-            backgroundColor: "rgba(255, 255, 255, 0.1)",
-            zIndex: 10,
+            backgroundColor: "rgba(255, 255, 255, 0.15)",
+            zIndex: 30,
           }}
         >
           <div
@@ -93,142 +91,80 @@ export function HeroPromoModal() {
           />
         </div>
 
-        {/* Close Button X */}
+        {/* Close Button X (Prominent, High Contrast) */}
         <button
           onClick={() => setIsOpen(false)}
           style={{
             position: "absolute",
-            top: 14,
-            right: 14,
-            zIndex: 20,
+            top: 12,
+            right: 12,
+            zIndex: 40,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            width: 36,
-            height: 36,
+            width: 38,
+            height: 38,
             borderRadius: "50%",
-            backgroundColor: "rgba(0, 0, 0, 0.6)",
-            border: "1px solid rgba(255, 255, 255, 0.2)",
+            backgroundColor: "rgba(0, 0, 0, 0.75)",
+            border: "1px solid rgba(255, 255, 255, 0.3)",
             color: "#ffffff",
             cursor: "pointer",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
             transition: "all 0.2s ease",
           }}
           aria-label="Cerrar publicidad"
         >
-          <X size={18} />
+          <X size={20} />
         </button>
 
-        {/* Modal Banner Graphic */}
-        <div style={{ position: "relative", width: "100%", maxHeight: 300, overflow: "hidden", backgroundColor: "#060D09" }}>
+        {/* Full Image Banner - No cropping, showing entire graphic */}
+        <div
+          style={{
+            position: "relative",
+            width: "100%",
+            backgroundColor: "#060D09",
+            overflow: "hidden",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/heromodal.png"
-            alt="Kits para Emprendedores ScentLabs"
+            alt="Kits para Emprendedores — Scentlabs Supply"
             style={{
               width: "100%",
-              height: "100%",
-              maxHeight: 300,
-              objectFit: "cover",
+              height: "auto",
+              maxHeight: "58vh",
+              objectFit: "contain",
               display: "block",
             }}
           />
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              background: "linear-gradient(to top, #0E1A14 5%, transparent 60%)",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              top: 16,
-              left: 16,
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 6,
-              padding: "6px 12px",
-              backgroundColor: "rgba(14, 26, 20, 0.9)",
-              border: "1px solid #5EAB85",
-              borderRadius: 9999,
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: "0.15em",
-              textTransform: "uppercase",
-              color: "#5EAB85",
-            }}
-          >
-            <Rocket size={12} />
-            Lanzamiento Oficial
-          </div>
         </div>
 
-        {/* Content Body */}
-        <div style={{ padding: "24px 32px 28px" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, flexWrap: "wrap", gap: 8 }}>
-            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#5EAB85" }}>
-              NUEVA SECCIÓN DE LA TIENDA
+        {/* Bottom Bar with CTA and Countdown */}
+        <div
+          style={{
+            padding: "16px 20px 20px",
+            backgroundColor: "#0B1510",
+            borderTop: "1px solid rgba(94, 171, 133, 0.25)",
+            display: "flex",
+            flexDirection: "column",
+            gap: 12,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 11, color: "rgba(255, 255, 255, 0.6)" }}>
+            <span style={{ fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#5EAB85" }}>
+              🚀 Kits para Emprendedores · $49.99
             </span>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, color: "rgba(255, 255, 255, 0.4)" }}>
-              <Clock size={12} />
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+              <Clock size={12} color="#5EAB85" />
               Cierra en {secondsRemaining}s
             </span>
           </div>
 
-          <h2
-            style={{
-              fontSize: 26,
-              fontWeight: 700,
-              color: "#ffffff",
-              margin: "0 0 10px",
-              lineHeight: 1.2,
-              fontFamily: "var(--font-bodoni), Georgia, serif",
-            }}
-          >
-            🚀 Kits para Emprendedores
-          </h2>
-
-          <p style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.75)", lineHeight: 1.6, margin: "0 0 20px" }}>
-            Todo lo necesario para comenzar tu negocio de perfumería. Prepara tus primeros{" "}
-            <strong style={{ color: "#ffffff" }}>6 perfumes de 50 ml</strong> con botellas oficiales, 2 esencias a elegir, base alcohólica y herramientas.
-          </p>
-
-          {/* Pricing & Potential Callout */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              backgroundColor: "rgba(255, 255, 255, 0.04)",
-              border: "1px solid rgba(255, 255, 255, 0.08)",
-              borderRadius: 12,
-              padding: "12px 18px",
-              marginBottom: 22,
-              flexWrap: "wrap",
-              gap: 12,
-            }}
-          >
-            <div>
-              <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.15em", color: "rgba(255, 255, 255, 0.4)" }}>
-                Inversión Inicial
-              </div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: "#5EAB85" }}>
-                $49.99 <span style={{ fontSize: 12, fontWeight: 400, color: "rgba(255, 255, 255, 0.5)" }}>USD</span>
-              </div>
-            </div>
-
-            <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.15em", color: "#E0B354", fontWeight: 700 }}>
-                Ventas Potenciales
-              </div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: "#ffffff" }}>
-                Hasta $120.00*
-              </div>
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
             <Link
               href="/kits"
               onClick={() => setIsOpen(false)}
@@ -237,31 +173,32 @@ export function HeroPromoModal() {
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: 10,
+                gap: 8,
                 backgroundColor: "#2B5F4A",
                 color: "#ffffff",
-                padding: "14px 24px",
+                padding: "14px 20px",
                 borderRadius: 10,
                 fontSize: 13,
                 fontWeight: 700,
-                letterSpacing: "0.1em",
+                letterSpacing: "0.08em",
                 textTransform: "uppercase",
                 textDecoration: "none",
-                boxShadow: "0 4px 14px rgba(43, 95, 74, 0.5)",
+                boxShadow: "0 6px 20px rgba(43, 95, 74, 0.4)",
                 transition: "all 0.2s ease",
               }}
             >
-              <span>Ver Kits Emprendedor</span>
+              <ShoppingBag size={16} />
+              <span>Ver Kits y Elegir Fragancias</span>
               <ArrowRight size={16} />
             </Link>
 
             <button
               onClick={() => setIsOpen(false)}
               style={{
-                padding: "14px 20px",
-                backgroundColor: "transparent",
+                padding: "14px 18px",
+                backgroundColor: "rgba(255, 255, 255, 0.06)",
                 border: "1px solid rgba(255, 255, 255, 0.15)",
-                color: "rgba(255, 255, 255, 0.6)",
+                color: "rgba(255, 255, 255, 0.8)",
                 borderRadius: 10,
                 fontSize: 12,
                 fontWeight: 600,
@@ -281,7 +218,7 @@ export function HeroPromoModal() {
           to { opacity: 1; }
         }
         @keyframes scaleIn {
-          from { opacity: 0; transform: scale(0.94); }
+          from { opacity: 0; transform: scale(0.92); }
           to { opacity: 1; transform: scale(1); }
         }
       `}</style>
