@@ -1,5 +1,6 @@
 import { collection, doc, getDoc, getDocs, setDoc, deleteDoc, query, where, orderBy } from "firebase/firestore";
 import { db } from "../firebase/client";
+import { adminDb } from "../firebase/admin";
 import { MediaAsset } from "@/types/media";
 import { b2Service } from "../b2/service";
 import { isFirebaseConfigured } from "../firebase/config";
@@ -9,17 +10,29 @@ const COLLECTION_NAME = "mediaMetadata";
 
 export const mediaMetadataService = {
   /**
-   * Saves or updates a MediaAsset metadata document in Firestore
+   * Saves or updates a MediaAsset metadata document in Firestore.
+   * Uses Admin SDK when running on the server to bypass client permission rules.
    */
   async saveMetadata(asset: MediaAsset): Promise<void> {
+    const payload = { ...asset, updatedAt: new Date().toISOString() };
+
+    if (typeof window === "undefined" && adminDb) {
+      try {
+        await adminDb.collection(COLLECTION_NAME).doc(asset.id).set(payload, { merge: true });
+        logger.info(`Media metadata saved via Admin SDK for ${asset.id}`);
+        return;
+      } catch (adminErr: any) {
+        logger.warn(`Admin SDK media metadata save failed, trying client SDK: ${adminErr.message}`);
+      }
+    }
+
     if (!db) return;
     try {
       const docRef = doc(db, COLLECTION_NAME, asset.id);
-      await setDoc(docRef, { ...asset, updatedAt: new Date().toISOString() }, { merge: true });
+      await setDoc(docRef, payload, { merge: true });
       logger.info(`Media metadata saved for ${asset.id} (key: ${asset.b2Key})`);
     } catch (error) {
       logger.error(`Failed to save media metadata for ${asset.id}`, error);
-      throw error;
     }
   },
 
@@ -55,7 +68,9 @@ export const mediaMetadataService = {
       await b2Service.deleteFile(b2Key);
 
       // 2. Delete metadata doc from Firestore
-      if (db) {
+      if (typeof window === "undefined" && adminDb) {
+        await adminDb.collection(COLLECTION_NAME).doc(assetId).delete();
+      } else if (db) {
         const docRef = doc(db, COLLECTION_NAME, assetId);
         await deleteDoc(docRef);
       }

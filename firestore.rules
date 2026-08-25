@@ -202,6 +202,12 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    // MEDIA METADATA
+    match /mediaMetadata/{mediaId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // LIVE CHAT & CUSTOMER SUPPORT
     match /live_chats/{chatId} {
       allow read, write: if true;
@@ -209,6 +215,11 @@ service cloud.firestore {
       match /messages/{messageId} {
         allow read, write: if true;
       }
+    }
+
+    // SITE ANALYTICS & VISITOR COUNTERS
+    match /site_analytics/{docId} {
+      allow read, write: if true;
     }
   }
 }

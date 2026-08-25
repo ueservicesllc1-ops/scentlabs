@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { VisitorCounter } from "./VisitorCounter";
 
 const shopLinks = [
   { label: "Fragrance Oils", href: "/fragrance" },
@@ -87,8 +88,13 @@ export function Footer() {
 
       </div>
 
+      {/* Real Traffic Counter Section */}
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 40px 24px", display: "flex", justifyContent: "flex-start", alignItems: "center" }}>
+        <VisitorCounter />
+      </div>
+
       {/* Bottom bar */}
-      <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", padding: "16px 40px", maxWidth: 1280, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", padding: "16px 40px", maxWidth: 1280, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
         <p style={{ fontSize: 10, color: "rgba(255,255,255,0.2)", margin: 0, letterSpacing: "0.15em", textTransform: "uppercase" }}>
           Wholesale Only · B2B Platform
         </p>
