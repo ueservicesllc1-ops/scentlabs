@@ -193,18 +193,23 @@ export const productService = {
    */
   async getAllProducts(): Promise<Product[]> {
     let physicalProducts: Product[] = [];
+    const deletedProductIds = getDeletedProductIds();
+
     if (!isFirebaseConfigured || !db) {
-      physicalProducts = LOCAL_STORE.filter((p) => p.status === "active");
+      physicalProducts = LOCAL_STORE.filter((p) => !deletedProductIds.has(p.id) && p.status === "active");
     } else {
       try {
-        const q = query(collection(db, COLLECTION_NAME), where("status", "==", "active"));
-        const snapshot = await getDocs(q);
-        physicalProducts = snapshot.empty
-          ? LOCAL_STORE.filter((p) => p.status === "active")
-          : snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Product));
+        const snapshot = await getDocs(collection(db, COLLECTION_NAME));
+        const map = new Map<string, Product>();
+        LOCAL_STORE.forEach(p => map.set(p.id, p));
+        snapshot.docs.forEach(d => {
+          const data = { id: d.id, ...d.data() } as Product;
+          map.set(d.id, { ...map.get(d.id), ...data });
+        });
+        physicalProducts = Array.from(map.values()).filter(p => !deletedProductIds.has(p.id) && p.status === "active");
       } catch (error) {
         logger.warn("Firestore getAllProducts failed; falling back to local dataset.", error);
-        physicalProducts = LOCAL_STORE.filter((p) => p.status === "active");
+        physicalProducts = LOCAL_STORE.filter((p) => !deletedProductIds.has(p.id) && p.status === "active");
       }
     }
 
@@ -313,11 +318,13 @@ export const productService = {
     } else {
       try {
         const snapshot = await getDocs(collection(db, COLLECTION_NAME));
-        if (snapshot.empty) {
-          products = [...LOCAL_STORE];
-        } else {
-          products = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Product));
-        }
+        const map = new Map<string, Product>();
+        LOCAL_STORE.forEach(p => map.set(p.id, p));
+        snapshot.docs.forEach(d => {
+          const data = { id: d.id, ...d.data() } as Product;
+          map.set(d.id, { ...map.get(d.id), ...data });
+        });
+        products = Array.from(map.values());
       } catch (error) {
         logger.warn("Firestore getAdminProducts failed; falling back to local dataset.", error);
         products = [...LOCAL_STORE];
