@@ -260,12 +260,44 @@ function PackagingProductCard({ item }: { item: PackagingItem }) {
   );
 }
 
+import { useEffect } from "react";
+import { productService } from "@/lib/firestore/products";
+
 export function PackagingCatalog() {
+  const [productsList, setProductsList] = useState<PackagingItem[]>(PACKAGING_PRODUCTS);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState("");
 
+  useEffect(() => {
+    productService.getAllProducts().then((allProds) => {
+      if (allProds && allProds.length > 0) {
+        setProductsList((prev) => {
+          return prev.map((item) => {
+            const match = allProds.find(
+              (p) => p.id === item.id || p.slug === item.slug || p.sku === item.sku
+            );
+            if (match) {
+              const liveImg =
+                match.primaryImageUrl ||
+                (match.media && (match.media as any[])[0]?.url) ||
+                (match.images && match.images[0]?.url) ||
+                item.imageUrl;
+              return {
+                ...item,
+                name: match.name || item.name,
+                description: match.description || match.shortDescription || item.description,
+                imageUrl: liveImg,
+              };
+            }
+            return item;
+          });
+        });
+      }
+    }).catch(() => {});
+  }, []);
+
   const filteredProducts = useMemo(() => {
-    return PACKAGING_PRODUCTS.filter((item) => {
+    return productsList.filter((item) => {
       const matchCat =
         selectedSubcategory === "All" ||
         item.subcategory === selectedSubcategory;
@@ -276,7 +308,7 @@ export function PackagingCatalog() {
         item.sku.toLowerCase().includes(searchQuery.toLowerCase());
       return matchCat && matchSearch;
     });
-  }, [selectedSubcategory, searchQuery]);
+  }, [productsList, selectedSubcategory, searchQuery]);
 
   return (
     <div style={{ background: "white", minHeight: "100vh" }}>

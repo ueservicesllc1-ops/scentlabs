@@ -8,7 +8,6 @@ import { productionRepository } from "@/lib/firestore/production";
 import { productService } from "@/lib/firestore/products";
 import { PackagingMaterial, BoxSizeVariant, ProductionJob } from "@/types/packaging";
 import { Product } from "@/types/product";
-import { INITIAL_PRODUCTS } from "@/data/products";
 import ProductQuickEditModal from "@/components/admin/ProductQuickEditModal";
 import { formatCurrency, formatUnitPrice } from "@/lib/utils";
 import { 
@@ -25,14 +24,173 @@ import {
   RotateCcw,
   Edit,
   Image as ImageIcon,
-  CheckCircle2
+  CheckCircle2,
+  Search
 } from "lucide-react";
+
+// Master seed for packaging products displayed in /packaging
+const MASTER_PACKAGING_SEED: Product[] = ([
+  {
+    id: "prod_box_10ml",
+    name: "Roll-On Box — 10 ml",
+    slug: "roll-on-box-10ml",
+    category: "packaging",
+    subcategory: "Boxes",
+    description: "110 lb Smooth White Cardstock. Fixed dimensions: 0.95\" × 3.65\" × 0.95\" for 10ml glass roll-ons.",
+    shortDescription: "Caja de cartulina blanca 110 lb para frascos roll-on de 10 ml.",
+    sku: "BOX-ROL-10ML",
+    basePrice: 0.45,
+    currency: "USD",
+    unit: "unit",
+    status: "active",
+    primaryImageUrl: "/images/products/perfume-boxes.jpg",
+    media: [{ id: "m1", url: "/images/products/perfume-boxes.jpg", type: "image", isPrimary: true, altText: "Roll-On Box 10ml", sortOrder: 0 }],
+    inventory: { quantityInStock: 240, status: "in_stock", lowStockThreshold: 5, reorderPoint: 10 },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "prod_box_30ml",
+    name: "Rectangular Perfume Box — 30 ml",
+    slug: "rectangular-perfume-box-30ml",
+    category: "packaging",
+    subcategory: "Boxes",
+    description: "110 lb Smooth White Cardstock. Fixed dimensions: 1.65\" × 4.85\" × 1.65\" for 30ml spray bottles.",
+    shortDescription: "Caja rectangular plegable 110 lb para frascos atomizadores de 30 ml.",
+    sku: "BOX-FLD-30ML",
+    basePrice: 0.65,
+    currency: "USD",
+    unit: "unit",
+    status: "active",
+    primaryImageUrl: "/images/products/perfume-boxes.jpg",
+    media: [{ id: "m2", url: "/images/products/perfume-boxes.jpg", type: "image", isPrimary: true, altText: "Perfume Box 30ml", sortOrder: 0 }],
+    inventory: { quantityInStock: 180, status: "in_stock", lowStockThreshold: 5, reorderPoint: 10 },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "prod_box_50ml",
+    name: "Rectangular Perfume Box — 50 ml",
+    slug: "rectangular-perfume-box-50ml",
+    category: "packaging",
+    subcategory: "Boxes",
+    description: "110 lb Smooth White Cardstock. Fixed dimensions: 2.10\" × 5.20\" × 2.10\" for 50ml perfume bottles.",
+    shortDescription: "Caja rectangular plegable 110 lb para botellas de perfume de 50 ml.",
+    sku: "BOX-FLD-50ML",
+    basePrice: 0.75,
+    currency: "USD",
+    unit: "unit",
+    status: "active",
+    primaryImageUrl: "/images/products/perfume-boxes.jpg",
+    media: [{ id: "m3", url: "/images/products/perfume-boxes.jpg", type: "image", isPrimary: true, altText: "Perfume Box 50ml", sortOrder: 0 }],
+    inventory: { quantityInStock: 150, status: "in_stock", lowStockThreshold: 5, reorderPoint: 10 },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "prod_shrink_4x6",
+    name: "POF Heat Shrink Bags (4×6 in · 10ml Roll-On)",
+    slug: "shrink-wrap-bags-4x6",
+    category: "packaging",
+    subcategory: "Heat Shrink Wrap Bags",
+    description: "100 Gauge crystal-clear polyolefin shrink film. Pre-sealed bottom for 10ml roll-on bottles.",
+    shortDescription: "Bolsas termorretráctiles 4x6 pulgadas para roll-ons.",
+    sku: "PKG-SHR-0406",
+    basePrice: 0.10,
+    currency: "USD",
+    unit: "bag",
+    status: "active",
+    primaryImageUrl: "/images/products/shrink-wrap.jpg",
+    media: [{ id: "m4", url: "/images/products/shrink-wrap.jpg", type: "image", isPrimary: true, altText: "Shrink Bags 4x6", sortOrder: 0 }],
+    inventory: { quantityInStock: 500, status: "in_stock", lowStockThreshold: 50, reorderPoint: 100 },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "prod_shrink_6x6",
+    name: "POF Heat Shrink Bags (6×6 in · 30ml Bottle)",
+    slug: "shrink-wrap-bags-6x6",
+    category: "packaging",
+    subcategory: "Heat Shrink Wrap Bags",
+    description: "100 Gauge POF heat shrink film for 30ml spray atomizers and small perfume boxes.",
+    shortDescription: "Bolsas termorretráctiles 6x6 pulgadas para botellas de 30 ml.",
+    sku: "PKG-SHR-0606",
+    basePrice: 0.12,
+    currency: "USD",
+    unit: "bag",
+    status: "active",
+    primaryImageUrl: "/images/products/shrink-wrap.jpg",
+    media: [{ id: "m5", url: "/images/products/shrink-wrap.jpg", type: "image", isPrimary: true, altText: "Shrink Bags 6x6", sortOrder: 0 }],
+    inventory: { quantityInStock: 450, status: "in_stock", lowStockThreshold: 50, reorderPoint: 100 },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "prod_shrink_6x8",
+    name: "POF Heat Shrink Bags (6×8 in · 50ml/100ml)",
+    slug: "shrink-wrap-bags-6x8",
+    category: "packaging",
+    subcategory: "Heat Shrink Wrap Bags",
+    description: "100 Gauge POF heat shrink film for 50ml and 100ml presentation boxes and glass bottles.",
+    shortDescription: "Bolsas termorretráctiles 6x8 pulgadas para botellas de 50ml a 100ml.",
+    sku: "PKG-SHR-0608",
+    basePrice: 0.12,
+    currency: "USD",
+    unit: "bag",
+    status: "active",
+    primaryImageUrl: "/images/products/shrink-wrap.jpg",
+    media: [{ id: "m6", url: "/images/products/shrink-wrap.jpg", type: "image", isPrimary: true, altText: "Shrink Bags 6x8", sortOrder: 0 }],
+    inventory: { quantityInStock: 400, status: "in_stock", lowStockThreshold: 50, reorderPoint: 100 },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "prod_security_stickers",
+    name: "Holographic Security Seals",
+    slug: "holographic-security-stickers",
+    category: "packaging",
+    subcategory: "Security Stickers",
+    description: "Tamper-evident holographic security stickers for box tucks, bottle caps, and laboratory closures.",
+    shortDescription: "Sellos holográficos de seguridad con evidencia de apertura.",
+    sku: "PKG-SEC-HOLO-100",
+    basePrice: 0.045,
+    currency: "USD",
+    unit: "sticker",
+    status: "active",
+    primaryImageUrl: "/images/products/security-stickers.jpg",
+    media: [{ id: "m7", url: "/images/products/security-stickers.jpg", type: "image", isPrimary: true, altText: "Security Seals", sortOrder: 0 }],
+    inventory: { quantityInStock: 1200, status: "in_stock", lowStockThreshold: 100, reorderPoint: 200 },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "prod_tags_cord",
+    name: "Metallic Hang Tags with Elastic Cord",
+    slug: "tags-with-cord",
+    category: "packaging",
+    subcategory: "Tags",
+    description: "Metallic hang tags with elastic cord for perfume packaging, bottle neck presentation, and branding.",
+    shortDescription: "Etiquetas colgantes metálicas con cordón elástico.",
+    sku: "PKG-TAG-50",
+    basePrice: 0.076,
+    currency: "USD",
+    unit: "tag",
+    status: "active",
+    primaryImageUrl: "/images/products/hang-tags.jpg",
+    media: [{ id: "m8", url: "/images/products/hang-tags.jpg", type: "image", isPrimary: true, altText: "Hang Tags with Cord", sortOrder: 0 }],
+    inventory: { quantityInStock: 800, status: "in_stock", lowStockThreshold: 50, reorderPoint: 100 },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+] as any[]) as Product[];
 
 export default function AdminPackagingDashboardPage() {
   const [materials, setMaterials] = useState<PackagingMaterial[]>([]);
   const [boxes, setBoxes] = useState<BoxSizeVariant[]>([]);
   const [jobs, setJobs] = useState<ProductionJob[]>([]);
   const [packagingProducts, setPackagingProducts] = useState<Product[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>("all");
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -47,12 +205,35 @@ export default function AdminPackagingDashboardPage() {
 
     try {
       const allProds = await productService.getAllProducts();
-      const packProds = allProds.filter(
-        (p) => p.category === "packaging" || p.categoryId === "cat_packaging" || p.tags?.includes("packaging") || p.id.startsWith("prod_box_") || p.id.startsWith("prod_shrink_") || p.id.startsWith("prod_tag") || p.id.startsWith("prod_security")
-      );
-      setPackagingProducts(packProds.length > 0 ? packProds : INITIAL_PRODUCTS.filter(p => p.category === "packaging" || p.id.startsWith("prod_box_")));
+      
+      // Merge Firestore products with all master packaging items
+      const map = new Map<string, Product>();
+      MASTER_PACKAGING_SEED.forEach(p => map.set(p.id, p));
+
+      allProds.forEach(p => {
+        if (
+          p.category === "packaging" ||
+          p.categoryId === "cat_packaging" ||
+          p.tags?.includes("packaging") ||
+          p.id.startsWith("prod_box_") ||
+          p.id.startsWith("prod_shrink_") ||
+          p.id.startsWith("prod_tag") ||
+          p.id.startsWith("prod_security") ||
+          p.id.includes("box") ||
+          p.id.includes("shrink")
+        ) {
+          const existing = map.get(p.id);
+          map.set(p.id, {
+            ...existing,
+            ...p,
+            primaryImageUrl: p.primaryImageUrl || (p.media && (p.media as any[])[0]?.url) || (p.images && p.images[0]?.url) || existing?.primaryImageUrl || '',
+          });
+        }
+      });
+
+      setPackagingProducts(Array.from(map.values()));
     } catch {
-      setPackagingProducts(INITIAL_PRODUCTS.filter(p => p.category === "packaging" || p.id.startsWith("prod_box_")));
+      setPackagingProducts(MASTER_PACKAGING_SEED);
     }
 
     setLoading(false);
@@ -65,6 +246,20 @@ export default function AdminPackagingDashboardPage() {
   const totalRawSheets = materials.reduce((acc, m) => acc + m.quantity, 0);
   const totalFinishedBoxes = boxes.reduce((acc, b) => acc + b.inventory, 0);
   const activeJobs = jobs.filter((j) => j.status === "queued" || j.status === "cutting" || j.status === "assembly");
+
+  const filteredProducts = packagingProducts.filter(p => {
+    if (selectedSubcategory !== "all" && p.subcategory !== selectedSubcategory) {
+      return false;
+    }
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    return (
+      p.name.toLowerCase().includes(q) ||
+      p.sku.toLowerCase().includes(q) ||
+      (p.description || '').toLowerCase().includes(q) ||
+      (p.subcategory || '').toLowerCase().includes(q)
+    );
+  });
 
   return (
     <AdminGuard>
@@ -80,11 +275,19 @@ export default function AdminPackagingDashboardPage() {
               Empaques, Cajas & Suministros
             </h1>
             <p className="text-xs text-gray-600 mt-1 max-w-2xl leading-relaxed">
-              Administra la fabricación de cajas Cricut, bolsas termoencogibles, sellos de seguridad, etiquetas colgantes y sube fotos a cada producto.
+              Administra todos los productos de la categoría Empaque: Cajas Cricut, Bolsas Termorretráctiles POF, Sellos de Seguridad y Etiquetas Colgantes.
             </p>
           </div>
 
           <div className="flex flex-wrap gap-2 shrink-0">
+            <Link
+              href="/packaging"
+              target="_blank"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-gray-300 text-gray-800 hover:bg-gray-50 text-xs font-semibold shadow-xs transition"
+            >
+              <Package className="w-3.5 h-3.5 text-gray-500" /> Ver Catálogo en Tienda &rarr;
+            </Link>
+
             <Link
               href="/admin/packaging/boxes"
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-gray-300 text-gray-800 hover:bg-gray-50 text-xs font-semibold shadow-xs transition"
@@ -104,9 +307,9 @@ export default function AdminPackagingDashboardPage() {
         {/* ━━━━ KPI SUMMARY CARDS ━━━━ */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="p-5 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
-            <span className="text-[11px] font-semibold text-gray-500 uppercase block">Cajas Terminadas</span>
-            <div className="text-2xl font-bold text-gray-950">{totalFinishedBoxes} Unidades</div>
-            <span className="text-[11px] text-[#166534] block">Listas para despacho</span>
+            <span className="text-[11px] font-semibold text-gray-500 uppercase block">Total Productos Empaque</span>
+            <div className="text-2xl font-bold text-gray-950">{packagingProducts.length} Artículos</div>
+            <span className="text-[11px] text-[#166534] block">Cajas, Bolsas, Sellos y Tags</span>
           </div>
 
           <div className="p-5 rounded-xl border border-gray-200 bg-white shadow-xs space-y-1">
@@ -129,23 +332,44 @@ export default function AdminPackagingDashboardPage() {
         </div>
 
         {/* ━━━━ ALL PACKAGING PRODUCTS TABLE (WITH PHOTO EDIT) ━━━━ */}
-        <div className="rounded-2xl border border-gray-200 bg-white shadow-xs overflow-hidden">
-          <div className="p-5 bg-gray-50/70 border-b border-gray-200 flex justify-between items-center">
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-xs overflow-hidden space-y-4">
+          
+          {/* Table Header & Search Filter Bar */}
+          <div className="p-5 bg-gray-50/70 border-b border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <h3 className="text-sm font-bold uppercase tracking-wider text-gray-950 flex items-center gap-2">
-                <Package className="w-4 h-4 text-[#2B5F4A]" /> Catálogo de Productos de Empaque ({packagingProducts.length})
+                <Package className="w-4 h-4 text-[#2B5F4A]" /> Catálogo Completo de Empaques ({filteredProducts.length})
               </h3>
               <p className="text-[11px] text-gray-500 font-light mt-0.5">
-                Haz clic en &quot;Editar / Subir Foto&quot; para cambiar precios, stock o subir fotos directamente.
+                Haz clic en &quot;Editar / Subir Foto&quot; o sobre la imagen de cualquier producto para cambiar precios, stock o subir fotos.
               </p>
             </div>
 
-            <Link
-              href="/admin/products"
-              className="text-xs text-[#2B5F4A] hover:underline font-bold"
-            >
-              Ver Todos los Productos &rarr;
-            </Link>
+            {/* Filter controls */}
+            <div className="flex items-center gap-2 w-full md:w-auto">
+              <div className="relative flex-1 md:w-48">
+                <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Buscar en empaques..."
+                  className="w-full pl-8 pr-3 py-1.5 bg-white border border-gray-300 rounded-lg text-xs text-gray-900 focus:outline-none focus:border-[#2B5F4A]"
+                />
+              </div>
+
+              <select
+                value={selectedSubcategory}
+                onChange={(e) => setSelectedSubcategory(e.target.value)}
+                className="bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#2B5F4A]"
+              >
+                <option value="all">Todas las subcategorías</option>
+                <option value="Boxes">Cajas (Boxes)</option>
+                <option value="Heat Shrink Wrap Bags">Bolsas Termorretráctiles</option>
+                <option value="Security Stickers">Sellos Holográficos</option>
+                <option value="Tags">Etiquetas Colgantes</option>
+              </select>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
@@ -154,15 +378,15 @@ export default function AdminPackagingDashboardPage() {
                 <tr className="bg-gray-50 text-[10px] text-gray-600 uppercase font-bold border-b border-gray-200">
                   <th className="py-3.5 px-4">Producto & Foto</th>
                   <th className="py-3.5 px-4">SKU</th>
-                  <th className="py-3.5 px-4">Categoría / Tipo</th>
+                  <th className="py-3.5 px-4">Subcategoría</th>
                   <th className="py-3.5 px-4 text-right">Precio Base</th>
-                  <th className="py-3.5 px-4 text-right">Inventario</th>
+                  <th className="py-3.5 px-4 text-right">Stock</th>
                   <th className="py-3.5 px-4 text-center">Estado</th>
                   <th className="py-3.5 px-4 text-right">Acción</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {packagingProducts.map((p) => {
+                {filteredProducts.map((p) => {
                   const image =
                     p.primaryImageUrl ||
                     (p.media && (p.media as any[])[0]?.url) ||
@@ -172,20 +396,30 @@ export default function AdminPackagingDashboardPage() {
                     <tr key={p.id} className="hover:bg-gray-50/80 transition">
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-lg bg-gray-50 border border-gray-200 overflow-hidden shrink-0 flex items-center justify-center relative">
+                          <button
+                            type="button"
+                            onClick={() => setEditingProduct(p)}
+                            className="w-12 h-12 rounded-lg bg-gray-50 border border-gray-200 overflow-hidden shrink-0 flex items-center justify-center relative hover:ring-2 hover:ring-[#2B5F4A] transition group"
+                            title="Hacer clic para subir o cambiar foto"
+                          >
                             {image ? (
                               // eslint-disable-next-line @next/next/no-img-element
                               <img src={image} alt={p.name} className="w-full h-full object-contain p-1" />
                             ) : (
-                              <div className="text-[9px] text-orange-600 font-bold px-1 uppercase bg-orange-50 w-full h-full flex items-center justify-center text-center">
-                                Sin Foto
+                              <div className="text-[9px] text-orange-700 font-bold px-1 uppercase bg-orange-50 w-full h-full flex flex-col items-center justify-center gap-0.5 group-hover:bg-orange-100">
+                                <ImageIcon className="w-3.5 h-3.5" />
+                                <span>Subir Foto</span>
                               </div>
                             )}
-                          </div>
+                          </button>
                           <div>
-                            <div className="font-bold text-gray-950 hover:text-[#2B5F4A]">
+                            <button
+                              type="button"
+                              onClick={() => setEditingProduct(p)}
+                              className="font-bold text-gray-950 hover:text-[#2B5F4A] text-left hover:underline"
+                            >
                               {p.name}
-                            </div>
+                            </button>
                             <div className="text-[11px] text-gray-500 line-clamp-1">{p.shortDescription || p.description}</div>
                           </div>
                         </div>
@@ -195,8 +429,10 @@ export default function AdminPackagingDashboardPage() {
                         {p.sku}
                       </td>
 
-                      <td className="py-3 px-4 text-gray-700 capitalize">
-                        {p.subcategory || p.category}
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-0.5 rounded bg-gray-100 text-gray-700 font-semibold text-[11px]">
+                          {p.subcategory || "General"}
+                        </span>
                       </td>
 
                       <td className="py-3 px-4 text-right font-mono font-bold text-gray-950">
@@ -222,7 +458,7 @@ export default function AdminPackagingDashboardPage() {
                           className="px-3 py-1.5 rounded-lg bg-[#2B5F4A] hover:bg-[#1E4233] text-white font-bold text-[11px] uppercase tracking-wider transition inline-flex items-center gap-1.5 shadow-2xs"
                         >
                           <ImageIcon className="w-3.5 h-3.5 text-amber-300" />
-                          <span>Editar / Subir Foto</span>
+                          <span>Editar / Foto</span>
                         </button>
                       </td>
                     </tr>
