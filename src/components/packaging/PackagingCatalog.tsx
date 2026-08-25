@@ -276,7 +276,7 @@ export function PackagingCatalog() {
   useEffect(() => {
     async function loadCatalog() {
       try {
-        const allProds = await productService.getAllProducts();
+        const allProds = await productService.getAdminProducts();
         
         // Build initial active map
         const activeItems: PackagingItem[] = [];
@@ -307,7 +307,7 @@ export function PackagingCatalog() {
             }
             // If match.status === "draft" or "archived", do NOT add (it's hidden!)
           } else {
-            // Not customized yet, show default if active
+            // Not in Firestore yet, check if default item is active
             if (defItem.status === "active") {
               activeItems.push(defItem);
             }

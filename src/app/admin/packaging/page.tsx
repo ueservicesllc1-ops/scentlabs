@@ -207,7 +207,7 @@ export default function AdminPackagingDashboardPage() {
     setJobs(jb);
 
     try {
-      const allProds = await productService.getAllProducts();
+      const allProds = await productService.getAdminProducts();
       
       const map = new Map<string, Product>();
       MASTER_PACKAGING_SEED.forEach(p => map.set(p.id, p));
@@ -228,6 +228,7 @@ export default function AdminPackagingDashboardPage() {
           map.set(p.id, {
             ...existing,
             ...p,
+            status: p.status || existing?.status || "active",
             primaryImageUrl: p.primaryImageUrl || (p.media && (p.media as any[])[0]?.url) || (p.images && p.images[0]?.url) || existing?.primaryImageUrl || '',
           });
         }
