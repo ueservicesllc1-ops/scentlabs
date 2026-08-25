@@ -201,5 +201,14 @@ service cloud.firestore {
     match /emailLogs/{logId} {
       allow read, write: if isAdmin();
     }
+
+    // LIVE CHAT & CUSTOMER SUPPORT
+    match /live_chats/{chatId} {
+      allow read, write: if true;
+      
+      match /messages/{messageId} {
+        allow read, write: if true;
+      }
+    }
   }
 }

@@ -26,7 +26,8 @@ import {
   ShoppingCart,
   DollarSign,
   AlertTriangle,
-  FileText
+  FileText,
+  MessageSquare
 } from "lucide-react";
 
 const AUTHORIZED_ADMIN_EMAIL = "ueservicesllc1@gmail.com";
@@ -70,8 +71,9 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    label: "Orders & Shipping",
+    label: "Orders & Live Support",
     items: [
+      { title: "Live Chat & Soporte", href: "/admin/chat", icon: MessageSquare },
       { title: "Orders Management", href: "/admin/orders", icon: ShoppingCart },
       { title: "Shipping Origin", href: "/admin/settings/shipping", icon: Truck },
     ],

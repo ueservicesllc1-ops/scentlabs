@@ -11,13 +11,20 @@ import {
   User,
   FlaskConical,
   RotateCcw,
-  ChevronDown,
   ExternalLink,
+  Headphones,
+  ShieldCheck,
 } from "lucide-react";
+import {
+  liveChatRepository,
+  LiveChatMessage,
+  LiveChatSession,
+} from "@/lib/firestore/live-chat";
 
-interface Message {
+interface DisplayMessage {
   id: string;
-  role: "user" | "assistant";
+  role: "user" | "assistant" | "admin";
+  senderName?: string;
   content: string;
   timestamp: string;
 }
@@ -31,10 +38,13 @@ const INITIAL_SUGGESTIONS = [
 
 export function ScentSommelierChat() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
+  const [sessionId, setSessionId] = useState<string>("");
+  const [chatSession, setChatSession] = useState<LiveChatSession | null>(null);
+  const [messages, setMessages] = useState<DisplayMessage[]>([
     {
       id: "welcome",
       role: "assistant",
+      senderName: "Experto SCENTLAB",
       content:
         "¡Hola! 👋 Soy tu **Asesor Experto en Perfumería de SCENTLAB**. ¿Buscas una fragancia en particular, equivalencias de notas olfativas o asesoría para formular tu propio perfume?",
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
@@ -42,25 +52,90 @@ export function ScentSommelierChat() {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isHumanMode, setIsHumanMode] = useState(false);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
+  // 1. Initialize persistent session ID
   useEffect(() => {
-    if (isOpen) {
-      scrollToBottom();
+    let sid = "";
+    if (typeof window !== "undefined") {
+      sid = localStorage.getItem("scentlab_live_chat_session_id") || "";
+      if (!sid) {
+        sid = `session_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+        localStorage.setItem("scentlab_live_chat_session_id", sid);
+      }
+      setSessionId(sid);
+    }
+  }, []);
+
+  // 2. Subscribe to Firestore messages & session updates in real-time
+  useEffect(() => {
+    if (!sessionId) return;
+
+    // Get or create session doc
+    liveChatRepository.getOrCreateSession(sessionId).then((s) => {
+      setChatSession(s);
+      setIsHumanMode(s.mode === "human");
+    });
+
+    // Real-time listener for incoming messages from Admin or AI
+    const unsubscribe = liveChatRepository.subscribeMessages(sessionId, (firestoreMsgs) => {
+      if (firestoreMsgs.length > 0) {
+        const mapped: DisplayMessage[] = firestoreMsgs.map((m) => ({
+          id: m.id,
+          role: m.sender === "admin" ? "admin" : m.sender === "customer" ? "user" : "assistant",
+          senderName: m.senderName,
+          content: m.content,
+          timestamp: new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        }));
+        setMessages(mapped);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [sessionId]);
+
+  // Mark as read when widget is opened
+  useEffect(() => {
+    if (isOpen && sessionId) {
+      liveChatRepository.markAsReadByCustomer(sessionId);
       setTimeout(() => inputRef.current?.focus(), 150);
     }
-  }, [isOpen, messages]);
+  }, [isOpen, sessionId]);
 
+  // Auto-scroll to bottom
+  useEffect(() => {
+    if (isOpen) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [isOpen, messages, loading]);
+
+  // Request human support
+  const handleRequestHuman = async () => {
+    if (!sessionId) return;
+    setIsHumanMode(true);
+    await liveChatRepository.requestHumanSupport(sessionId);
+
+    const notice: DisplayMessage = {
+      id: `notice_${Date.now()}`,
+      role: "admin",
+      senderName: "Centro de Asistencia",
+      content:
+        "👤 **Te hemos conectado con nuestro equipo en vivo.** Un asesor humano ha recibido tu solicitud y te responderá en este chat en breve. ¡Escribe cualquier consulta!",
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
+
+    setMessages((prev) => [...prev, notice]);
+  };
+
+  // Send message
   const handleSend = async (textToSend?: string) => {
     const query = textToSend || input.trim();
-    if (!query || loading) return;
+    if (!query || loading || !sessionId) return;
 
-    const userMsg: Message = {
+    const userMsg: DisplayMessage = {
       id: `usr_${Date.now()}`,
       role: "user",
       content: query,
@@ -69,11 +144,26 @@ export function ScentSommelierChat() {
 
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
-    setLoading(true);
 
+    // 1. Save customer message to Firestore
+    await liveChatRepository.sendMessage({
+      chatId: sessionId,
+      sender: "customer",
+      senderName: "Visitante",
+      content: query,
+      mode: isHumanMode ? "human" : "ai",
+    });
+
+    // 2. If in Human mode, wait for admin response
+    if (isHumanMode) {
+      return;
+    }
+
+    // 3. In AI mode, fetch instant answer from AI route
+    setLoading(true);
     try {
       const history = [...messages, userMsg].map((m) => ({
-        role: m.role,
+        role: m.role === "user" ? "user" : "assistant",
         content: m.content,
       }));
 
@@ -84,35 +174,49 @@ export function ScentSommelierChat() {
       });
 
       const data = await res.json();
+      const replyContent = data.reply || "Disculpa, hubo un inconveniente al procesar tu solicitud.";
 
-      const aiMsg: Message = {
+      // Save AI reply to Firestore so Admin can see the conversation thread
+      await liveChatRepository.sendMessage({
+        chatId: sessionId,
+        sender: "ai",
+        senderName: "Experto en Perfumes SCENTLAB",
+        content: replyContent,
+        mode: "ai",
+      });
+
+      const aiMsg: DisplayMessage = {
         id: `ai_${Date.now()}`,
         role: "assistant",
-        content: data.reply || "Disculpa, hubo un inconveniente al procesar tu solicitud.",
+        senderName: "Experto en Perfumes SCENTLAB",
+        content: replyContent,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
 
       setMessages((prev) => [...prev, aiMsg]);
     } catch (err) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `err_${Date.now()}`,
-          role: "assistant",
-          content: "Hubo un error de conexión con el servidor. Por favor intenta nuevamente.",
-          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        },
-      ]);
+      const errMsg: DisplayMessage = {
+        id: `err_${Date.now()}`,
+        role: "assistant",
+        content: "Hubo un error de conexión con el servidor. Por favor intenta nuevamente.",
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      };
+      setMessages((prev) => [...prev, errMsg]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
+    setIsHumanMode(false);
+    if (sessionId) {
+      await liveChatRepository.setChatMode(sessionId, "ai");
+    }
     setMessages([
       {
         id: "welcome",
         role: "assistant",
+        senderName: "Experto SCENTLAB",
         content:
           "¡Hola! 👋 Soy tu **Asesor Experto en Perfumería de SCENTLAB**. ¿En qué te puedo orientar hoy?",
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
@@ -146,23 +250,31 @@ export function ScentSommelierChat() {
 
       {/* ━━━━ CHAT MODAL WINDOW ━━━━ */}
       {isOpen && (
-        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-[calc(100vw-32px)] sm:w-[410px] h-[580px] max-h-[calc(100vh-80px)] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200 font-sans">
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-[calc(100vw-32px)] sm:w-[420px] h-[600px] max-h-[calc(100vh-80px)] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200 font-sans">
           
           {/* Header */}
-          <div className="bg-[#2B5F4A] text-white px-4 py-3.5 flex items-center justify-between shadow-xs">
+          <div className="bg-[#2B5F4A] text-white px-4 py-3 flex items-center justify-between shadow-xs">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-amber-300" />
+                {isHumanMode ? (
+                  <Headphones className="w-4 h-4 text-emerald-300 animate-pulse" />
+                ) : (
+                  <Sparkles className="w-4 h-4 text-amber-300" />
+                )}
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-xs font-bold tracking-wide">Experto en Perfumes & Ayuda</h3>
+                  <h3 className="text-xs font-bold tracking-wide">
+                    {isHumanMode ? "Soporte Humano en Vivo" : "Experto en Perfumes & Ayuda"}
+                  </h3>
                   <span className="inline-flex items-center gap-1 text-[9px] font-semibold bg-emerald-400/20 text-emerald-200 px-1.5 py-0.2 rounded-full border border-emerald-300/30">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> En línea
                   </span>
                 </div>
                 <p className="text-[10px] text-emerald-100/80 font-light">
-                  Asesoría en esencias, fórmulas y pedidos
+                  {isHumanMode
+                    ? "Atendido por el equipo de SCENTLAB"
+                    : "Asesoría en esencias, fórmulas y pedidos"}
                 </p>
               </div>
             </div>
@@ -187,18 +299,25 @@ export function ScentSommelierChat() {
             </div>
           </div>
 
-          {/* Quick links header bar */}
-          <div className="bg-emerald-50/70 border-b border-emerald-100 px-4 py-1.5 flex items-center justify-between text-[11px] text-[#166534]">
+          {/* Sub-header with Live Human Agent Trigger */}
+          <div className="bg-emerald-50/80 border-b border-emerald-100 px-3.5 py-1.5 flex items-center justify-between text-[11px] text-[#166534]">
             <span className="font-semibold flex items-center gap-1">
-              <FlaskConical className="w-3 h-3 text-[#2B5F4A]" /> +1,390 esencias puras Grado A
+              <FlaskConical className="w-3 h-3 text-[#2B5F4A]" /> +1,390 esencias Grado A
             </span>
-            <Link
-              href="/fragrance"
-              onClick={() => setIsOpen(false)}
-              className="text-[10px] uppercase font-bold hover:underline inline-flex items-center gap-0.5 text-[#2B5F4A]"
-            >
-              Ver catálogo <ExternalLink className="w-2.5 h-2.5" />
-            </Link>
+
+            {!isHumanMode ? (
+              <button
+                type="button"
+                onClick={handleRequestHuman}
+                className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-white hover:bg-emerald-100 text-[#166534] px-2 py-0.5 rounded border border-emerald-300 transition shadow-2xs"
+              >
+                <Headphones className="w-2.5 h-2.5 text-[#2B5F4A]" /> Hablar con Asesor Humano
+              </button>
+            ) : (
+              <span className="text-[10px] font-bold uppercase tracking-wider text-blue-800 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                👤 Modo Asesor Activo
+              </span>
+            )}
           </div>
 
           {/* Messages Body */}
@@ -208,9 +327,19 @@ export function ScentSommelierChat() {
                 key={m.id}
                 className={`flex gap-2.5 ${m.role === "user" ? "justify-end" : "justify-start"}`}
               >
-                {m.role === "assistant" && (
-                  <div className="w-7 h-7 rounded-full bg-[#2B5F4A] text-white flex items-center justify-center shrink-0 mt-0.5 text-xs shadow-xs">
-                    <Bot className="w-3.5 h-3.5 text-amber-200" />
+                {m.role !== "user" && (
+                  <div
+                    className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 text-xs shadow-xs ${
+                      m.role === "admin"
+                        ? "bg-blue-900 text-white"
+                        : "bg-[#2B5F4A] text-white"
+                    }`}
+                  >
+                    {m.role === "admin" ? (
+                      <ShieldCheck className="w-3.5 h-3.5 text-blue-200" />
+                    ) : (
+                      <Bot className="w-3.5 h-3.5 text-amber-200" />
+                    )}
                   </div>
                 )}
 
@@ -218,15 +347,22 @@ export function ScentSommelierChat() {
                   className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed shadow-xs ${
                     m.role === "user"
                       ? "bg-[#2B5F4A] text-white rounded-br-xs font-medium"
+                      : m.role === "admin"
+                      ? "bg-blue-50/90 text-blue-950 border border-blue-200 rounded-bl-xs"
                       : "bg-white text-gray-800 border border-gray-200/80 rounded-bl-xs"
                   }`}
                 >
+                  {m.senderName && m.role !== "user" && (
+                    <div className="text-[10px] font-bold uppercase tracking-wider mb-1 text-[#2B5F4A]">
+                      {m.senderName}
+                    </div>
+                  )}
+
                   <div className="whitespace-pre-wrap space-y-1">
                     {m.content.split("\n").map((line, i) => {
                       if (!line.trim()) return <div key={i} className="h-1" />;
 
-                      // Rich inline parser: supports both **bold** and [link text](url)
-                      // Tokenize by links first: [title](href)
+                      // Link parser: [title](href)
                       const linkRegex = /(\[[^\]]+\]\([^)]+\))/g;
                       const segments = line.split(linkRegex);
 
@@ -265,6 +401,7 @@ export function ScentSommelierChat() {
                       );
                     })}
                   </div>
+
                   <span
                     className={`block text-[9px] mt-1 text-right ${
                       m.role === "user" ? "text-emerald-200/70" : "text-gray-400"
@@ -291,7 +428,7 @@ export function ScentSommelierChat() {
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-bounce" />
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-bounce [animation-delay:0.2s]" />
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-bounce [animation-delay:0.4s]" />
-                  <span className="text-[11px] text-gray-500 ml-1.5">Analizando acordes y catálogo…</span>
+                  <span className="text-[11px] text-gray-500 ml-1.5">Analizando catálogo y notas…</span>
                 </div>
               </div>
             )}
@@ -299,8 +436,8 @@ export function ScentSommelierChat() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Suggestions Pills (when only 1 or 2 messages) */}
-          {messages.length <= 2 && (
+          {/* Suggestions Pills (when <= 2 messages and not in human mode) */}
+          {!isHumanMode && messages.length <= 2 && (
             <div className="p-2.5 bg-white border-t border-gray-100 flex flex-wrap gap-1.5">
               <span className="w-full text-[10px] uppercase font-bold text-gray-400 tracking-wider">
                 Preguntas frecuentes:
@@ -331,7 +468,11 @@ export function ScentSommelierChat() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Pregúntame sobre un perfume, notas o formulación..."
+              placeholder={
+                isHumanMode
+                  ? "Escribe tu mensaje para el asesor humano..."
+                  : "Pregúntame sobre un perfume, notas o formulación..."
+              }
               disabled={loading}
               className="flex-1 text-xs px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#2B5F4A] focus:bg-white transition"
             />
