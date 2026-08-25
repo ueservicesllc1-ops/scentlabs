@@ -28,6 +28,7 @@ export function Navbar() {
 
   const navLinks = [
     { name: "Kits Emprendedor", href: "/kits" },
+    { name: "Tutorial & Calculadora", href: "/tutorial" },
     { name: "Fragrances", href: "/fragrance" },
     { name: "Perfumes", href: "/perfumes" },
     { name: "Packaging & Boxes", href: "/packaging" },

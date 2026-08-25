@@ -14,6 +14,7 @@ const shopLinks = [
 ];
 
 const companyLinks = [
+  { label: "🧪 Tutorial & Calculadora", href: "/tutorial" },
   { label: "About SCENTLAB", href: "/about" },
   { label: "Wholesale Catalog", href: "/shop" },
   { label: "Account & Orders", href: "/account" },
