@@ -252,7 +252,7 @@ function getSmartOlfactoryResponse(userQuery: string): string {
     return `🚚 **INFORMACIÓN Y POLÍTICAS DE ENVÍO (SCENTLAB)**
 
 • **ENVÍO GRATIS:** A partir de **$250.00 USD** de compra, tu orden califica automáticamente para envío estándar gratuito a todos los 50 estados de EE. UU. y Puerto Rico.
-• **Despacho Rápido (24-48h):** Procesamos, fraccionamos y embalamos los pedidos de lunes a viernes desde nuestro centro de formulación en **Miami, Florida**.
+• **Despacho Rápido (24-48h):** Procesamos, fraccionamos y embalamos los pedidos de lunes a viernes desde nuestro centro de formulación y distribución en **New Jersey, Estados Unidos**.
 • **Tiempos de Tránsito:** 
   - *USPS Ground / UPS Ground:* 2 a 5 días hábiles promedio.
   - *USPS Priority Mail:* 1 a 3 días hábiles.

@@ -81,7 +81,7 @@ export default function TermsPage() {
         <section className="space-y-3 border-t border-gray-100 pt-8">
           <h2 className="text-lg font-bold text-gray-950">5. Envíos y Reemplazos por Daño</h2>
           <p>
-            Los despachos se realizan en 24-48 horas hábiles desde Miami, Florida mediante USPS o UPS. En caso de recibir artículos dañados en tránsito o derrames, el cliente debe reportarlo dentro de los primeros 5 días hábiles a <a href="mailto:support@scentlab.com" className="text-[#2B5F4A] underline font-semibold">support@scentlab.com</a> con fotos de respaldo para recibir un reemplazo sin costo. Consulte los detalles completos en nuestras <Link href="/shipping" className="text-[#2B5F4A] underline font-semibold">Políticas de Envío</Link>.
+            Los despachos se realizan en 24-48 horas hábiles desde New Jersey mediante USPS o UPS. En caso de recibir artículos dañados en tránsito o derrames, el cliente debe reportarlo dentro de los primeros 5 días hábiles a <a href="mailto:support@scentlab.com" className="text-[#2B5F4A] underline font-semibold">support@scentlab.com</a> con fotos de respaldo para recibir un reemplazo sin costo. Consulte los detalles completos en nuestras <Link href="/shipping" className="text-[#2B5F4A] underline font-semibold">Políticas de Envío</Link>.
           </p>
         </section>
 
@@ -97,7 +97,7 @@ export default function TermsPage() {
         <section className="space-y-3 border-t border-gray-100 pt-8">
           <h2 className="text-lg font-bold text-gray-950">7. Ley Aplicable y Jurisdicción</h2>
           <p>
-            Estos términos se rigen e interpretan de acuerdo con las leyes del Estado de Florida, Estados Unidos, sin perjuicio de sus disposiciones sobre conflicto de leyes.
+            Estos términos se rigen e interpretan de acuerdo con las leyes del Estado de New Jersey, Estados Unidos, sin perjuicio de sus disposiciones sobre conflicto de leyes.
           </p>
         </section>
 

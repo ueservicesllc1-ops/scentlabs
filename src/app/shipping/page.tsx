@@ -5,7 +5,7 @@ import { Truck, ShieldCheck, Clock, PackageCheck, AlertCircle, Sparkles, MapPin,
 
 export const metadata: Metadata = {
   title: "Políticas de Envío y Devoluciones | SCENTLAB",
-  description: "Información sobre envíos gratis a partir de $250, tiempos de entrega de 24-48h desde Miami, empaque hermético y garantías de satisfacción.",
+  description: "Información sobre envíos gratis a partir de $250, tiempos de entrega de 24-48h desde New Jersey, empaque hermético y garantías de satisfacción.",
 };
 
 export default function ShippingPolicyPage() {
@@ -22,7 +22,7 @@ export default function ShippingPolicyPage() {
             Políticas de Envío y Devoluciones
           </h1>
           <p className="text-sm sm:text-base text-gray-600 max-w-2xl font-light leading-relaxed">
-            Envíos rápidos y seguros a todo Estados Unidos y Puerto Rico desde nuestro centro de formulación y distribución en Miami, Florida.
+            Envíos rápidos y seguros a todo Estados Unidos y Puerto Rico desde nuestro centro de formulación y distribución en New Jersey, Estados Unidos.
           </p>
         </div>
       </div>
@@ -54,7 +54,7 @@ export default function ShippingPolicyPage() {
             <Clock className="w-6 h-6 text-[#2B5F4A]" />
             <h3 className="font-bold text-gray-950 text-sm">Despacho en 24-48h</h3>
             <p className="text-xs text-gray-600 font-light">
-              Procesamos y fraccionamos tu pedido de lunes a viernes en nuestro laboratorio en Miami.
+              Procesamos y fraccionamos tu pedido de lunes a viernes en nuestro centro en New Jersey.
             </p>
           </div>
 

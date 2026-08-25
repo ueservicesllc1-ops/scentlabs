@@ -36,7 +36,7 @@ const CANNED_RESPONSES = [
   },
   {
     label: "🚚 Envío Gratis $250",
-    text: "Te recordamos que todas las órdenes a partir de $250 USD califican para Envío Gratis a todo EE.UU. y Puerto Rico. Despachamos en 24 a 48 horas hábiles desde Miami.",
+    text: "Te recordamos que todas las órdenes a partir de $250 USD califican para Envío Gratis a todo EE.UU. y Puerto Rico. Despachamos en 24 a 48 horas hábiles desde New Jersey.",
   },
   {
     label: "🧪 Fórmula EDP (18-20%)",

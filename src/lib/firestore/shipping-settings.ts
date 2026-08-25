@@ -10,13 +10,13 @@ const SHIPPING_SETTINGS_DOC = "shippingSettings";
 export const DEFAULT_SHIPPING_ORIGIN: ShippingOrigin = {
   name: "SCENTLAB Fulfillment Center",
   company: "ScentLab Formulations LLC",
-  street1: "2000 NW 84th Ave",
-  street2: "Suite 100",
-  city: "Miami",
-  state: "FL",
-  zip: "33122",
+  street1: "100 Industrial Parkway",
+  street2: "Suite 4",
+  city: "Edison",
+  state: "NJ",
+  zip: "08817",
   country: "US",
-  phone: "+1 (305) 555-0188",
+  phone: "+1 (800) 555-SCENT",
   email: "fulfillment@scentlab.com",
 };
 
