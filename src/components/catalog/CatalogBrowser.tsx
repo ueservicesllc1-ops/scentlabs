@@ -15,16 +15,32 @@ interface CatalogBrowserProps {
 
 export type SortOption = "featured" | "newest" | "price_asc" | "price_desc";
 
+import { useEffect } from "react";
+import { productService } from "@/lib/firestore/products";
+
 export function CatalogBrowser({
   initialProducts,
   fixedCategory,
   title = "Fragrance Formulation Catalog",
   subtitle = "Glass bottles, compounding solvents, precision tools, and custom labels for artisan perfumers.",
 }: CatalogBrowserProps) {
+  const [products, setProducts] = useState<Product[]>(initialProducts);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>(fixedCategory || "all");
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>("all");
   const [sortBy, setSortBy] = useState<SortOption>("featured");
+
+  useEffect(() => {
+    productService.getAdminProducts().then((all) => {
+      if (all && all.length > 0) {
+        // Merge with initial products
+        const map = new Map<string, Product>();
+        initialProducts.forEach((p) => map.set(p.id, p));
+        all.forEach((p) => map.set(p.id, { ...map.get(p.id), ...p }));
+        setProducts(Array.from(map.values()));
+      }
+    }).catch(() => {});
+  }, [initialProducts]);
 
   // Available subcategories based on selected category
   const currentCategoryConfig = INITIAL_CATEGORIES.find(
@@ -34,7 +50,11 @@ export function CatalogBrowser({
 
   // Filtered and sorted products
   const filteredProducts = useMemo(() => {
-    return initialProducts.filter((product) => {
+    return products.filter((product) => {
+      // Exclude hidden / draft / archived products
+      if (product.status && product.status !== "active") {
+        return false;
+      }
       // Category filter
       if (selectedCategory !== "all" && product.category.toLowerCase() !== selectedCategory.toLowerCase()) {
         return false;

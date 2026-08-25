@@ -27,7 +27,8 @@ import {
   DollarSign,
   AlertTriangle,
   FileText,
-  MessageSquare
+  MessageSquare,
+  Wine
 } from "lucide-react";
 
 const AUTHORIZED_ADMIN_EMAIL = "ueservicesllc1@gmail.com";
@@ -54,6 +55,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { title: "All Products", href: "/admin/products", icon: Package },
       { title: "Fragrance Oils", href: "/admin/fragrance", icon: Droplet },
+      { title: "Glass Bottles", href: "/admin/bottles", icon: Wine },
       { title: "Packaging & Boxes", href: "/admin/packaging", icon: Box },
       { title: "Custom Labels", href: "/admin/custom-labels", icon: Tag, exact: true },
       { title: "Testing Supplies", href: "/admin/testing", icon: FlaskConical },
