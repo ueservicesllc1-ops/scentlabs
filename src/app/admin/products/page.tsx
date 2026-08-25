@@ -510,16 +510,22 @@ export default function AdminProductsPage() {
                           {/* Image & Name */}
                           <td className="py-3 px-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-12 h-12 rounded-lg bg-gray-50 border border-gray-200 overflow-hidden shrink-0 flex items-center justify-center relative">
+                              <button
+                                type="button"
+                                onClick={() => setQuickEditProduct(product)}
+                                className="w-12 h-12 rounded-lg bg-gray-50 border border-gray-200 overflow-hidden shrink-0 flex items-center justify-center relative hover:ring-2 hover:ring-[#2B5F4A] transition group"
+                                title="Hacer clic para subir o cambiar foto"
+                              >
                                 {image ? (
                                   // eslint-disable-next-line @next/next/no-img-element
-                                  <img src={image} alt={product.name} className="w-full h-full object-contain" />
+                                  <img src={image} alt={product.name} className="w-full h-full object-contain p-1" />
                                 ) : (
-                                  <div className="text-[9px] text-gray-400 text-center font-bold px-1 uppercase">
-                                    No Pic
+                                  <div className="text-[9px] text-orange-700 font-bold px-1 uppercase bg-orange-50 w-full h-full flex flex-col items-center justify-center gap-0.5 group-hover:bg-orange-100">
+                                    <ImageIcon className="w-3.5 h-3.5" />
+                                    <span>Subir Foto</span>
                                   </div>
                                 )}
-                              </div>
+                              </button>
                               <div className="space-y-0.5">
                                 <div className="font-semibold text-gray-950 flex items-center gap-1.5">
                                   <button
@@ -637,7 +643,18 @@ export default function AdminProductsPage() {
 
                           {/* Row Actions */}
                           <td className="py-3 px-4 text-right">
-                            <div className="flex items-center justify-end gap-1">
+                            <div className="flex items-center justify-end gap-1.5">
+                              {/* Edit / Upload Photo Button */}
+                              <button
+                                type="button"
+                                onClick={() => setQuickEditProduct(product)}
+                                className="px-2.5 py-1.5 rounded-lg bg-[#2B5F4A] hover:bg-[#1E4233] text-white font-bold text-[11px] uppercase tracking-wider transition flex items-center gap-1 shadow-2xs"
+                                title="Editar producto y subir fotos"
+                              >
+                                <ImageIcon className="w-3.5 h-3.5 text-amber-300" />
+                                <span>Editar / Foto</span>
+                              </button>
+
                               {/* Preview button */}
                               <button
                                 type="button"
@@ -646,16 +663,6 @@ export default function AdminProductsPage() {
                                 title="Customer Store Preview"
                               >
                                 <Eye className="w-3.5 h-3.5" />
-                              </button>
-
-                              {/* Edit */}
-                              <button
-                                type="button"
-                                onClick={() => setQuickEditProduct(product)}
-                                className="p-1.5 rounded-lg bg-white border border-gray-300 text-gray-600 hover:text-[#2B5F4A] hover:bg-gray-50"
-                                title="Quick Edit Product"
-                              >
-                                <Edit className="w-3.5 h-3.5" />
                               </button>
 
                               {/* Duplicate */}

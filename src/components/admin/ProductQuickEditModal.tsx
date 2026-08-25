@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { X, Save, Edit, Package, DollarSign, Tag, Image as ImageIcon, Barcode, ScanLine, Trash2, Upload } from 'lucide-react';
+import { X, Save, Edit, Package, DollarSign, Tag, Image as ImageIcon, Barcode, Trash2, Upload, Star, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Product, ProductStatus } from '@/types/product';
 import { productService } from '@/lib/firestore/products';
 
@@ -15,19 +14,65 @@ interface Props {
 
 export default function ProductQuickEditModal({ isOpen, onClose, product, onSaved }: Props) {
   const [formData, setFormData] = useState<Partial<Product>>({});
+  const [mediaList, setMediaList] = useState<{ id: string; url: string; isPrimary: boolean; fileName?: string }[]>([]);
+  const [urlInput, setUrlInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (product) {
+      // Extract existing media
+      const existingMedia: { id: string; url: string; isPrimary: boolean; fileName?: string }[] = [];
+      
+      if (product.media && Array.isArray(product.media)) {
+        product.media.forEach((m: any, idx: number) => {
+          if (m.url) {
+            existingMedia.push({
+              id: m.id || `med_${idx}`,
+              url: m.url,
+              isPrimary: m.isPrimary || (idx === 0 && !product.primaryImageUrl),
+              fileName: m.fileName || m.altText || `Image ${idx + 1}`,
+            });
+          }
+        });
+      } else if (product.images && Array.isArray(product.images)) {
+        product.images.forEach((img: any, idx: number) => {
+          const u = typeof img === 'string' ? img : img.url;
+          if (u) {
+            existingMedia.push({
+              id: `img_${idx}`,
+              url: u,
+              isPrimary: idx === 0,
+            });
+          }
+        });
+      }
+
+      if (product.primaryImageUrl && !existingMedia.some(m => m.url === product.primaryImageUrl)) {
+        existingMedia.unshift({
+          id: `pri_${Date.now()}`,
+          url: product.primaryImageUrl,
+          isPrimary: true,
+          fileName: 'Primary Image',
+        });
+      }
+
+      // Ensure at least one is marked primary if media exists
+      if (existingMedia.length > 0 && !existingMedia.some(m => m.isPrimary)) {
+        existingMedia[0].isPrimary = true;
+      }
+
+      setMediaList(existingMedia);
       setFormData({
         name: product.name,
         sku: product.sku,
         basePrice: product.basePrice,
-        status: product.status,
-        primaryImageUrl: product.primaryImageUrl,
-        media: product.media ? [...(product.media as any[])] : [],
+        status: product.status || 'active',
+        primaryImageUrl: product.primaryImageUrl || (existingMedia[0]?.url || ''),
+        shortDescription: product.shortDescription || '',
+        category: product.category,
         inventory: product.inventory ? { ...product.inventory } : {
           quantityInStock: 0,
           status: 'out_of_stock',
@@ -35,60 +80,119 @@ export default function ProductQuickEditModal({ isOpen, onClose, product, onSave
           reorderPoint: 5
         }
       });
+      setUrlInput('');
       setError(null);
+      setSuccessMsg(null);
     }
   }, [product]);
 
   if (!isOpen || !product) return null;
 
+  // File Upload to B2
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    const file = files[0];
     setIsUploading(true);
     setError(null);
 
     try {
-      const data = new FormData();
-      data.append("file", file);
-      data.append("folder", "products");
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const data = new FormData();
+        data.append("file", file);
+        data.append("folder", "products");
 
-      const res = await fetch("/api/media/upload", {
-        method: "POST",
-        body: data,
-      });
+        const res = await fetch("/api/media/upload", {
+          method: "POST",
+          body: data,
+        });
 
-      if (!res.ok) {
-        throw new Error("Failed to upload image to B2 storage");
+        if (!res.ok) {
+          throw new Error(`Error al subir la imagen '${file.name}'`);
+        }
+
+        const json = await res.json();
+        const newUrl = json.url;
+
+        setMediaList(prev => {
+          const isFirst = prev.length === 0;
+          const updated = [
+            ...prev.map(m => isFirst ? { ...m, isPrimary: false } : m),
+            {
+              id: `med_${Date.now()}_${i}`,
+              url: newUrl,
+              isPrimary: isFirst,
+              fileName: file.name,
+            }
+          ];
+          return updated;
+        });
+
+        // Set primary if none exists
+        if (!formData.primaryImageUrl) {
+          setFormData(prev => ({ ...prev, primaryImageUrl: newUrl }));
+        }
       }
-
-      const json = await res.json();
-      const newMediaItem = {
-        id: `med_${Date.now()}`,
-        b2Key: json.key || `products/${file.name}`,
-        url: json.url,
-        fileName: file.name,
-        mimeType: file.type || "image/jpeg",
-        size: file.size || 0,
-        sortOrder: 0,
-        isPrimary: true,
-        createdAt: new Date().toISOString(),
-      };
-
-      setFormData(prev => ({
-        ...prev,
-        primaryImageUrl: json.url,
-        media: [
-          newMediaItem,
-          ...((prev.media as any[]) || []).map((m: any) => ({ ...m, isPrimary: false }))
-        ] as any
-      }));
+      setSuccessMsg("¡Foto(s) subida(s) con éxito!");
+      setTimeout(() => setSuccessMsg(null), 3000);
     } catch (err: any) {
-      setError(err.message || "Image upload failed");
+      setError(err.message || "Error al subir la foto");
     } finally {
       setIsUploading(false);
     }
+  };
+
+  // Add Image from Direct URL
+  const handleAddUrl = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!urlInput.trim()) return;
+
+    const trimmed = urlInput.trim();
+    setMediaList(prev => {
+      const isFirst = prev.length === 0;
+      return [
+        ...prev,
+        {
+          id: `url_${Date.now()}`,
+          url: trimmed,
+          isPrimary: isFirst,
+          fileName: 'Direct URL',
+        }
+      ];
+    });
+
+    if (!formData.primaryImageUrl) {
+      setFormData(prev => ({ ...prev, primaryImageUrl: trimmed }));
+    }
+
+    setUrlInput('');
+  };
+
+  // Set as primary image
+  const handleSetPrimary = (index: number) => {
+    setMediaList(prev => {
+      const updated = prev.map((item, idx) => ({
+        ...item,
+        isPrimary: idx === index,
+      }));
+      setFormData(f => ({ ...f, primaryImageUrl: updated[index].url }));
+      return updated;
+    });
+  };
+
+  // Remove image
+  const handleRemoveImage = (index: number) => {
+    setMediaList(prev => {
+      const filtered = prev.filter((_, idx) => idx !== index);
+      if (filtered.length > 0 && !filtered.some(m => m.isPrimary)) {
+        filtered[0].isPrimary = true;
+        setFormData(f => ({ ...f, primaryImageUrl: filtered[0].url }));
+      } else if (filtered.length === 0) {
+        setFormData(f => ({ ...f, primaryImageUrl: '' }));
+      }
+      return filtered;
+    });
   };
 
   const handleChange = (field: keyof Product, value: any) => {
@@ -116,30 +220,51 @@ export default function ProductQuickEditModal({ isOpen, onClose, product, onSave
       if (qty <= 0) stockStatus = 'out_of_stock';
       else if (qty <= (formData.inventory?.lowStockThreshold || 5)) stockStatus = 'low_stock';
 
-      const updatedProduct = {
+      const primaryUrl = mediaList.find(m => m.isPrimary)?.url || mediaList[0]?.url || formData.primaryImageUrl || '';
+
+      const updatedMedia = mediaList.map((m, idx) => ({
+        id: m.id,
+        url: m.url,
+        type: 'image',
+        isPrimary: m.isPrimary || (idx === 0 && !mediaList.some(x => x.isPrimary)),
+        altText: formData.name || product.name,
+        sortOrder: idx,
+      }));
+
+      const updatedImages = mediaList.map((m, idx) => ({
+        url: m.url,
+        isPrimary: m.isPrimary || idx === 0,
+      }));
+
+      const updatedProduct: Product = {
         ...product,
-        name: formData.name,
-        sku: formData.sku,
-        basePrice: formData.basePrice,
-        status: formData.status as ProductStatus,
-        primaryImageUrl: formData.primaryImageUrl,
+        name: formData.name || product.name,
+        sku: formData.sku || product.sku,
+        basePrice: formData.basePrice !== undefined ? Number(formData.basePrice) : product.basePrice,
+        status: formData.status as ProductStatus || product.status,
+        primaryImageUrl: primaryUrl,
+        shortDescription: formData.shortDescription !== undefined ? formData.shortDescription : product.shortDescription,
+        media: updatedMedia as any,
+        images: updatedImages as any,
         inventory: {
           ...product.inventory,
           ...formData.inventory,
+          quantityInStock: Number(formData.inventory?.quantityInStock ?? product.inventory?.quantityInStock ?? 0),
           status: stockStatus as any
-        }
+        },
+        updatedAt: new Date().toISOString(),
       };
 
-      const result = await productService.saveProduct(updatedProduct as Product);
+      const result = await productService.saveProduct(updatedProduct);
       
       if (result.success) {
         onSaved();
         onClose();
       } else {
-        setError(result.error || 'Failed to save product');
+        setError(result.error || 'Error al guardar el producto.');
       }
     } catch (err: any) {
-      setError(err.message || 'An error occurred while saving');
+      setError(err.message || 'Ocurrió un error al guardar');
     } finally {
       setLoading(false);
     }
@@ -175,17 +300,17 @@ export default function ProductQuickEditModal({ isOpen, onClose, product, onSave
       />
       
       {/* Modal Card */}
-      <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh] z-10">
+      <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] z-10 animate-in fade-in zoom-in-95 duration-150">
         
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-gray-50/50">
+        <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-gray-50/70">
           <div>
-            <h2 className="text-lg font-bold text-gray-950 flex items-center gap-2">
+            <h2 className="text-base sm:text-lg font-bold text-gray-950 flex items-center gap-2">
               <Edit className="w-5 h-5 text-[#2B5F4A]" />
-              Editar Producto: {product.name}
+              Editar Producto & Fotos: {product.name}
             </h2>
             <p className="text-xs text-gray-500 font-mono mt-0.5">
-              SKU: {product.sku} • ID: {product.id}
+              SKU: {product.sku} &bull; ID: {product.id}
             </p>
           </div>
           <button 
@@ -198,175 +323,256 @@ export default function ProductQuickEditModal({ isOpen, onClose, product, onSave
         </div>
 
         {/* Form Body */}
-        <div className="p-6 overflow-y-auto flex-1">
+        <div className="p-6 overflow-y-auto flex-1 space-y-6">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 text-red-700 text-xs rounded-lg border border-red-200 font-medium">
-              {error}
+            <div className="p-3 bg-red-50 text-red-700 text-xs rounded-xl border border-red-200 font-medium flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+              <span>{error}</span>
             </div>
           )}
 
-          <form id="quick-edit-form" onSubmit={handleSave} className="space-y-5">
+          {successMsg && (
+            <div className="p-3 bg-emerald-50 text-emerald-800 text-xs rounded-xl border border-emerald-200 font-medium flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>{successMsg}</span>
+            </div>
+          )}
+
+          <form id="quick-edit-form" onSubmit={handleSave} className="space-y-6 text-xs">
             
-            {/* Image Preview & Upload (Supplies Modal Style 1:1) */}
-            <div className="p-4 border border-gray-200 rounded-xl bg-gray-50/50 flex flex-col sm:flex-row items-center gap-4">
-              <div className="w-20 h-20 bg-white rounded-lg border border-gray-200 overflow-hidden shrink-0 flex items-center justify-center relative shadow-xs">
-                {formData.primaryImageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={formData.primaryImageUrl} alt="Product Spec" className="w-full h-full object-contain p-1" />
-                ) : (
-                  <ImageIcon className="w-8 h-8 text-gray-300" />
-                )}
-              </div>
-              <div className="flex-1 space-y-1.5 w-full">
-                <label className="text-xs font-bold uppercase tracking-wider text-gray-700 block">
-                  Foto del Producto / Imagen Primaria
+            {/* ━━━━ PHOTO & MEDIA UPLOADER SECTION ━━━━ */}
+            <div className="p-5 border border-gray-200 rounded-2xl bg-gray-50/60 space-y-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-gray-950 flex items-center gap-1.5">
+                    <ImageIcon className="w-4 h-4 text-[#2B5F4A]" /> Fotos del Producto ({mediaList.length})
+                  </label>
+                  <p className="text-[11px] text-gray-500 font-light">
+                    Sube fotos desde tu dispositivo o pega enlaces directos. La foto con la estrella será la imagen principal.
+                  </p>
+                </div>
+                
+                {/* Upload from file button */}
+                <label className="px-3.5 py-2 bg-[#2B5F4A] hover:bg-[#1E4233] text-white text-xs font-bold rounded-xl cursor-pointer inline-flex items-center gap-1.5 transition shadow-xs">
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>{isUploading ? "Subiendo..." : "Subir Foto"}</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageUpload}
+                    disabled={isUploading}
+                    className="hidden"
+                  />
                 </label>
-                <div className="flex items-center gap-2">
-                  <label className="px-3 py-1.5 bg-[#2B5F4A] hover:bg-[#1E4233] text-white text-xs font-semibold rounded-lg cursor-pointer inline-flex items-center gap-1.5 transition">
-                    <Upload className="w-3.5 h-3.5" />
-                    {isUploading ? "Subiendo a B2..." : "Subir Foto"}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      disabled={isUploading}
-                      className="hidden"
-                    />
+              </div>
+
+              {/* URL input field */}
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  value={urlInput}
+                  onChange={(e) => setUrlInput(e.target.value)}
+                  placeholder="https://ejemplo.com/foto-producto.jpg"
+                  className="flex-1 bg-white border border-gray-300 rounded-xl px-3.5 py-2 text-gray-900 text-xs focus:outline-none focus:border-[#2B5F4A]"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddUrl}
+                  disabled={!urlInput.trim()}
+                  className="px-3 py-2 bg-gray-200 hover:bg-gray-300 disabled:opacity-50 text-gray-800 font-semibold rounded-xl text-xs transition"
+                >
+                  Agregar URL
+                </button>
+              </div>
+
+              {/* Gallery Preview Cards */}
+              {mediaList.length === 0 ? (
+                <div className="py-8 text-center border-2 border-dashed border-gray-200 rounded-xl bg-white space-y-2">
+                  <ImageIcon className="w-8 h-8 text-gray-300 mx-auto" />
+                  <p className="text-xs text-gray-500 font-light">Este producto aún no tiene fotos.</p>
+                  <p className="text-[10px] text-gray-400">Haz clic en &quot;Subir Foto&quot; o pega un link para añadir una.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 pt-1">
+                  {mediaList.map((item, idx) => (
+                    <div 
+                      key={item.id || idx} 
+                      className={`group relative rounded-xl border bg-white overflow-hidden p-2 flex flex-col items-center justify-between transition shadow-2xs ${
+                        item.isPrimary ? "border-[#2B5F4A] ring-2 ring-[#2B5F4A]/20" : "border-gray-200 hover:border-gray-300"
+                      }`}
+                    >
+                      <div className="w-full h-24 flex items-center justify-center overflow-hidden rounded-lg bg-gray-50">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img 
+                          src={item.url} 
+                          alt={item.fileName || "Foto de producto"} 
+                          className="max-h-full max-w-full object-contain"
+                        />
+                      </div>
+
+                      {/* Primary badge or Make Primary button */}
+                      <div className="w-full pt-2 flex items-center justify-between gap-1 text-[10px]">
+                        {item.isPrimary ? (
+                          <span className="inline-flex items-center gap-1 font-bold text-[#166534] bg-[#F0FDF4] px-2 py-0.5 rounded-md">
+                            <Star className="w-3 h-3 fill-[#166534]" /> Principal
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleSetPrimary(idx)}
+                            className="text-gray-500 hover:text-[#2B5F4A] hover:underline font-semibold"
+                          >
+                            Hacer Principal
+                          </button>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveImage(idx)}
+                          className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition"
+                          title="Eliminar foto"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* ━━━━ PRODUCT DETAILS FIELDS ━━━━ */}
+            <div className="space-y-4">
+              <div>
+                <label className="text-gray-700 block mb-1 font-semibold text-[11px]">
+                  Nombre del Producto
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name || ''}
+                  onChange={e => handleChange('name', e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-white border border-gray-300 rounded-xl text-xs font-bold text-gray-900 focus:border-[#2B5F4A] focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="text-gray-700 block mb-1 font-semibold text-[11px]">
+                  Descripción Corta
+                </label>
+                <input
+                  type="text"
+                  value={formData.shortDescription || ''}
+                  onChange={e => handleChange('shortDescription', e.target.value)}
+                  placeholder="Descripción resumida para el catálogo..."
+                  className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-xl text-xs text-gray-900 focus:border-[#2B5F4A] focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="text-gray-700 block mb-1 font-semibold text-[11px]">
+                    Código SKU
                   </label>
                   <input
                     type="text"
-                    value={formData.primaryImageUrl || ''}
-                    onChange={e => handleChange('primaryImageUrl', e.target.value)}
-                    placeholder="o pega URL de la imagen..."
-                    className="flex-1 text-xs px-3 py-1.5 bg-white border border-gray-300 rounded-lg text-gray-900 focus:border-[#2B5F4A] focus:outline-none"
+                    required
+                    value={formData.sku || ''}
+                    onChange={e => handleChange('sku', e.target.value)}
+                    className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-xl text-xs font-mono text-gray-900 focus:border-[#2B5F4A] focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-gray-700 block mb-1 font-semibold text-[11px]">
+                    Precio Base ($ USD)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    required
+                    value={formData.basePrice !== undefined ? formData.basePrice : ''}
+                    onChange={e => handleChange('basePrice', parseFloat(e.target.value) || 0)}
+                    className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-xl text-xs font-mono font-bold text-gray-900 focus:border-[#2B5F4A] focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-gray-700 block mb-1 font-semibold text-[11px]">
+                    Inventario en Stock (Unidades)
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.inventory?.quantityInStock ?? 0}
+                    onChange={e => handleInventoryChange('quantityInStock', parseInt(e.target.value) || 0)}
+                    className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-xl text-xs font-mono text-gray-900 focus:border-[#2B5F4A] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-gray-700 block mb-1 font-semibold text-[11px]">
+                    Estado de Publicación
+                  </label>
+                  <select
+                    value={formData.status || 'active'}
+                    onChange={e => handleChange('status', e.target.value)}
+                    className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-xl text-xs font-medium text-gray-900 focus:border-[#2B5F4A] focus:outline-none"
+                  >
+                    <option value="active">Activo (Visible en tienda)</option>
+                    <option value="draft">Borrador (Oculto)</option>
+                    <option value="archived">Archivado</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-gray-700 block mb-1 font-semibold text-[11px]">
+                    Alerta de Stock Mínimo
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.inventory?.lowStockThreshold ?? 5}
+                    onChange={e => handleInventoryChange('lowStockThreshold', parseInt(e.target.value) || 5)}
+                    className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-xl text-xs font-mono text-gray-900 focus:border-[#2B5F4A] focus:outline-none"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Product Name */}
-            <div>
-              <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
-                <Tag className="w-3.5 h-3.5 text-[#2B5F4A]" /> Nombre del Producto
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.name || ''}
-                onChange={e => handleChange('name', e.target.value)}
-                className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-xs font-bold text-gray-900 focus:border-[#2B5F4A] focus:outline-none"
-              />
-            </div>
-
-            {/* SKU / Barcode */}
-            <div>
-              <label className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
-                <span className="flex items-center gap-1.5"><Barcode className="w-3.5 h-3.5 text-[#2B5F4A]" /> SKU / Código de Barras</span>
-                <span className="text-[10px] text-gray-400 font-normal flex items-center gap-1"><ScanLine className="w-3 h-3 text-[#2B5F4A]" /> Escaneable con pistola</span>
-              </label>
-              <input
-                type="text"
-                value={formData.sku || ''}
-                placeholder="Escanea con la pistola..."
-                onChange={e => handleChange('sku', e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                  }
-                }}
-                className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-xs font-mono font-bold text-gray-900 focus:border-[#2B5F4A] focus:outline-none"
-              />
-            </div>
-
-            {/* Price & Stock */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
-                  <DollarSign className="w-3.5 h-3.5 text-[#2B5F4A]" /> Precio Base ($)
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  required
-                  value={formData.basePrice === undefined ? '' : formData.basePrice}
-                  onChange={e => handleChange('basePrice', parseFloat(e.target.value) || 0)}
-                  className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-xs font-mono font-bold text-gray-900 focus:border-[#2B5F4A] focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
-                  <Package className="w-3.5 h-3.5 text-[#2B5F4A]" /> Inventario en Stock
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  required
-                  value={formData.inventory?.quantityInStock === undefined ? '' : formData.inventory.quantityInStock}
-                  onChange={e => handleInventoryChange('quantityInStock', parseInt(e.target.value) || 0)}
-                  className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-xs font-mono font-bold text-gray-900 focus:border-[#2B5F4A] focus:outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Status */}
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-gray-700 block mb-1.5">
-                Estado del Catálogo
-              </label>
-              <select
-                value={formData.status || 'draft'}
-                onChange={e => handleChange('status', e.target.value)}
-                className="w-full px-3.5 py-2 bg-white border border-gray-300 rounded-lg text-xs font-bold text-gray-900 focus:border-[#2B5F4A] focus:outline-none"
-              >
-                <option value="active">Activo (Visible)</option>
-                <option value="draft">Borrador (Oculto)</option>
-                <option value="inactive">Inactivo</option>
-                <option value="archived">Archivado</option>
-              </select>
-            </div>
-
           </form>
         </div>
 
-        {/* Footer */}
-        <div className="p-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={handleDelete}
-              disabled={loading}
-              className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-lg text-xs font-bold transition disabled:opacity-50"
-            >
-              <Trash2 className="w-3.5 h-3.5 text-red-600" />
-              <span>Eliminar</span>
-            </button>
-            <Link 
-              href={`/admin/products/${product.id}/edit`}
-              className="text-xs font-bold text-[#2B5F4A] hover:underline"
-            >
-              Editor Avanzado →
-            </Link>
-          </div>
+        {/* Footer Actions */}
+        <div className="p-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={loading}
+            className="px-3 py-2 text-xs font-semibold text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl transition"
+          >
+            Eliminar Producto
+          </button>
 
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 rounded-lg text-xs font-bold uppercase tracking-wider transition disabled:opacity-50"
+              className="px-4 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 text-xs font-semibold rounded-xl transition"
             >
               Cancelar
             </button>
+
             <button
               type="submit"
               form="quick-edit-form"
               disabled={loading || isUploading}
-              className="px-5 py-2 bg-[#2B5F4A] hover:bg-[#1E4233] text-white rounded-lg text-xs font-bold uppercase tracking-wider shadow-xs flex items-center gap-1.5 transition disabled:opacity-50"
+              className="px-6 py-2.5 bg-[#2B5F4A] hover:bg-[#1E4233] text-white text-xs font-bold uppercase tracking-wider rounded-xl transition flex items-center gap-1.5 shadow-xs disabled:opacity-50"
             >
               <Save className="w-3.5 h-3.5" />
-              {loading ? 'Guardando...' : 'Guardar Cambios'}
+              <span>{loading ? "Guardando..." : "Guardar Cambios"}</span>
             </button>
           </div>
         </div>

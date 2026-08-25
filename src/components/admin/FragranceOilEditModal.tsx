@@ -88,6 +88,11 @@ export default function FragranceOilEditModal({ isOpen, onClose, fragrance, onSa
         images: formData.primaryImage ? [formData.primaryImage] : fragrance.images,
         updatedAt: new Date().toISOString(),
       };
+      if (formData.primaryImage) {
+        (updatedFragrance as any).media = [
+          { url: formData.primaryImage, type: "image", isPrimary: true, altText: formData.name || fragrance.name }
+        ];
+      }
 
       await fragranceRepository.saveFragrance(updatedFragrance);
       onSaved();

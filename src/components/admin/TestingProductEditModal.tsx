@@ -124,6 +124,7 @@ export default function TestingProductEditModal({ isOpen, onClose, product, onSa
         supplierName: formData.supplierName || product.supplierName,
         basePrice: formData.basePrice !== undefined ? formData.basePrice : product.basePrice,
         primaryImage: formData.primaryImage || product.primaryImage,
+        media: formData.primaryImage ? [{ id: `med_${Date.now()}`, url: formData.primaryImage, type: "image", isPrimary: true, altText: formData.name || product.name, sortOrder: 0 }] : product.media,
         packageOptions: formData.packageOptions || product.packageOptions,
         inventory: {
           ...product.inventory,
@@ -134,6 +135,9 @@ export default function TestingProductEditModal({ isOpen, onClose, product, onSa
         },
         updatedAt: new Date().toISOString(),
       };
+      if (formData.primaryImage) {
+        (updatedProduct as any).images = [{ url: formData.primaryImage, isPrimary: true }];
+      }
 
       await testingRepository.saveTestingProduct(updatedProduct);
       onSaved();
