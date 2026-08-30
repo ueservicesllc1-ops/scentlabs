@@ -3,30 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { VisitorCounter } from "./VisitorCounter";
-
-const shopLinks = [
-  { label: "🚀 Kits Emprendedor", href: "/kits" },
-  { label: "Fragrance Oils", href: "/fragrance" },
-  { label: "Glass Bottles", href: "/bottles" },
-  { label: "Custom Labels", href: "/custom-labels" },
-  { label: "Packaging", href: "/packaging" },
-  { label: "Testing Supplies", href: "/testing" },
-];
-
-const companyLinks = [
-  { label: "🧪 Tutorial & Calculadora", href: "/tutorial" },
-  { label: "About SCENTLAB", href: "/about" },
-  { label: "Wholesale Catalog", href: "/shop" },
-  { label: "Account & Orders", href: "/account" },
-  { label: "Admin Portal", href: "/admin/login" },
-];
-
-const supportLinks = [
-  { label: "Contact Us", href: "/contact" },
-  { label: "Shipping & Returns", href: "/shipping" },
-  { label: "Terms of Service", href: "/terms" },
-  { label: "Privacy Policy", href: "/privacy" },
-];
+import { useLanguage } from "@/context/LanguageContext";
 
 function FooterLink({ href, label }: { href: string; label: string }) {
   return (
@@ -41,6 +18,30 @@ function FooterLink({ href, label }: { href: string; label: string }) {
 }
 
 export function Footer() {
+  const { t } = useLanguage();
+
+  const shopLinks = [
+    { label: t.footer.kitsTitle, href: "/kits" },
+    { label: t.footer.allFragrances, href: "/fragrance" },
+    { label: t.footer.glassBottles, href: "/bottles" },
+    { label: t.footer.customLabels, href: "/custom-labels" },
+    { label: t.footer.customBoxes, href: "/packaging" },
+  ];
+
+  const companyLinks = [
+    { label: t.footer.tutorialTitle, href: "/tutorial" },
+    { label: t.common.myAccount, href: "/account" },
+    { label: t.nav.catalog, href: "/shop" },
+    { label: "Admin Portal", href: "/admin/login" },
+  ];
+
+  const supportLinks = [
+    { label: t.footer.contactSupport, href: "/contact" },
+    { label: t.footer.shippingInfo, href: "/shipping" },
+    { label: t.footer.termsConditions, href: "/terms" },
+    { label: t.footer.privacyPolicy, href: "/privacy" },
+  ];
+
   return (
     <footer className="bg-[#0E1A14] text-white/60 font-sans border-t border-white/10">
       <style>{`
@@ -57,16 +58,16 @@ export function Footer() {
             <img src="/logo2.png" alt="SCENTLAB Supply" className="h-10 sm:h-12 w-auto object-contain" />
           </div>
           <p className="text-xs font-light leading-relaxed max-w-sm text-white/50 mb-6">
-            Wholesale fragrance oils, clinical-grade packaging, and custom labels for artisan perfumers and growing brands.
+            {t.footer.brandTagline}
           </p>
           <p className="text-[11px] text-white/30">
-            © {new Date().getFullYear()} ScentLabs Supply. All rights reserved.
+            © {new Date().getFullYear()} ScentLabs Supply. {t.footer.allRightsReserved}
           </p>
         </div>
 
         {/* Shop */}
         <div>
-          <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-[#5EAB85] block mb-3.5">Shop</span>
+          <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-[#5EAB85] block mb-3.5">{t.footer.catalogCol}</span>
           <div className="flex flex-col gap-2.5">
             {shopLinks.map((l) => <FooterLink key={l.href} {...l} />)}
           </div>
@@ -74,7 +75,7 @@ export function Footer() {
 
         {/* Company */}
         <div>
-          <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-[#5EAB85] block mb-3.5">Company</span>
+          <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-[#5EAB85] block mb-3.5">{t.footer.companyCol}</span>
           <div className="flex flex-col gap-2.5">
             {companyLinks.map((l) => <FooterLink key={l.href} {...l} />)}
           </div>
@@ -82,7 +83,7 @@ export function Footer() {
 
         {/* Support */}
         <div>
-          <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-[#5EAB85] block mb-3.5">Support</span>
+          <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-[#5EAB85] block mb-3.5">{t.footer.supportCol}</span>
           <div className="flex flex-col gap-2.5">
             {supportLinks.map((l) => <FooterLink key={l.href} {...l} />)}
           </div>

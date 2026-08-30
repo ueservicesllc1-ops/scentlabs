@@ -5,34 +5,36 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Sparkles, Package, Search, ShoppingBag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 export function MobileBottomBar() {
   const pathname = usePathname();
   const { itemCount, setIsCartDrawerOpen } = useCart();
+  const { t } = useLanguage();
 
   // Navigation items for the mobile bottom bar
   const navItems = [
     {
-      label: "Inicio",
+      label: t.bottomBar.home,
       href: "/",
       icon: Home,
       isActive: pathname === "/",
     },
     {
-      label: "Catálogo",
+      label: t.bottomBar.catalog,
       href: "/shop",
       icon: Package,
       isActive: pathname === "/shop" || pathname?.startsWith("/product") || pathname === "/bottles" || pathname === "/packaging",
     },
     {
-      label: "Kits",
+      label: t.bottomBar.kits,
       href: "/kits",
       icon: Sparkles,
       isActive: pathname === "/kits",
-      badge: "PROMO",
+      badge: t.bottomBar.promoBadge,
     },
     {
-      label: "Esencias",
+      label: t.bottomBar.fragrances,
       href: "/fragrance",
       icon: Search,
       isActive: pathname?.startsWith("/fragrance"),
@@ -87,7 +89,7 @@ export function MobileBottomBar() {
             )}
           </div>
           <span className={`text-[10px] tracking-wide mt-1 font-medium ${itemCount > 0 ? "font-bold text-[#2B5F4A]" : ""}`}>
-            Carrito
+            {t.bottomBar.cart}
           </span>
         </button>
       </div>

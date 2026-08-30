@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { X, Trash2, ArrowRight, ShieldCheck, Tag, Sparkles } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { useLanguage } from "@/context/LanguageContext";
 import { formatCurrency } from "@/lib/utils";
 
 export function CartDrawer() {
@@ -16,6 +17,7 @@ export function CartDrawer() {
     summary,
     totalUnits,
   } = useCart();
+  const { t } = useLanguage();
 
   if (!isCartDrawerOpen) return null;
 
@@ -33,12 +35,12 @@ export function CartDrawer() {
           <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-outline-variant flex items-center justify-between bg-surface-container-low">
             <div>
               <h2 className="font-label-caps text-label-caps text-primary uppercase flex items-center gap-2">
-                Order Selection
+                {t.cartDrawer.title}
                 <span className="text-[10px] bg-primary text-on-primary px-2 py-0.5 rounded-sm">
-                  {totalUnits} Units
+                  {totalUnits} {t.cartDrawer.units}
                 </span>
               </h2>
-              <p className="text-xs text-secondary mt-0.5">Wholesale compounding batch</p>
+              <p className="text-xs text-secondary mt-0.5">{t.cartDrawer.wholesaleBatch}</p>
             </div>
             <button
               onClick={() => setIsCartDrawerOpen(false)}
@@ -56,11 +58,11 @@ export function CartDrawer() {
                 {summary.subtotal >= 250 ? (
                   <span className="text-[#166534] flex items-center gap-1.5 font-bold">
                     <Sparkles className="w-3.5 h-3.5 text-[#166534]" />
-                    ¡Calificas para Envío Gratis!
+                    {t.cartDrawer.freeShippingUnlocked}
                   </span>
                 ) : (
                   <span className="text-gray-700">
-                    Faltan <strong className="text-[#166534]">{formatCurrency(250 - summary.subtotal)}</strong> para <strong className="text-[#166534]">Envío Gratis</strong>
+                    <strong className="text-[#166534]">{formatCurrency(250 - summary.subtotal)}</strong> {t.cartDrawer.freeShippingRemaining}
                   </span>
                 )}
                 <span className="text-[10px] text-gray-500 font-mono font-bold">
@@ -200,21 +202,21 @@ export function CartDrawer() {
 
               <div className="space-y-1.5 text-xs">
                 <div className="flex justify-between text-secondary">
-                  <span>Subtotal</span>
+                  <span>{t.cartDrawer.subtotal}</span>
                   <span className="text-primary font-medium">{formatCurrency(summary.subtotal)}</span>
                 </div>
                 {summary.discountTotal > 0 && (
                   <div className="flex justify-between text-emerald-700">
-                    <span>Wholesale Discounts</span>
+                    <span>{t.cartDrawer.discounts}</span>
                     <span>-{formatCurrency(summary.discountTotal)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-secondary">
                   <span>US Freight</span>
-                  <span className="italic">Calculated at checkout</span>
+                  <span className="italic">{t.cartDrawer.freightNotice}</span>
                 </div>
                 <div className="flex justify-between text-base font-bold text-primary pt-2 border-t border-outline-variant">
-                  <span>Total Due</span>
+                  <span>{t.cartDrawer.totalDue}</span>
                   <span>{formatCurrency(summary.totalBeforeShipping)}</span>
                 </div>
               </div>
@@ -225,14 +227,14 @@ export function CartDrawer() {
                   onClick={() => setIsCartDrawerOpen(false)}
                   className="outline-btn w-full py-2.5 text-center text-xs uppercase"
                 >
-                  View Full Cart
+                  {t.cartDrawer.viewFullCart}
                 </Link>
                 <Link
                   href="/checkout"
                   onClick={() => setIsCartDrawerOpen(false)}
                   className="flat-btn w-full py-3 text-center text-xs uppercase flex items-center justify-center gap-2"
                 >
-                  Proceed to Checkout <ArrowRight className="w-4 h-4" />
+                  {t.cartDrawer.proceedCheckout} <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
             </div>

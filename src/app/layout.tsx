@@ -9,6 +9,7 @@ import { ScentSommelierChat } from "@/components/ai/ScentSommelierChat";
 import { HeroPromoModal } from "@/components/layout/HeroPromoModal";
 import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { LanguageProvider } from "@/context/LanguageContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -67,15 +68,17 @@ export default function RootLayout({
           <ScrollToTop />
         </Suspense>
         <AuthProvider>
-          <CartProvider>
-            <Navbar />
-            <main className="flex-1 pb-16 lg:pb-0">{children}</main>
-            <Footer />
-            <MobileBottomBar />
-            <CartDrawer />
-            <ScentSommelierChat />
-            <HeroPromoModal />
-          </CartProvider>
+          <LanguageProvider>
+            <CartProvider>
+              <Navbar />
+              <main className="flex-1 pb-16 lg:pb-0">{children}</main>
+              <Footer />
+              <MobileBottomBar />
+              <CartDrawer />
+              <ScentSommelierChat />
+              <HeroPromoModal />
+            </CartProvider>
+          </LanguageProvider>
         </AuthProvider>
       </body>
     </html>

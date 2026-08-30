@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { productService } from "@/lib/firestore/products";
 import { fragranceRepository } from "@/lib/firestore/fragrance";
+import { useLanguage } from "@/context/LanguageContext";
 import { Product } from "@/types/product";
 import { FragranceOil } from "@/types/fragrance";
 
@@ -19,25 +20,26 @@ interface TrendingCardItem {
   placeholderLabel?: string;
 }
 
-const categories = [
-  { label: "Fragrance Oils", desc: "1,600+ Grade-A concentrates", href: "/fragrance", badge: "Most Popular" },
-  { label: "Glass Bottles", desc: "Roll-ons, atomizers, droppers", href: "/bottles", badge: null },
-  { label: "Custom Labels", desc: "Metallic foil, oil-proof vinyl", href: "/custom-labels", badge: null },
-  { label: "Packaging", desc: "Boxes, shrink wrap, seals", href: "/packaging", badge: null },
-  { label: "Testing Supplies", desc: "Strips, blotters, pipettes", href: "/testing", badge: null },
-  { label: "Perfume Making", desc: "Solvents, bases, kits", href: "/perfume-making", badge: null },
-];
-
-const stats = [
-  { value: "1,600+", label: "Fragrance References" },
-  { value: "Grade-A", label: "Uncut Concentrates" },
-  { value: "6 Sizes", label: "Per Fragrance" },
-  { value: "Same-Day", label: "US Dispatch" },
-];
-
 export default function HomePage() {
+  const { t } = useLanguage();
   const [trendingProducts, setTrendingProducts] = useState<TrendingCardItem[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const categories = [
+    { label: t.categories.rawOilsTitle, desc: t.categories.rawOilsDesc, href: "/fragrance", badge: t.categories.kitsBadge },
+    { label: t.categories.bottlesTitle, desc: t.categories.bottlesDesc, href: "/bottles", badge: null },
+    { label: t.categories.labelsTitle, desc: t.categories.labelsDesc, href: "/custom-labels", badge: null },
+    { label: t.categories.packagingTitle, desc: t.categories.packagingDesc, href: "/packaging", badge: null },
+    { label: t.categories.perfumesTitle, desc: t.categories.perfumesDesc, href: "/perfumes", badge: null },
+    { label: t.categories.kitsTitle, desc: t.categories.kitsDesc, href: "/kits", badge: t.categories.kitsBadge },
+  ];
+
+  const stats = [
+    { value: t.stats.referencesCount, label: t.stats.referencesLabel },
+    { value: t.stats.gradeA, label: t.stats.gradeALabel },
+    { value: t.stats.sizes, label: t.stats.sizesLabel },
+    { value: t.stats.sameDay, label: t.stats.sameDayLabel },
+  ];
 
   useEffect(() => {
     async function loadTrendingEssentials() {
@@ -180,15 +182,15 @@ export default function HomePage() {
           </div>
 
           <span className="text-[9px] font-bold tracking-[0.25em] uppercase text-[#2B5F4A] bg-[#E8F0EC] px-3 py-1 rounded-full inline-block mb-2">
-            Wholesale Perfume Compounding
+            {t.hero.eyebrow}
           </span>
 
           <h1 className="text-2xl font-light text-gray-950 font-serif leading-tight mb-2">
-            Todo para Formular Perfumes de Lujo
+            {t.hero.mobileTitle}
           </h1>
 
           <p className="text-xs text-gray-600 max-w-xs mx-auto mb-4 leading-relaxed">
-            Esencias puras Grado A, frascos clínicos, cajas y etiquetas personalizadas para emprendedores y marcas.
+            {t.hero.mobileSubtitle}
           </p>
 
           {/* Action CTAs */}
@@ -197,13 +199,13 @@ export default function HomePage() {
               href="/fragrance"
               className="bg-[#2B5F4A] hover:bg-[#224b3b] text-white text-[11px] font-bold tracking-wider uppercase py-3 px-3 rounded-lg shadow-md transition text-center no-underline flex items-center justify-center"
             >
-              Ver Esencias
+              {t.hero.shopFragrances}
             </Link>
             <Link
               href="/kits"
               className="bg-white hover:bg-gray-50 border border-gray-300 text-gray-900 text-[11px] font-bold tracking-wider uppercase py-3 px-3 rounded-lg shadow-xs transition text-center no-underline flex items-center justify-center"
             >
-              Kits $49.99
+              {t.hero.kitsPromo}
             </Link>
           </div>
 
@@ -218,10 +220,10 @@ export default function HomePage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
             <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-white text-[10px] font-medium">
               <span className="bg-black/50 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/20">
-                1,600+ Concentrados Grado A
+                {t.hero.badgeReferences}
               </span>
               <Link href="/shop" className="text-white hover:underline flex items-center gap-1 font-bold">
-                Ver Catálogo →
+                {t.hero.viewCatalog}
               </Link>
             </div>
           </div>
@@ -244,20 +246,20 @@ export default function HomePage() {
         {/* Floating Call to Action Bar positioned cleanly below the logo */}
         <div className="absolute bottom-8 lg:bottom-12 left-8 lg:left-16 z-20 max-w-md">
           <p className="text-xs lg:text-sm text-gray-900 font-medium mb-3.5 bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg border border-white/70 inline-block shadow-sm">
-            Fragrance oils, bottles, custom labels & packaging for perfume makers.
+            {t.hero.desktopSubtitle}
           </p>
           <div className="flex items-center gap-3">
             <Link
               href="/fragrance"
               className="px-6 py-3.5 bg-[#2B5F4A] hover:bg-[#224b3b] text-white text-xs font-bold tracking-widest uppercase rounded-lg shadow-lg transition text-center no-underline"
             >
-              Shop Fragrances
+              {t.hero.shopFragrances}
             </Link>
             <Link
               href="/shop"
               className="px-6 py-3.5 bg-white/95 hover:bg-white text-gray-900 border border-gray-300 text-xs font-bold tracking-widest uppercase rounded-lg shadow-md transition flex items-center gap-2 text-center no-underline"
             >
-              All Categories <ArrowRight className="w-3.5 h-3.5" />
+              {t.hero.allCategories} <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
@@ -280,16 +282,16 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
           <div className="flex items-end justify-between mb-6 sm:mb-8">
             <div>
-              <p className="text-[10px] font-bold tracking-widest uppercase text-[#2B5F4A] mb-1.5 sm:mb-2">Shop by Category</p>
+              <p className="text-[10px] font-bold tracking-widest uppercase text-[#2B5F4A] mb-1.5 sm:mb-2">{t.categories.sectionTitle}</p>
               <h2 className="text-xl sm:text-2xl lg:text-3xl font-light text-gray-950 tracking-tight m-0">
-                Everything a Perfumer Needs
+                {t.categories.sectionSubtitle}
               </h2>
             </div>
             <Link
               href="/shop"
               className="text-[10px] font-bold tracking-wider uppercase text-gray-500 hover:text-black no-underline flex items-center gap-1.5"
             >
-              View All <ArrowRight className="w-3 h-3" />
+              {t.categories.viewAll}
             </Link>
           </div>
 
@@ -321,14 +323,14 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
           <div className="flex items-end justify-between mb-6 sm:mb-8 pb-4 border-b border-gray-200">
             <div>
-              <p className="text-[10px] font-bold tracking-widest uppercase text-[#2B5F4A] mb-1.5 sm:mb-2">Curated Selection</p>
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-light text-gray-950 tracking-tight m-0">Trending Essentials</h2>
+              <p className="text-[10px] font-bold tracking-widest uppercase text-[#2B5F4A] mb-1.5 sm:mb-2">{t.trending.eyebrow}</p>
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-light text-gray-950 tracking-tight m-0">{t.trending.title}</h2>
             </div>
             <Link
               href="/shop"
               className="text-[10px] font-bold tracking-wider uppercase text-gray-500 hover:text-black no-underline flex items-center gap-1.5"
             >
-              View All <ArrowRight className="w-3 h-3" />
+              {t.trending.viewCatalog}
             </Link>
           </div>
 
@@ -380,7 +382,7 @@ export default function HomePage() {
           ) : (
             <div className="py-12 text-center">
               <p className="text-xs text-gray-500">
-                {loading ? "Loading catalog essentials..." : "No featured products currently active."}
+                {loading ? t.trending.loading : "No featured products currently active."}
               </p>
             </div>
           )}
@@ -391,19 +393,19 @@ export default function HomePage() {
       <section className="bg-[#0E1A14] py-10 sm:py-14 px-4 sm:px-8 lg:px-12">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sm:gap-10">
           <div>
-            <p className="text-[10px] font-bold tracking-widest uppercase text-[#5EAB85] mb-2">Wholesale Scale · US Logistics</p>
+            <p className="text-[10px] font-bold tracking-widest uppercase text-[#5EAB85] mb-2">{t.cta.badge}</p>
             <h2 className="text-2xl sm:text-3xl font-light text-white tracking-tight m-0 mb-2 font-serif">
-              Same-Day Dispatch on Commercial Orders
+              {t.cta.title}
             </h2>
-            <p className="text-xs sm:text-sm text-white/50 font-light m-0 max-w-lg leading-relaxed">
-              Volume tier discounting in real-time. Direct Shippo API with discounted freight across North America.
+            <p className="text-xs sm:text-sm text-white/60 font-light m-0 max-w-lg leading-relaxed">
+              {t.cta.subtitle}
             </p>
           </div>
           <Link
             href="/shop"
             className="w-full sm:w-auto px-8 py-3.5 bg-[#2B5F4A] hover:bg-[#224b3b] text-white text-[11px] font-bold tracking-widest uppercase no-underline shrink-0 text-center transition rounded-md"
           >
-            Browse Full Catalog
+            {t.cta.button}
           </Link>
         </div>
       </section>
