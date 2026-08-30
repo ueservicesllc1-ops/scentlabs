@@ -29,18 +29,18 @@ export default function CartPage() {
   const volumeSavings = summary.discountTotal || 0;
 
   return (
-    <div className="min-h-[80vh] bg-surface text-on-surface font-body-md py-section-gap">
-      <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop space-y-stack-lg">
+    <div className="min-h-[70vh] bg-surface text-on-surface font-body-md py-6 sm:py-10 md:py-14">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
         
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-outline-variant pb-stack-sm gap-2">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-outline-variant pb-3 sm:pb-4 gap-2">
           <div>
             <span className="font-label-caps text-label-caps text-secondary uppercase tracking-[0.2em] block mb-1">
               Your Selection
             </span>
-            <h1 className="font-display-hero text-headline-lg-mobile md:text-headline-lg text-primary uppercase">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-light text-primary uppercase font-serif">
               Shopping Bag
-              <span className="font-body-md text-body-md text-secondary font-light ml-3 normal-case">
+              <span className="text-xs sm:text-sm text-secondary font-normal ml-2.5 normal-case font-sans">
                 ({items.length} {items.length === 1 ? "item" : "items"} &bull; {totalUnits} units)
               </span>
             </h1>
@@ -175,8 +175,8 @@ export default function CartPage() {
             </div>
 
             {/* Sticky Order Summary Sidebar (Stitch 4 Columns) */}
-            <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-stack-md">
-              <div className="p-stack-lg bg-surface-container-lowest border border-outline-variant rounded-sm space-y-stack-md">
+            <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-4">
+              <div className="p-4 sm:p-6 bg-surface-container-lowest border border-outline-variant rounded-sm space-y-4">
                 
                 <h3 className="font-label-caps text-label-caps text-primary uppercase border-b border-outline-variant pb-stack-sm">
                   Order Summary

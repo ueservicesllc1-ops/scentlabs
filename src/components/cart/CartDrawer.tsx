@@ -27,10 +27,10 @@ export function CartDrawer() {
         onClick={() => setIsCartDrawerOpen(false)}
       />
 
-      <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md bg-surface border-l border-outline-variant flex flex-col shadow-2xl">
+      <div className="fixed inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10">
+        <div className="w-screen max-w-full sm:max-w-md bg-surface border-l border-outline-variant flex flex-col shadow-2xl">
           {/* Header */}
-          <div className="px-6 py-5 border-b border-outline-variant flex items-center justify-between bg-surface-container-low">
+          <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-outline-variant flex items-center justify-between bg-surface-container-low">
             <div>
               <h2 className="font-label-caps text-label-caps text-primary uppercase flex items-center gap-2">
                 Order Selection
@@ -185,7 +185,7 @@ export function CartDrawer() {
 
           {/* Footer & Financial Breakdown */}
           {items.length > 0 && (
-            <div className="p-6 border-t border-outline-variant bg-surface-container-low space-y-4">
+            <div className="p-4 sm:p-6 border-t border-outline-variant bg-surface-container-low space-y-3.5 sm:space-y-4">
               {summary.discountTotal > 0 && (
                 <div className="p-2.5 rounded-sm bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-start gap-2">
                   <ShieldCheck className="w-4 h-4 text-emerald-700 flex-shrink-0 mt-0.5" />

@@ -42,48 +42,48 @@ function FooterLink({ href, label }: { href: string; label: string }) {
 
 export function Footer() {
   return (
-    <footer style={{ background: "#0E1A14", color: "rgba(255,255,255,0.6)", fontFamily: "var(--font-body)" }}>
+    <footer className="bg-[#0E1A14] text-white/60 font-sans border-t border-white/10">
       <style>{`
         .footer-link { transition: color 0.15s; }
         .footer-link:hover { color: white !important; }
       `}</style>
 
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "56px 40px 32px", display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 40 }}>
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-12 sm:py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 sm:gap-10">
 
         {/* Brand */}
-        <div>
-          <div style={{ marginBottom: 16 }}>
+        <div className="sm:col-span-2">
+          <div className="mb-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo2.png" alt="SCENTLAB Supply" style={{ height: 50, width: "auto", objectFit: "contain" }} />
+            <img src="/logo2.png" alt="SCENTLAB Supply" className="h-10 sm:h-12 w-auto object-contain" />
           </div>
-          <p style={{ fontSize: 12, fontWeight: 300, lineHeight: 1.7, maxWidth: 280, color: "rgba(255,255,255,0.45)", margin: "0 0 24px" }}>
+          <p className="text-xs font-light leading-relaxed max-w-sm text-white/50 mb-6">
             Wholesale fragrance oils, clinical-grade packaging, and custom labels for artisan perfumers and growing brands.
           </p>
-          <p style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", margin: 0 }}>
+          <p className="text-[11px] text-white/30">
             © {new Date().getFullYear()} ScentLabs Supply. All rights reserved.
           </p>
         </div>
 
         {/* Shop */}
         <div>
-          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", color: "#5EAB85", display: "block", marginBottom: 16 }}>Shop</span>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-[#5EAB85] block mb-3.5">Shop</span>
+          <div className="flex flex-col gap-2.5">
             {shopLinks.map((l) => <FooterLink key={l.href} {...l} />)}
           </div>
         </div>
 
         {/* Company */}
         <div>
-          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", color: "#5EAB85", display: "block", marginBottom: 16 }}>Company</span>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-[#5EAB85] block mb-3.5">Company</span>
+          <div className="flex flex-col gap-2.5">
             {companyLinks.map((l) => <FooterLink key={l.href} {...l} />)}
           </div>
         </div>
 
         {/* Support */}
         <div>
-          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", color: "#5EAB85", display: "block", marginBottom: 16 }}>Support</span>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-[#5EAB85] block mb-3.5">Support</span>
+          <div className="flex flex-col gap-2.5">
             {supportLinks.map((l) => <FooterLink key={l.href} {...l} />)}
           </div>
         </div>
@@ -91,16 +91,16 @@ export function Footer() {
       </div>
 
       {/* Real Traffic Counter Section */}
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 40px 24px", display: "flex", justifyContent: "flex-start", alignItems: "center" }}>
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pb-6 flex justify-start items-center">
         <VisitorCounter />
       </div>
 
       {/* Bottom bar */}
-      <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", padding: "16px 40px", maxWidth: 1280, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-        <p style={{ fontSize: 10, color: "rgba(255,255,255,0.2)", margin: 0, letterSpacing: "0.15em", textTransform: "uppercase" }}>
+      <div className="border-t border-white/10 px-5 sm:px-8 lg:px-12 py-4 max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+        <p className="text-[10px] text-white/30 m-0 tracking-wider uppercase">
           Wholesale Only · B2B Platform
         </p>
-        <p style={{ fontSize: 10, color: "rgba(255,255,255,0.2)", margin: 0 }}>
+        <p className="text-[10px] text-white/30 m-0">
           Secure Checkout · Shippo · Stripe
         </p>
       </div>

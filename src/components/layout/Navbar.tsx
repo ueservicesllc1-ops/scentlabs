@@ -40,26 +40,26 @@ export function Navbar() {
   return (
     <>
       {/* ── Top Announcement Bar ── */}
-      <div style={{ background: "#2B5F4A", color: "rgba(255,255,255,0.95)", padding: "7px 16px", textAlign: "center" }}>
-        <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase" }}>
+      <div className="bg-[#2B5F4A] text-white/95 py-1.5 px-3 sm:px-4 text-center">
+        <p className="text-[9px] sm:text-[10px] font-bold tracking-[0.12em] sm:tracking-[0.2em] uppercase m-0 line-clamp-1">
           Free Shipping on Orders Over $250 &nbsp;·&nbsp; Wholesale Perfume Compounding & Supplies
-        </span>
+        </p>
       </div>
 
       {/* ── Main Top Navbar ── */}
-      <header style={{ background: "rgba(255,255,255,0.98)", backdropFilter: "blur(8px)", position: "sticky", top: 0, zIndex: 50, borderBottom: "1px solid #EEEEEE" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", maxWidth: "1280px", margin: "0 auto", padding: "10px 24px", gap: "20px" }}>
+      <header className="bg-white/98 backdrop-blur-md sticky top-0 z-50 border-b border-[#EEEEEE]">
+        <div className="flex justify-between items-center max-w-7xl mx-auto px-4 sm:px-6 py-2.5 sm:py-3 gap-3 sm:gap-5">
           
           {/* Logo */}
           <Link
             href="/"
-            style={{ display: "flex", alignItems: "center", textDecoration: "none", flexShrink: 0 }}
+            className="flex items-center no-underline shrink-0"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/logo.png?v=10"
-              alt="Logo"
-              style={{ height: "38px", width: "auto", objectFit: "contain", display: "block" }}
+              src="/logo.png?v=12"
+              alt="SCENTLABS Supply"
+              className="h-10 sm:h-12 w-auto object-contain block"
             />
           </Link>
           <nav className="hidden lg:flex items-center gap-5 xl:gap-6 flex-nowrap whitespace-nowrap">
@@ -95,16 +95,16 @@ export function Navbar() {
           </nav>
 
           {/* Actions: Search, Account, Cart */}
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <div className="flex items-center gap-2 sm:gap-3.5">
             
             {/* Search Button */}
             <button
               type="button"
               aria-label="Search"
               onClick={() => setSearchOpen(!searchOpen)}
-              style={{ background: "none", border: "none", cursor: "pointer", color: "#333333", padding: "4px" }}
+              className="p-2 text-gray-700 hover:text-black transition"
             >
-              <Search style={{ width: 18, height: 18 }} />
+              <Search className="w-[18px] h-[18px]" />
             </button>
 
             {/* Admin Shield Access */}
@@ -113,34 +113,33 @@ export function Navbar() {
               aria-label="Admin Shield Access"
               title="Panel de Administración (PIN 1619)"
               onClick={() => setAdminPinModalOpen(true)}
-              style={{ background: "none", border: "none", cursor: "pointer", color: "#2B5F4A", padding: "4px", display: "inline-flex", alignItems: "center" }}
-              className="hover:opacity-80 transition"
+              className="p-2 text-[#2B5F4A] hover:opacity-80 transition"
             >
-              <Shield style={{ width: 18, height: 18 }} />
+              <Shield className="w-[18px] h-[18px]" />
             </button>
 
             {/* Customer Account */}
             <Link
               href="/account"
               aria-label="Customer Account"
-              style={{ color: "#333333", padding: "4px", display: "inline-flex" }}
+              className="p-2 text-gray-700 hover:text-black transition"
             >
-              <User style={{ width: 18, height: 18 }} />
+              <User className="w-[18px] h-[18px]" />
             </Link>
 
             {/* Shopping Cart */}
             <Link
               href="/cart"
               aria-label="Shopping Cart"
-              style={{ color: "#333333", padding: "4px", position: "relative", display: "inline-flex", alignItems: "center" }}
+              className="p-2 text-gray-700 hover:text-black relative inline-flex items-center transition"
             >
-              <ShoppingBag style={{ width: 18, height: 18 }} />
+              <ShoppingBag className="w-[18px] h-[18px]" />
               {itemCount > 0 && (
                 <span
                   style={{
                     position: "absolute",
-                    top: -2,
-                    right: -4,
+                    top: 2,
+                    right: 0,
                     background: "#2B5F4A",
                     color: "white",
                     fontSize: "9px",
@@ -162,11 +161,10 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden"
-              style={{ background: "none", border: "none", cursor: "pointer", color: "#333333", padding: "4px" }}
+              className="lg:hidden p-2 text-gray-800 hover:text-black transition"
               aria-label="Toggle navigation menu"
             >
-              {mobileMenuOpen ? <X style={{ width: 22, height: 22 }} /> : <Menu style={{ width: 22, height: 22 }} />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
 
@@ -174,32 +172,24 @@ export function Navbar() {
 
         {/* Expandable Search Input */}
         {searchOpen && (
-          <div style={{ borderTop: "1px solid #EEEEEE", background: "#FAFAFA", padding: "12px 24px" }}>
-            <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-              <form onSubmit={handleSearchSubmit} style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                <Search style={{ position: "absolute", left: 12, width: 16, height: 16, color: "#888888" }} />
+          <div className="border-t border-[#EEEEEE] bg-[#FAFAFA] px-4 py-3 sm:px-6">
+            <div className="max-w-7xl mx-auto">
+              <form onSubmit={handleSearchSubmit} className="relative flex items-center">
+                <Search className="absolute left-3 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search fragrance oils, glass bottles, packaging boxes, custom labels..."
-                  style={{
-                    width: "100%",
-                    fontSize: "12px",
-                    padding: "9px 36px 9px 36px",
-                    background: "white",
-                    border: "1px solid #DDDDDD",
-                    color: "#111111",
-                    outline: "none",
-                  }}
+                  className="w-full text-xs pl-9 pr-8 py-2 bg-white border border-gray-300 text-gray-900 rounded-md outline-none focus:border-[#2B5F4A]"
                   autoFocus
                 />
                 <button
                   type="button"
                   onClick={() => setSearchOpen(false)}
-                  style={{ position: "absolute", right: 10, background: "none", border: "none", cursor: "pointer", color: "#888888" }}
+                  className="absolute right-2.5 p-1 text-gray-400 hover:text-gray-700"
                 >
-                  <X style={{ width: 14, height: 14 }} />
+                  <X className="w-3.5 h-3.5" />
                 </button>
               </form>
             </div>
@@ -208,41 +198,31 @@ export function Navbar() {
 
         {/* Mobile Menu Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden" style={{ borderTop: "1px solid #EEEEEE", background: "white", padding: "20px 24px" }}>
-            <nav style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: 600,
-                    letterSpacing: "0.15em",
-                    textTransform: "uppercase",
-                    color: "#222222",
-                    padding: "8px 0",
-                    textDecoration: "none",
-                    borderBottom: "1px solid #F0F0F0",
-                  }}
-                >
-                  {link.name}
-                </Link>
-              ))}
+          <div className="lg:hidden border-t border-[#EEEEEE] bg-white px-5 py-4 shadow-lg animate-in slide-in-from-top-2 duration-150">
+            <nav className="flex flex-col space-y-1">
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href || (link.href !== "/" && pathname?.startsWith(link.href));
+                return (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center justify-between text-xs font-semibold uppercase tracking-wider py-3 border-b border-gray-100 ${
+                      isActive ? "text-[#2B5F4A] font-bold" : "text-gray-800 hover:text-black"
+                    }`}
+                  >
+                    <span>{link.name}</span>
+                    <span className="text-gray-400 text-sm">›</span>
+                  </Link>
+                );
+              })}
               <Link
                 href="/account"
                 onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  fontSize: "12px",
-                  fontWeight: 600,
-                  letterSpacing: "0.15em",
-                  textTransform: "uppercase",
-                  color: "#2B5F4A",
-                  padding: "8px 0",
-                  textDecoration: "none",
-                }}
+                className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-[#2B5F4A] py-3.5 pt-4"
               >
-                Mi Cuenta / Portal
+                <span>Mi Cuenta / Portal Mayorista</span>
+                <span>›</span>
               </Link>
             </nav>
           </div>

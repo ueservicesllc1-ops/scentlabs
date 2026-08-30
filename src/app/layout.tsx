@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Bodoni_Moda, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { MobileBottomBar } from "@/components/layout/MobileBottomBar";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { ScentSommelierChat } from "@/components/ai/ScentSommelierChat";
 import { HeroPromoModal } from "@/components/layout/HeroPromoModal";
@@ -27,6 +28,13 @@ const cormorant = Cormorant_Garamond({
   weight: ["300", "400", "500", "600"],
   display: "swap",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#2B5F4A",
+};
 
 export const metadata: Metadata = {
   title: "SCENTLAB | Wholesale Fragrance & Packaging",
@@ -54,15 +62,16 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen bg-surface text-on-surface font-body-md antialiased flex flex-col selection:bg-primary selection:text-on-primary">
+      <body className="min-h-screen bg-surface text-on-surface font-body-md antialiased flex flex-col selection:bg-primary selection:text-on-primary overflow-x-hidden">
         <Suspense fallback={null}>
           <ScrollToTop />
         </Suspense>
         <AuthProvider>
           <CartProvider>
             <Navbar />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 pb-16 lg:pb-0">{children}</main>
             <Footer />
+            <MobileBottomBar />
             <CartDrawer />
             <ScentSommelierChat />
             <HeroPromoModal />

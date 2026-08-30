@@ -63,9 +63,9 @@ export function FragranceCatalog() {
     <div style={{ background: "white", minHeight: "100vh" }}>
 
       {/* ── Page Header ── */}
-      <div className="max-w-screen-xl mx-auto px-6 lg:px-10">
+      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-10">
         <div className="sl-catalog-header">
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
               <span className="sl-catalog-eyebrow">Pure Concentration · Grade-A</span>
               <h1 className="sl-catalog-title">Fragrance Oils</h1>
@@ -74,31 +74,21 @@ export function FragranceCatalog() {
               </p>
             </div>
             {/* Search */}
-            <div style={{ position: "relative", width: "100%", maxWidth: 280 }}>
+            <div className="relative w-full sm:w-72 shrink-0">
               <Search style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", width: 14, height: 14, color: "#8A8A8A" }} />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(1); }}
                 placeholder="Search fragrances…"
-                style={{
-                  width: "100%",
-                  fontSize: 12,
-                  paddingLeft: 36,
-                  paddingRight: search ? 32 : 12,
-                  paddingTop: 8,
-                  paddingBottom: 8,
-                  border: "1px solid var(--sl-gray-light)",
-                  background: "white",
-                  color: "var(--sl-ink)",
-                  outline: "none",
-                }}
-                onFocus={(e) => (e.target.style.borderColor = "var(--sl-green)")}
-                onBlur={(e) => (e.target.style.borderColor = "var(--sl-gray-light)")}
+                className="w-full text-xs pl-9 pr-8 py-2 border border-gray-300 bg-white text-gray-900 rounded-md outline-none focus:border-[#2B5F4A]"
               />
               {search && (
-                <button type="button" onClick={() => setSearch("")}
-                  style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", color: "#8A8A8A", background: "none", border: "none", cursor: "pointer" }}>
+                <button
+                  type="button"
+                  onClick={() => setSearch("")}
+                  style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", color: "#8A8A8A", background: "none", border: "none", cursor: "pointer" }}
+                >
                   <X style={{ width: 13, height: 13 }} />
                 </button>
               )}
@@ -108,55 +98,67 @@ export function FragranceCatalog() {
       </div>
 
       {/* ── Sticky Filter Bar ── */}
-      <div className="sl-filter-bar" style={{ top: 48 }}>
-        <div style={{ display: "flex", alignItems: "center", maxWidth: "100%", paddingLeft: 24, paddingRight: 24, gap: 0, flex: 1 }}>
-
+      <div className="sl-filter-bar sticky z-30 bg-white border-b border-gray-200 top-0">
+        <div className="flex items-center w-full px-3 sm:px-6 overflow-x-auto scrollbar-none gap-1 sm:gap-2">
           {/* Family pills */}
-          {FAMILIES.map((f) => (
-            <button key={f} type="button"
-              className={`sl-filter-pill ${family === f ? "active" : ""}`}
-              onClick={() => { setFamily(f); setPage(1); }}
-            >
-              {f}
-            </button>
-          ))}
-
-          {/* Spacer */}
-          <div style={{ flex: 1 }} />
-
-          {/* Gender */}
-          <select value={gender} onChange={(e) => { setGender(e.target.value); setPage(1); }}
-            style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", border: "none", background: "transparent", color: "var(--sl-gray-mid)", cursor: "pointer", padding: "14px 8px", outline: "none" }}>
-            <option value="all">All</option>
-            <option value="women">Women</option>
-            <option value="men">Men</option>
-            <option value="unisex">Unisex</option>
-          </select>
-
-          <div style={{ width: 1, height: 16, background: "var(--sl-gray-light)", margin: "0 4px" }} />
-
-          {/* Sort */}
-          <select value={sort} onChange={(e) => setSort(e.target.value as any)}
-            style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", border: "none", background: "transparent", color: "var(--sl-gray-mid)", cursor: "pointer", padding: "14px 8px", outline: "none" }}>
-            <option value="name">A–Z</option>
-            <option value="price_asc">Price ↑</option>
-            <option value="price_desc">Price ↓</option>
-          </select>
-
-          {hasFilters && (
-            <>
-              <div style={{ width: 1, height: 16, background: "var(--sl-gray-light)", margin: "0 4px" }} />
-              <button type="button" onClick={reset}
-                style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", border: "none", background: "transparent", color: "#C8963E", cursor: "pointer", padding: "14px 8px" }}>
-                Reset
+          <div className="flex items-center flex-nowrap shrink-0">
+            {FAMILIES.map((f) => (
+              <button
+                key={f}
+                type="button"
+                className={`sl-filter-pill ${family === f ? "active" : ""}`}
+                onClick={() => { setFamily(f); setPage(1); }}
+              >
+                {f}
               </button>
-            </>
-          )}
+            ))}
+          </div>
+
+          <div className="flex-1 min-w-[8px]" />
+
+          {/* Quick Selects in filter bar */}
+          <div className="flex items-center shrink-0">
+            <select
+              value={gender}
+              onChange={(e) => { setGender(e.target.value); setPage(1); }}
+              className="text-[10px] font-semibold tracking-wider uppercase border-none bg-transparent text-gray-500 cursor-pointer py-3.5 px-2 outline-none"
+            >
+              <option value="all">All</option>
+              <option value="women">Women</option>
+              <option value="men">Men</option>
+              <option value="unisex">Unisex</option>
+            </select>
+
+            <div className="w-[1px] h-4 bg-gray-200 mx-1" />
+
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value as any)}
+              className="text-[10px] font-semibold tracking-wider uppercase border-none bg-transparent text-gray-500 cursor-pointer py-3.5 px-2 outline-none"
+            >
+              <option value="name">A–Z</option>
+              <option value="price_asc">Price ↑</option>
+              <option value="price_desc">Price ↓</option>
+            </select>
+
+            {hasFilters && (
+              <>
+                <div className="w-[1px] h-4 bg-gray-200 mx-1" />
+                <button
+                  type="button"
+                  onClick={reset}
+                  className="text-[10px] font-semibold tracking-wider uppercase border-none bg-transparent text-[#C8963E] cursor-pointer py-3.5 px-2"
+                >
+                  Reset
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
       {/* ── Grid ── */}
-      <div className="max-w-screen-xl mx-auto px-6 lg:px-10 py-8">
+      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-10 py-6 sm:py-8">
 
         <p style={{ fontSize: 10, color: "var(--sl-gray-mid)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 20 }}>
           {loading ? "Loading…" : `${filtered.length.toLocaleString()} references`}
@@ -179,7 +181,7 @@ export function FragranceCatalog() {
         ) : (
           <>
             {/* Responsive grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3.5 sm:gap-5">
               {paginated.map((frag) => (
                 <FragranceCard key={frag.id} fragrance={frag} />
               ))}

@@ -241,15 +241,15 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-section-gap font-body-md text-on-surface space-y-stack-lg">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 md:py-14 font-body-md text-on-surface space-y-6 sm:space-y-8">
       
       {/* Header */}
-      <div className="border-b border-outline-variant pb-4 flex justify-between items-end">
+      <div className="border-b border-outline-variant pb-3 sm:pb-4 flex justify-between items-end">
         <div>
           <span className="font-label-caps text-label-caps text-secondary uppercase tracking-[0.2em] block mb-1">
             Secure Fulfillment
           </span>
-          <h1 className="font-display-hero text-headline-lg-mobile md:text-headline-md text-primary uppercase">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-light text-primary uppercase font-serif">
             Secure Checkout
           </h1>
         </div>

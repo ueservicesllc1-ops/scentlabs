@@ -484,6 +484,27 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
           </div>
         )}
 
+        {/* Sticky Mobile Add To Cart Bar */}
+        <div className="lg:hidden fixed bottom-16 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-gray-200 px-4 py-2.5 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] flex items-center justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold text-gray-900 truncate m-0">{product.name}</p>
+            <p className="text-sm font-extrabold text-[#2B5F4A] m-0 font-mono">${currentTotal.toFixed(2)}</p>
+          </div>
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 shadow-xs ${
+              added ? "bg-emerald-700 text-white" : "bg-gray-950 hover:bg-gray-800 text-white active:scale-95"
+            }`}
+          >
+            {added ? (
+              <><Check className="w-3.5 h-3.5" /> Agregado</>
+            ) : (
+              <><ShoppingBag className="w-3.5 h-3.5" /> Agregar</>
+            )}
+          </button>
+        </div>
+
       </div>
     </div>
   );

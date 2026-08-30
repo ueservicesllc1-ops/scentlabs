@@ -166,28 +166,11 @@ export function HeroPromoModal() {
             </span>
           </div>
 
-          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center">
             <Link
               href="/kits"
               onClick={() => setIsOpen(false)}
-              style={{
-                flex: 1,
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-                backgroundColor: "#2B5F4A",
-                color: "#ffffff",
-                padding: "14px 20px",
-                borderRadius: 10,
-                fontSize: 13,
-                fontWeight: 700,
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                textDecoration: "none",
-                boxShadow: "0 6px 20px rgba(43, 95, 74, 0.4)",
-                transition: "all 0.2s ease",
-              }}
+              className="flex-1 inline-flex items-center justify-center gap-2 bg-[#2B5F4A] hover:bg-[#224b3b] text-white py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold tracking-wide uppercase no-underline shadow-lg transition"
             >
               <ShoppingBag size={16} />
               <span>Ver Kits y Elegir Fragancias</span>
@@ -196,17 +179,7 @@ export function HeroPromoModal() {
 
             <button
               onClick={() => setIsOpen(false)}
-              style={{
-                padding: "14px 18px",
-                backgroundColor: "rgba(255, 255, 255, 0.06)",
-                border: "1px solid rgba(255, 255, 255, 0.15)",
-                color: "rgba(255, 255, 255, 0.8)",
-                borderRadius: 10,
-                fontSize: 12,
-                fontWeight: 600,
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-              }}
+              className="py-3 px-4 bg-white/10 hover:bg-white/15 border border-white/20 text-white/80 rounded-xl text-xs font-semibold cursor-pointer transition text-center"
             >
               Cerrar
             </button>

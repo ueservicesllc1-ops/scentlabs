@@ -241,21 +241,21 @@ export function ScentSommelierChat() {
   return (
     <>
       {/* ━━━━ FLOATING TRIGGER BUTTON ━━━━ */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+      <div className="fixed bottom-20 sm:bottom-6 right-3 sm:right-6 z-40 flex flex-col items-end">
         {!isOpen && (
           <button
             type="button"
             onClick={() => setIsOpen(true)}
-            className="group flex items-center gap-2.5 px-4 py-3 bg-[#2B5F4A] hover:bg-[#1E4233] text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 border border-[#3E8064]/50"
+            className="group flex items-center gap-2 px-3.5 py-2.5 sm:px-4 sm:py-3 bg-[#2B5F4A] hover:bg-[#1E4233] text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 border border-[#3E8064]/50"
             aria-label="Abrir Asesor Experto en Perfumería"
           >
             <div className="relative flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-amber-300 animate-pulse" />
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300 animate-pulse" />
             </div>
             <div className="text-left">
-              <span className="block text-xs font-bold tracking-wide">Experto en Perfumes</span>
-              <span className="block text-[10px] text-emerald-200/90 font-light -mt-0.5">
-                Asesoría y Ayuda en vivo
+              <span className="block text-[11px] sm:text-xs font-bold tracking-wide">Experto</span>
+              <span className="hidden sm:block text-[10px] text-emerald-200/90 font-light -mt-0.5">
+                Asesoría en vivo
               </span>
             </div>
           </button>
@@ -264,7 +264,7 @@ export function ScentSommelierChat() {
 
       {/* ━━━━ CHAT MODAL WINDOW ━━━━ */}
       {isOpen && (
-        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-[calc(100vw-32px)] sm:w-[420px] h-[600px] max-h-[calc(100vh-80px)] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200 font-sans">
+        <div className="fixed inset-x-3 bottom-20 top-16 sm:inset-auto sm:bottom-6 sm:right-6 z-50 sm:w-[420px] sm:h-[600px] sm:max-h-[calc(100vh-80px)] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200 font-sans">
           
           {/* Header */}
           <div className="bg-[#2B5F4A] text-white px-4 py-3 flex items-center justify-between shadow-xs">
