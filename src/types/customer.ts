@@ -34,6 +34,7 @@ export interface Customer {
   firstName?: string;
   lastName?: string;
   displayName?: string;
+  company?: string;
   businessName?: string;
   phone?: string;
   photoFileId?: string;

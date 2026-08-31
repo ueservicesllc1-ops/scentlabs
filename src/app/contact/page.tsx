@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   Building2,
   Headphones
+} from "lucide-react";
 import { contactMessageService } from "@/lib/firestore/contact-messages";
 
 export default function ContactPage() {

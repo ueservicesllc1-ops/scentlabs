@@ -21,6 +21,7 @@ const bodoni = Bodoni_Moda({
   subsets: ["latin"],
   variable: "--font-bodoni",
   display: "swap",
+  adjustFontFallback: false,
 });
 
 const cormorant = Cormorant_Garamond({
@@ -28,6 +29,7 @@ const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
   weight: ["300", "400", "500", "600"],
   display: "swap",
+  adjustFontFallback: false,
 });
 
 export const viewport: Viewport = {

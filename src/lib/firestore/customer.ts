@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, setDoc, deleteDoc, query, where, orderBy, updateDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, setDoc, deleteDoc, query, where, orderBy, updateDoc, limit } from "firebase/firestore";
 import { db } from "../firebase/client";
 import { Customer, CustomerAddress, CustomerNotification } from "@/types/customer";
 import { isFirebaseConfigured } from "../firebase/config";
@@ -60,6 +60,7 @@ export const customerRepository = {
         lastName: "Villar",
         company: "Villar Fragrances LLC",
         phone: "+1 (305) 555-0144",
+        role: "customer",
         createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
         updatedAt: new Date().toISOString(),
       },
@@ -70,6 +71,7 @@ export const customerRepository = {
         lastName: "Pérez",
         company: "Georgina Perfumery",
         phone: "+1 (786) 555-0899",
+        role: "customer",
         createdAt: new Date(Date.now() - 86400000 * 12).toISOString(),
         updatedAt: new Date().toISOString(),
       },
@@ -80,6 +82,7 @@ export const customerRepository = {
         lastName: "Mendoza",
         company: "Artisan Lab Miami",
         phone: "+1 (305) 555-0721",
+        role: "customer",
         createdAt: new Date(Date.now() - 86400000 * 25).toISOString(),
         updatedAt: new Date().toISOString(),
       },

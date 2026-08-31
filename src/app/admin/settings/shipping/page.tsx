@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { AdminGuard } from "@/components/auth/AdminGuard";
-import { shippingSettingsRepository } from "@/lib/firestore/shipping-settings";
+import { shippingSettingsRepository, DEFAULT_SHIPPING_ORIGIN, DEFAULT_PARCEL } from "@/lib/firestore/shipping-settings";
 import { ShippingSettings, ShippingOrigin, ParcelDimensions } from "@/types/shipping";
 import { 
   Truck, 
@@ -21,23 +21,23 @@ export default function AdminShippingSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Origin fields
-  const [name, setName] = useState("");
-  const [company, setCompany] = useState("");
-  const [street1, setStreet1] = useState("");
-  const [street2, setStreet2] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [zip, setZip] = useState("");
-  const [country, setCountry] = useState("US");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
+  // Origin fields prefilled with default Paterson NJ warehouse address
+  const [name, setName] = useState(DEFAULT_SHIPPING_ORIGIN.name);
+  const [company, setCompany] = useState(DEFAULT_SHIPPING_ORIGIN.company);
+  const [street1, setStreet1] = useState(DEFAULT_SHIPPING_ORIGIN.street1);
+  const [street2, setStreet2] = useState(DEFAULT_SHIPPING_ORIGIN.street2 || "");
+  const [city, setCity] = useState(DEFAULT_SHIPPING_ORIGIN.city);
+  const [state, setState] = useState(DEFAULT_SHIPPING_ORIGIN.state);
+  const [zip, setZip] = useState(DEFAULT_SHIPPING_ORIGIN.zip);
+  const [country, setCountry] = useState(DEFAULT_SHIPPING_ORIGIN.country);
+  const [phone, setPhone] = useState(DEFAULT_SHIPPING_ORIGIN.phone);
+  const [email, setEmail] = useState(DEFAULT_SHIPPING_ORIGIN.email);
 
   // Default parcel fields
-  const [weight, setWeight] = useState(1.5);
-  const [length, setLength] = useState(8);
-  const [width, setWidth] = useState(6);
-  const [height, setHeight] = useState(4);
+  const [weight, setWeight] = useState(DEFAULT_PARCEL.weight);
+  const [length, setLength] = useState(DEFAULT_PARCEL.length);
+  const [width, setWidth] = useState(DEFAULT_PARCEL.width);
+  const [height, setHeight] = useState(DEFAULT_PARCEL.height);
 
   const loadSettings = async () => {
     const s = await shippingSettingsRepository.getSettings();
