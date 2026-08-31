@@ -135,7 +135,7 @@ export const translations: Record<Language, Translations> = {
     common: {
       announcement: "Envío gratis en órdenes superiores a $250 · Suministros y Mezcla de Perfumería al Por Mayor",
       announcementFacility: "Laboratorio Directo",
-      announcementLocation: "Miami, FL",
+      announcementLocation: "New Jersey, NJ",
       search: "Buscar",
       searchPlaceholder: "Buscar fragancias, frascos, insumos...",
       account: "Cuenta",
@@ -221,7 +221,7 @@ export const translations: Record<Language, Translations> = {
       button: "Comenzar con un Asesor",
     },
     footer: {
-      brandTagline: "Suministros mayoristas directos de laboratorio para perfumistas, marcas de autor e industrias aromáticas. Miami, Florida.",
+      brandTagline: "Suministros mayoristas directos de laboratorio para perfumistas, marcas de autor e industrias aromáticas. New Jersey, United States.",
       catalogCol: "Catálogo",
       packagingCol: "Empaque y Marca",
       supportCol: "Soporte",
@@ -264,7 +264,7 @@ export const translations: Record<Language, Translations> = {
     common: {
       announcement: "Free shipping on orders over $250 · Wholesale Perfume Compounding & Supplies",
       announcementFacility: "Direct Compounding Facility",
-      announcementLocation: "Miami, FL",
+      announcementLocation: "New Jersey, NJ",
       search: "Search",
       searchPlaceholder: "Search fragrances, bottles, supplies...",
       account: "Account",
@@ -350,7 +350,7 @@ export const translations: Record<Language, Translations> = {
       button: "Talk to a Perfume Specialist",
     },
     footer: {
-      brandTagline: "Direct lab compounding supplies for perfumers, artisanal brands and scent designers. Miami, Florida.",
+      brandTagline: "Direct lab compounding supplies for perfumers, artisanal brands and scent designers. New Jersey, United States.",
       catalogCol: "Catalog",
       packagingCol: "Packaging & Branding",
       supportCol: "Support",

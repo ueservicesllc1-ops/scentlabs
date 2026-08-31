@@ -121,8 +121,8 @@ export default function AdminPurchaseDetailPage() {
                 SCENTLAB FORMULATIONS
               </div>
               <div className="text-[11px] text-lab-400 print:text-gray-600 mt-1">
-                2000 NW 84th Ave, Suite 100<br />
-                Miami, FL 33122 • United States<br />
+                ScentLabs Direct Lab Facility<br />
+                New Jersey, NJ • United States<br />
                 procurement@scentlab.com
               </div>
             </div>
