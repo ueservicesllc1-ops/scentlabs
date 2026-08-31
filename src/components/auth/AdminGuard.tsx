@@ -28,7 +28,9 @@ import {
   AlertTriangle,
   FileText,
   MessageSquare,
-  Wine
+  Wine,
+  Users,
+  Inbox
 } from "lucide-react";
 
 const AUTHORIZED_ADMIN_EMAIL = "ueservicesllc1@gmail.com";
@@ -48,6 +50,15 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Dashboard",
     items: [
       { title: "Operations Hub", href: "/admin", icon: LayoutDashboard, exact: true },
+    ],
+  },
+  {
+    label: "Customers & Orders",
+    items: [
+      { title: "Orders (Compras)", href: "/admin/orders", icon: ShoppingCart },
+      { title: "Registered Users", href: "/admin/users", icon: Users },
+      { title: "Contact Messages", href: "/admin/messages", icon: Inbox },
+      { title: "Live Support Chat", href: "/admin/chat", icon: MessageSquare },
     ],
   },
   {
@@ -73,17 +84,10 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    label: "Orders & Live Support",
-    items: [
-      { title: "Live Chat & Soporte", href: "/admin/chat", icon: MessageSquare },
-      { title: "Orders Management", href: "/admin/orders", icon: ShoppingCart },
-      { title: "Shipping Origin", href: "/admin/settings/shipping", icon: Truck },
-    ],
-  },
-  {
     label: "Marketing & System",
     items: [
       { title: "Label Pricing Matrix", href: "/admin/custom-labels/pricing", icon: DollarSign },
+      { title: "Shipping Origin", href: "/admin/settings/shipping", icon: Truck },
       { title: "Email System Logs", href: "/admin/emails", icon: Mail },
       { title: "API Integrations", href: "/admin/settings/integrations", icon: ShieldCheck },
       { title: "System Audit Logs", href: "/admin/audit-logs", icon: ShieldAlert },

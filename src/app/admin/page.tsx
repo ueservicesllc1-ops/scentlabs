@@ -6,6 +6,7 @@ import { INITIAL_PRODUCTS, SHRINK_WRAP_VARIANTS } from "@/data/products";
 import { INITIAL_CATEGORIES } from "@/config/categories";
 import { formatCurrency, formatUnitPrice, calculateMarginPercentage } from "@/lib/utils";
 import { AdminGuard } from "@/components/auth/AdminGuard";
+import { AdminQuickNav } from "@/components/admin/AdminQuickNav";
 import { seedProducts, seedCategories } from "@/lib/firestore/seed";
 import { Product, ProductPackage, VolumePriceTier } from "@/types";
 import { 
@@ -89,8 +90,11 @@ export default function AdminDashboardPage() {
 
   return (
     <AdminGuard>
-      <div className="space-y-8 font-sans">
+      <div className="space-y-6 font-sans">
         
+        {/* Quick Nav Bar */}
+        <AdminQuickNav />
+
         {/* ━━━━ HEADER & SUB-TABS ━━━━ */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 pb-6 border-b border-gray-200">
           <div>

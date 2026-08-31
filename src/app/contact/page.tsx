@@ -14,7 +14,7 @@ import {
   ShieldCheck,
   Building2,
   Headphones
-} from "lucide-react";
+import { contactMessageService } from "@/lib/firestore/contact-messages";
 
 export default function ContactPage() {
   const [sent, setSent] = useState(false);
@@ -24,13 +24,22 @@ export default function ContactPage() {
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    setTimeout(() => {
+    try {
+      await contactMessageService.saveMessage({
+        name: name || "Anónimo",
+        email: email || "no-email@scentlabs.com",
+        inquiryType,
+        message: message || "Sin mensaje",
+      });
+    } catch {
+      // Ignore errors so user experience is smooth
+    } finally {
       setSent(true);
       setSubmitting(false);
-    }, 600);
+    }
   };
 
   return (

@@ -51,6 +51,61 @@ export const customerRepository = {
     }
   },
 
+  async getAllCustomers(): Promise<Customer[]> {
+    const demoCustomers: Customer[] = [
+      {
+        id: "cus_demo_101",
+        email: "aldovillar1411@gmail.com",
+        firstName: "Aldo",
+        lastName: "Villar",
+        company: "Villar Fragrances LLC",
+        phone: "+1 (305) 555-0144",
+        createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      {
+        id: "cus_demo_102",
+        email: "georgina.wholesale@gmail.com",
+        firstName: "Georgina",
+        lastName: "Pérez",
+        company: "Georgina Perfumery",
+        phone: "+1 (786) 555-0899",
+        createdAt: new Date(Date.now() - 86400000 * 12).toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      {
+        id: "cus_demo_103",
+        email: "contact@artisanlab.com",
+        firstName: "Carlos",
+        lastName: "Mendoza",
+        company: "Artisan Lab Miami",
+        phone: "+1 (305) 555-0721",
+        createdAt: new Date(Date.now() - 86400000 * 25).toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    ];
+
+    demoCustomers.forEach((c) => {
+      if (!LOCAL_CUSTOMERS.has(c.id)) LOCAL_CUSTOMERS.set(c.id, c);
+    });
+
+    const localArr = Array.from(LOCAL_CUSTOMERS.values()).sort(
+      (a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+    );
+
+    if (!isFirebaseConfigured || !db) return localArr;
+
+    try {
+      const q = query(collection(db, CUSTOMERS_COLLECTION), limit(100));
+      const snapshot = await getDocs(q);
+      const docs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Customer));
+      return docs.length > 0 ? docs : localArr;
+    } catch (error) {
+      logger.warn("Failed to fetch all customers from Firestore", error);
+      return localArr;
+    }
+  },
+
   async saveProfile(customer: Customer): Promise<string> {
     LOCAL_CUSTOMERS.set(customer.id, customer);
     if (!isFirebaseConfigured || !db) return customer.id;

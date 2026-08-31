@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { AdminGuard } from "@/components/auth/AdminGuard";
+import { AdminQuickNav } from "@/components/admin/AdminQuickNav";
 import { orderRepository } from "@/lib/firestore/orders";
 import { Order, OrderStatus, PaymentStatus } from "@/types";
 import { formatCurrency, formatUnitPrice } from "@/lib/utils";
@@ -64,8 +65,11 @@ export default function AdminOrdersPage() {
 
   return (
     <AdminGuard>
-      <div className="space-y-8 font-sans">
+      <div className="space-y-6 font-sans">
         
+        {/* Quick Nav Bar */}
+        <AdminQuickNav />
+
         {/* ━━━━ HEADER ━━━━ */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 pb-6 border-b border-gray-200">
           <div>
